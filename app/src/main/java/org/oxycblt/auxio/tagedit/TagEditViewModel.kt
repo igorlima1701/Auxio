@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.oxycblt.auxio.music.MusicRepository
+import org.oxycblt.auxio.playback.state.PlaybackStateManager
 import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.musikr.Album
 import org.oxycblt.musikr.Music
@@ -65,6 +66,7 @@ class TagEditViewModel
 constructor(
     @ApplicationContext private val context: Context,
     private val musicRepository: MusicRepository,
+    private val playbackManager: PlaybackStateManager,
 ) : ViewModel() {
     private val editor = TagEditor(context)
     private var songs = listOf<Song>()
@@ -134,9 +136,17 @@ constructor(
                 songs.map { it.album }.distinct().forEach { AlbumRatings.rememberForRetag(it) }
             }
             val failures = mutableListOf<String>()
+            // Gravar o arquivo que o player está usando pode interromper a música; essa fica de fora.
+            val playing = playbackManager.currentSong
             withContext(Dispatchers.IO) {
                 songs.forEachIndexed { i, song ->
                     state.value = TagEditState.Saving(i, songs.size)
+                    if (song == playing) {
+                        failures +=
+                            "• ${song.path.name ?: song.uri}: está tocando agora; " +
+                                "passe para outra música e grave de novo"
+                        return@forEachIndexed
+                    }
                     val error = editor.write(song.uri, song.path.name ?: "", edits)
                     if (error != null) failures += "• ${song.path.name ?: song.uri}: $error"
                 }

@@ -42,7 +42,8 @@ import timber.log.Timber as L
  * @author Alexander Capehart (OxygenCobalt)
  */
 @AndroidEntryPoint
-class QueueFragment : ViewBindingFragment<FragmentQueueBinding>(), EditClickListListener<Song> {
+class QueueFragment :
+    ViewBindingFragment<FragmentQueueBinding>(), EditClickListListener<Song>, QueueMenuOpener {
     private val queueModel: QueueViewModel by viewModels()
     private val playbackModel: PlaybackViewModel by activityViewModels()
     private val queueAdapter = QueueAdapter(this)
@@ -95,6 +96,11 @@ class QueueFragment : ViewBindingFragment<FragmentQueueBinding>(), EditClickList
 
     override fun onClick(item: Song, viewHolder: RecyclerView.ViewHolder) {
         queueModel.goto(viewHolder.bindingAdapterPosition)
+    }
+
+    override fun openQueueMenu(song: Song, index: Int) {
+        if (index == RecyclerView.NO_POSITION) return
+        QueueItemMenuDialog.show(childFragmentManager, song, index)
     }
 
     override fun onPickUp(viewHolder: RecyclerView.ViewHolder) {

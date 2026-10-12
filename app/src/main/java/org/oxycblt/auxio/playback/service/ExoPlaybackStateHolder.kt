@@ -18,6 +18,9 @@
  
 package org.oxycblt.auxio.playback.service
 
+import org.oxycblt.auxio.playback.PlayHistory
+import org.oxycblt.auxio.playback.StopAfterSong
+
 import android.content.Context
 import android.content.Intent
 import android.media.audiofx.AudioEffect
@@ -96,6 +99,7 @@ class ExoPlaybackStateHolder(
         playbackManager.registerStateHolder(this)
         musicRepository.addUpdateListener(this)
         player.addListener(this)
+        StopAfterSong.listener = { updatePauseOnRepeat() }
         replayGainProcessor.attach()
         playbackSettings.registerListener(this)
         imageSettings.registerListener(this)
@@ -106,6 +110,7 @@ class ExoPlaybackStateHolder(
         playbackManager.unregisterStateHolder(this)
         musicRepository.removeUpdateListener(this)
         player.removeListener(this)
+        StopAfterSong.listener = null
         replayGainProcessor.release()
         imageSettings.unregisterListener(this)
         playbackSettings.unregisterListener(this)
@@ -465,8 +470,21 @@ class ExoPlaybackStateHolder(
 
     // --- PLAYER OVERRIDES ---
 
+    /** Fork pessoal: música já contada no histórico ao pausar no fim dela. */
+    private var countedAtPause: org.oxycblt.musikr.Music.UID? = null
+
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
         super.onPlayWhenReadyChanged(playWhenReady, reason)
+
+        // Fork pessoal: a música marcada terminou e o player pausou; a marcação vale só uma vez.
+        if (!playWhenReady && reason == Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
+            // Pausou no fim da música (parar depois desta / pausar ao repetir): ela tocou inteira.
+            playbackManager.currentSong?.let {
+                PlayHistory.record(it.uid)
+                countedAtPause = it.uid
+            }
+            if (StopAfterSong.target.value != null) StopAfterSong.set(null)
+        }
 
         if (player.playWhenReady) {
             // Mark that we have started playing so that the notification can now be posted.
@@ -490,6 +508,10 @@ class ExoPlaybackStateHolder(
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
 
+        if (playbackState == Player.STATE_ENDED) {
+            // Fork pessoal: a última música da fila tocou até o fim.
+            playbackManager.currentSong?.let { PlayHistory.record(it.uid) }
+        }
         if (playbackState == Player.STATE_ENDED && player.repeatMode == Player.REPEAT_MODE_OFF) {
             goto(0)
             player.pause()
@@ -499,6 +521,17 @@ class ExoPlaybackStateHolder(
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
 
+        if (
+            reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO ||
+                reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
+        ) {
+            // Fork pessoal: a música anterior tocou até o fim; conta no histórico (a não ser que já
+            // tenha sido contada ao pausar no fim dela).
+            playbackManager.currentSong?.let {
+                if (it.uid != countedAtPause) PlayHistory.record(it.uid)
+            }
+            countedAtPause = null
+        }
         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
             playbackManager.ack(this, StateAck.IndexMoved)
             deferSave()
@@ -519,6 +552,9 @@ class ExoPlaybackStateHolder(
         ) {
             L.d("Player state changed, must synchronize state")
             playbackManager.ack(this, StateAck.ProgressionChanged)
+        }
+        if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
+            updatePauseOnRepeat()
         }
     }
 
@@ -559,8 +595,12 @@ class ExoPlaybackStateHolder(
     }
 
     private fun updatePauseOnRepeat() {
+        // Fork pessoal: também pausa ao fim da música marcada com "Parar depois desta música".
+        val stopHere =
+            StopAfterSong.target.value?.let { it == playbackManager.currentSong?.uid } ?: false
         player.pauseAtEndOfMediaItems =
-            player.repeatMode == Player.REPEAT_MODE_ONE && playbackSettings.pauseOnRepeat
+            (player.repeatMode == Player.REPEAT_MODE_ONE && playbackSettings.pauseOnRepeat) ||
+                stopHere
     }
 
     private fun save(cb: () -> Unit) {

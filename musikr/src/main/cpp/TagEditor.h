@@ -52,6 +52,13 @@ namespace tagedit {
     bool readFields(const char *path, TagLib::String &format, std::vector<Field> &out);
 
     /*
+     * Fork pessoal: informações extras para a tela "Informações da música" (compositor, letrista,
+     * comentário, bits por amostra, canais, codificação, sample rate). Só leitura; aceita qualquer
+     * formato que o TagLib reconheça.
+     */
+    bool readInfo(const char *path, std::vector<Field> &out);
+
+    /*
      * Grava [edits] em [work] (uma cópia exata de [original]) e confere o resultado.
      * Retorna string vazia se tudo deu certo, ou a descrição do problema.
      */

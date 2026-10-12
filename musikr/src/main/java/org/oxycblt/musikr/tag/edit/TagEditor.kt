@@ -36,7 +36,10 @@ enum class TagField(val key: String) {
     TRACK("TRACKNUMBER"),
     DISC("DISCNUMBER"),
     GENRE("GENRE"),
-    COMMENT("COMMENT");
+    COMMENT("COMMENT"),
+
+    /** Fork pessoal: nota do álbum (0 a 5), campo personalizado. Não aparece no editor. */
+    ALBUM_RATING("ALBUMRATING");
 
     companion object {
         fun fromKey(key: String) = entries.find { it.key == key }
@@ -88,6 +91,26 @@ class TagEditor(private val context: Context) {
             original.delete()
         }
     }
+
+    /**
+     * Fork pessoal: informações extras da música (compositor, letrista, comentário, bits por
+     * amostra, canais, codificação, sample rate). Lê o arquivo direto, sem copiar.
+     */
+    fun info(uri: Uri): Map<String, String> =
+        try {
+            context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+                val raw = TagEditorJNI.info("/proc/self/fd/${pfd.fd}")
+                val out = mutableMapOf<String, String>()
+                var i = 0
+                while (i + 1 < raw.size) {
+                    out[raw[i]] = raw[i + 1].fixWindows1252()
+                    i += 2
+                }
+                out
+            } ?: emptyMap()
+        } catch (e: Exception) {
+            emptyMap()
+        }
 
     /**
      * Grava [edits] no arquivo [uri]. Retorna null se deu certo, ou a descrição do problema (e nesse
@@ -193,6 +216,10 @@ internal object TagEditorJNI {
     }
 
     fun read(path: String): Array<String> = readNative(path)
+
+    fun info(path: String): Array<String> = infoNative(path)
+
+    private external fun infoNative(path: String): Array<String>
 
     fun write(original: String, work: String, keys: Array<String>, values: Array<String>): String =
         writeNative(original, work, keys, values)

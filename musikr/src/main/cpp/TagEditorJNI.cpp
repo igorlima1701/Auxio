@@ -111,3 +111,28 @@ Java_org_oxycblt_musikr_tag_edit_TagEditorJNI_writeNative(JNIEnv *env, jobject /
     }
     return toJava(env, result);
 }
+
+/* Fork pessoal: informações extras da música, como [chave1, valor1, chave2, valor2, ...]. */
+extern "C" JNIEXPORT jobjectArray JNICALL
+Java_org_oxycblt_musikr_tag_edit_TagEditorJNI_infoNative(JNIEnv *env, jobject /* this */,
+        jstring path) {
+    std::vector<tagedit::Field> fields;
+    try {
+        tagedit::readInfo(pathOf(env, path).c_str(), fields);
+    } catch (std::exception &e) {
+        fields.clear();
+    }
+    jclass stringClass = env->FindClass("java/lang/String");
+    jobjectArray out = env->NewObjectArray(static_cast<jsize>(fields.size() * 2), stringClass,
+            nullptr);
+    jsize i = 0;
+    for (const auto &f: fields) {
+        jstring k = toJava(env, f.key);
+        jstring v = toJava(env, f.value);
+        env->SetObjectArrayElement(out, i++, k);
+        env->SetObjectArrayElement(out, i++, v);
+        env->DeleteLocalRef(k);
+        env->DeleteLocalRef(v);
+    }
+    return out;
+}

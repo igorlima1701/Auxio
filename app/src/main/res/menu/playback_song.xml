@@ -16,8 +16,8 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_detail"
-        android:icon="@drawable/ic_details_24"
-        android:title="@string/lbl_song_detail"
+        android:icon="@drawable/ic_info_24"
+        android:title="@string/lbl_song_info"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_share"

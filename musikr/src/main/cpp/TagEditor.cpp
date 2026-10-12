@@ -47,7 +47,8 @@ using TagLib::StringList;
 namespace tagedit {
 
     const char *const KEYS[] = {"TITLE", "ARTIST", "ALBUMARTIST", "ALBUM", "DATE",
-                                "ORIGINALDATE", "TRACKNUMBER", "DISCNUMBER", "GENRE", "COMMENT"};
+                                "ORIGINALDATE", "TRACKNUMBER", "DISCNUMBER", "GENRE", "COMMENT",
+                                "ALBUMRATING"};
     const int KEY_COUNT = sizeof(KEYS) / sizeof(KEYS[0]);
 
     namespace {
@@ -250,6 +251,15 @@ namespace tagedit {
                 removeTxxxFor(tag, edit.key);
                 if (edit.key == "COMMENT") {
                     setId3Comment(tag, edit.value.stripWhiteSpace(), version);
+                } else if (edit.key == "ALBUMRATING") {
+                    // Campo personalizado: quadro TXXX "ALBUMRATING" (o antigo já foi removido).
+                    if (!values.isEmpty()) {
+                        auto *txxx = new TagLib::ID3v2::UserTextIdentificationFrame(
+                                encodingFor(nullptr, values, version));
+                        txxx->setDescription("ALBUMRATING");
+                        txxx->setText(values);
+                        tag->addFrame(txxx);
+                    }
                 } else {
                     ByteVector id = id3FrameFor(edit.key);
                     if (id.isEmpty()) return "campo desconhecido: " + edit.key;
@@ -593,6 +603,63 @@ namespace tagedit {
         TagLib::PropertyMap props = ref->file()->properties();
         for (int i = 0; i < KEY_COUNT; i++) {
             out.push_back({KEYS[i], join(currentValues(props, KEYS[i]))});
+        }
+        return true;
+    }
+
+    bool readInfo(const char *path, std::vector<Field> &out) {
+        TagLib::FileRef ref(path, true, TagLib::AudioProperties::Average);
+        if (ref.isNull()) return false;
+        TagLib::File *file = ref.file();
+        TagLib::PropertyMap props = file->properties();
+        auto first = [&](const char *key) {
+            auto it = props.find(key);
+            return it != props.end() ? join(it->second) : String();
+        };
+        out.push_back({"COMPOSER", first("COMPOSER")});
+        out.push_back({"LYRICIST", first("LYRICIST")});
+        out.push_back({"COMMENT", join(currentValues(props, "COMMENT"))});
+        out.push_back({"ALBUMRATING", first("ALBUMRATING")});
+
+        auto *audio = file->audioProperties();
+        if (audio != nullptr) {
+            out.push_back({"SAMPLERATE", String::number(audio->sampleRate())});
+            out.push_back({"BITRATE", String::number(audio->bitrate())});
+            int channels = audio->channels();
+            String channelText = channels == 1 ? U("Mono")
+                                 : channels == 2 ? U("Estéreo")
+                                 : String::number(channels) + U(" canais");
+            String bits;
+            String encoding;
+            if (auto *mp3 = dynamic_cast<TagLib::MPEG::File *>(file)) {
+                auto *p = mp3->audioProperties();
+                String version;
+                switch (p->version()) {
+                    case TagLib::MPEG::Header::Version1: version = "1"; break;
+                    case TagLib::MPEG::Header::Version2: version = "2"; break;
+                    case TagLib::MPEG::Header::Version2_5: version = "2.5"; break;
+                    default: version = "4"; break;
+                }
+                encoding = "MPEG-" + version + " Layer " + String::number(p->layer());
+                switch (p->channelMode()) {
+                    case TagLib::MPEG::Header::JointStereo: channelText = "Joint Stereo"; break;
+                    case TagLib::MPEG::Header::DualChannel: channelText = "Dual Channel"; break;
+                    case TagLib::MPEG::Header::SingleChannel: channelText = "Mono"; break;
+                    default: channelText = U("Estéreo"); break;
+                }
+                // MP3 não tem profundidade de bits; os decodificadores entregam 16 bits.
+                bits = "16";
+            } else if (auto *flac = dynamic_cast<TagLib::FLAC::File *>(file)) {
+                bits = String::number(flac->audioProperties()->bitsPerSample());
+                encoding = "FLAC";
+            } else if (dynamic_cast<TagLib::Ogg::Opus::File *>(file)) {
+                encoding = "Opus";
+            } else if (dynamic_cast<TagLib::Ogg::Vorbis::File *>(file)) {
+                encoding = "Vorbis";
+            }
+            out.push_back({"CHANNELS", channelText});
+            out.push_back({"BITS", bits});
+            out.push_back({"ENCODING", encoding});
         }
         return true;
     }

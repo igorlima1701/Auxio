@@ -93,6 +93,20 @@ object AlbumRatings {
         if (changed) version.value = version.value + 1
     }
 
+    /** Fork pessoal: avisado quando o usuário muda uma nota (para gravar na tag ALBUMRATING). */
+    @Volatile var onUserChange: ((Album, Int?) -> Unit)? = null
+
+    fun hasAny(): Boolean = ratings.isNotEmpty()
+
+    /** Recupera uma nota lida das tags (sem regravar os arquivos). */
+    fun restore(album: Album, rating: Int) {
+        val key = album.uid.toString()
+        if (ratings.containsKey(key)) return
+        ratings[key] = rating
+        prefs.edit().putInt(key, rating).apply()
+        version.value = version.value + 1
+    }
+
     fun set(album: Album, rating: Int?) {
         val key = album.uid.toString()
         if (rating == null) {
@@ -104,5 +118,6 @@ object AlbumRatings {
             prefs.edit().putInt(key, clamped).apply()
         }
         version.value = version.value + 1
+        onUserChange?.invoke(album, rating?.coerceIn(MIN, MAX))
     }
 }

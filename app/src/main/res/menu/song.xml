@@ -30,8 +30,8 @@
         android:title="@string/lbl_album_details" />
     <item
         android:id="@+id/action_detail"
-        android:icon="@drawable/ic_details_24"
-        android:title="@string/lbl_song_detail" />
+        android:icon="@drawable/ic_info_24"
+        android:title="@string/lbl_song_info" />
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_24"

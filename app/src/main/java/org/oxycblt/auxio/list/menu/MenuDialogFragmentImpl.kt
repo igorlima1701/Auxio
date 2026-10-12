@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.rating.AlbumRatings
+import org.oxycblt.auxio.tagedit.SongInfoDialog
 import org.oxycblt.auxio.tagedit.TagEditDialog
 import org.oxycblt.auxio.databinding.DialogMenuBinding
 import org.oxycblt.auxio.detail.DetailViewModel
@@ -87,7 +88,8 @@ class SongMenuDialogFragment : MenuDialogFragment<Menu.ForSong>() {
             R.id.action_artist_details -> detailModel.showArtist(menu.song)
             R.id.action_album_details -> detailModel.showAlbum(menu.song.album)
             R.id.action_share -> requireContext().share(menu.song)
-            R.id.action_detail -> detailModel.showSong(menu.song)
+            // Fork pessoal: "Informações da música" no estilo do Music OLED.
+            R.id.action_detail -> SongInfoDialog.show(requireActivity(), menu.song)
             R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.song)
             else -> error("Unexpected menu item selected $item")
         }

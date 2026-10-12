@@ -34,6 +34,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -173,6 +174,7 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
         // --- VIEWMODEL SETUP ---
         collect(homeModel.recreateTabs.flow, ::handleRecreate)
         collect(homeModel.showTabEvent.flow, ::handleShowTab)
+        collect(homeModel.scrollTopEvent.flow, ::handleScrollTop)
         collect(homeModel.chooseMusicLocations.flow, ::handleChooseFolders)
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
         collect(detailModel.toShow.flow, ::handleShow)
@@ -308,6 +310,32 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
         if (type == null) return
         homeModel.showTabEvent.consume()
         selectTab(type)
+    }
+
+    /** Fork pessoal: tocar de novo no ícone da aba atual leva a lista ao topo. */
+    private fun handleScrollTop(type: MusicType?) {
+        if (type == null) return
+        homeModel.scrollTopEvent.consume()
+        val recyclerId =
+            when (type) {
+                MusicType.SONGS -> R.id.home_song_recycler
+                MusicType.ALBUMS -> R.id.home_album_recycler
+                MusicType.ARTISTS -> R.id.home_artist_recycler
+                MusicType.GENRES -> R.id.home_genre_recycler
+                MusicType.PLAYLISTS -> R.id.home_playlist_recycler
+            }
+        requireView().findViewById<RecyclerView>(recyclerId)?.scrollToPosition(0)
+        requireBinding().homeAppbar.setExpanded(true, false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        homeModel.homeVisible = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        homeModel.homeVisible = false
     }
 
     private fun selectTab(type: MusicType) {

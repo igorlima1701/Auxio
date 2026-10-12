@@ -38,6 +38,7 @@ import org.oxycblt.auxio.music.MusicType
 import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.playback.PlaySong
 import org.oxycblt.auxio.playback.PlaybackSettings
+import org.oxycblt.auxio.rating.AlbumRatingTagSync
 import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.auxio.util.Event
 import org.oxycblt.auxio.util.MutableEvent
@@ -58,6 +59,7 @@ class HomeViewModel
 @Inject
 constructor(
     @ApplicationContext private val context: Context,
+    private val albumRatingTagSync: AlbumRatingTagSync,
     private val listSettings: ListSettings,
     private val playbackSettings: PlaybackSettings,
     homeGeneratorFactory: HomeGenerator.Factory,
@@ -234,6 +236,7 @@ constructor(
             MusicType.ALBUMS -> {
                 allAlbums = homeGenerator.albums()
                 AlbumRatings.resolvePending(allAlbums)
+                if (allAlbums.isNotEmpty()) albumRatingTagSync.importIfNeeded(allAlbums)
                 albumInstructions.put(
                     if (albumFilter.value.isEmpty) instructions else UpdateInstructions.Replace(0)
                 )
@@ -309,9 +312,22 @@ constructor(
     /** Fork pessoal: sorteia um álbum entre todos os da biblioteca. */
     fun randomAlbum(): Album? = allAlbums.randomOrNull()
 
-    /** Fork pessoal: vai para uma aba da tela inicial. */
+    /** Fork pessoal: se a tela inicial está visível (não há álbum/artista aberto por cima). */
+    var homeVisible = false
+
+    /** Fork pessoal: pedido para rolar a lista de uma aba até o topo. */
+    val scrollTopEvent: Event<MusicType>
+        field = MutableEvent<MusicType>()
+
+    /**
+     * Fork pessoal: vai para uma aba da tela inicial. Se já estiver nela, rola a lista até o topo.
+     */
     fun showTab(type: MusicType) {
-        showTabEvent.put(type)
+        if (homeVisible && mainPage.value == MainPage.HOME && currentTabType.value == type) {
+            scrollTopEvent.put(type)
+        } else {
+            showTabEvent.put(type)
+        }
     }
 
     /** Fork pessoal: abre a busca geral. */

@@ -153,6 +153,11 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
     @SuppressLint("ClickableViewAccessibility")
     fun bind(song: Song, listener: EditClickListListener<Song>) {
         listener.bind(song, this, body, binding.songDragHandle)
+        // Fork pessoal: segurar o dedo na música abre as opções dela.
+        body.setOnLongClickListener {
+            (listener as? QueueMenuOpener)?.openQueueMenu(song, bindingAdapterPosition)
+            true
+        }
         binding.songAlbumCover.bind(song)
         binding.songName.text = song.name.resolve(binding.context)
         binding.songInfo.text = song.artists.resolveNames(binding.context)
@@ -181,4 +186,9 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
         /** A comparator that can be used with DiffUtil. */
         val DIFF_CALLBACK = SongViewHolder.DIFF_CALLBACK
     }
+}
+
+/** Fork pessoal: abre o menu de opções de uma música da fila. */
+interface QueueMenuOpener {
+    fun openQueueMenu(song: Song, index: Int)
 }
