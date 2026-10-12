@@ -27,8 +27,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 import org.oxycblt.auxio.BuildConfig
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentDetailBinding
@@ -152,15 +150,9 @@ abstract class DetailFragment<P : MusicParent, C : Music> :
         val range = appBarLayout.totalScrollRange
         val ratio = abs(verticalOffset.toFloat()) / range.toFloat()
 
-        val outRatio = min(ratio * 2, 1f)
-        val detailHeader = binding.detailHeader
-        if (detailHeader != null) {
-            detailHeader.scaleX = 1 - 0.2f * outRatio / (5f / 3f)
-            detailHeader.scaleY = 1 - 0.2f * outRatio / (5f / 3f)
-            detailHeader.alpha = 1 - outRatio
-        }
-
-        val inRatio = max(ratio - 0.5f, 0f) * 2
+        // Fork pessoal: o cabeçalho (capa, nome) sobe junto com a lista, sem encolher nem esmaecer.
+        // O título e os botões da barra aparecem de uma vez quando o cabeçalho sai da tela.
+        val inRatio = if (ratio >= 0.98f) 1f else 0f
         animateToolbarView(binding.detailNormalToolbar.titleContainer, inRatio)
         animateToolbarActionButton(
             binding.detailNormalToolbar.getMenuButton(R.id.action_play),
@@ -209,7 +201,7 @@ abstract class DetailFragment<P : MusicParent, C : Music> :
             return
         }
         view.alpha = ratio
-        view.translationY = spacingSmall * (1 - ratio)
+        view.translationY = 0f
     }
 
     private fun animateToolbarActionButton(view: View?, ratio: Float) {
@@ -228,7 +220,7 @@ abstract class DetailFragment<P : MusicParent, C : Music> :
             view.visibility = View.VISIBLE
         }
         view.alpha = ratio
-        view.translationY = spacingSmall * (1 - ratio)
+        view.translationY = 0f
     }
 
     private fun saveStateInMemory(binding: FragmentDetailBinding) {

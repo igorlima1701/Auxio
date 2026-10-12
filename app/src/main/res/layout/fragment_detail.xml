@@ -27,7 +27,7 @@
                 android:layout_height="match_parent"
                 app:expandedTitleMargin="0dp"
                 app:forceApplySystemWindowInsetTop="false"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:titleEnabled="false"
                 app:toolbarId="@+id/detail_toolbar">
 
@@ -39,8 +39,8 @@
                     android:paddingStart="@dimen/spacing_medium"
                     android:paddingTop="?attr/actionBarSize"
                     android:paddingEnd="@dimen/spacing_medium"
-                    app:layout_collapseMode="parallax"
-                    app:layout_collapseParallaxMultiplier="0.85">
+                    app:layout_collapseMode="none"
+                    >
 
                     <org.oxycblt.auxio.image.CoverView
                         android:id="@+id/detail_cover"

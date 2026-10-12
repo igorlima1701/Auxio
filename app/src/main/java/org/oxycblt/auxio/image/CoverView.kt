@@ -335,6 +335,12 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
     private fun invalidateSelectionIndicatorAlpha(selectionBadge: ImageView) {
         fadeAnimators?.forEach { it.cancel() }
+        // Fork pessoal: marca de seleção aparece na hora, sem animação.
+        fadeAnimators = null
+        selectionBadge.alpha = if (isActivated) 1f else 0f
+        selectionBadge.scaleX = 1f
+        selectionBadge.scaleY = 1f
+        if (selectionBadge.alpha >= 0f) return
         val scaleAnim: SpringAnimation
         val alphaAnim: SpringAnimation
         if (isActivated) {

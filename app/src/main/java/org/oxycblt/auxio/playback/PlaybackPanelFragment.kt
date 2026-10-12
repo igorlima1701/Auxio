@@ -48,7 +48,6 @@ import org.oxycblt.auxio.playback.state.RepeatMode
 import org.oxycblt.auxio.playback.ui.StyledSeekBar
 import org.oxycblt.auxio.playback.ui.stepper.Direction
 import org.oxycblt.auxio.playback.ui.stepper.StepperOverlay
-import org.oxycblt.auxio.playback.ui.swiper.CarouselTransformer
 import org.oxycblt.auxio.playback.ui.swiper.CoverPagerAdapter
 import org.oxycblt.auxio.playback.ui.swiper.UserAwarePagerCallback
 import org.oxycblt.auxio.ui.ViewBindingFragment
@@ -133,7 +132,7 @@ class PlaybackPanelFragment :
                         post { queueModel.goto(it) }
                     }
                     .also { it.attach() }
-            setPageTransformer(CarouselTransformer())
+            // Fork pessoal: troca de capa sem o efeito carrossel.
             recycler().apply {
                 // Make it possible to collapse the bottom sheet from the ViewPager's touch area.
                 isNestedScrollingEnabled = false

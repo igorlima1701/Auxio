@@ -47,6 +47,8 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         // Auxio's non-dialog RecyclerViews never change their size based on adapter contents,
         // so we can enable fixed-size optimizations.
         setHasFixedSize(true)
+        // Fork pessoal: listas mudam na hora, sem animar itens entrando, saindo ou mudando.
+        itemAnimator = null
     }
 
     final override fun setHasFixedSize(hasFixedSize: Boolean) {

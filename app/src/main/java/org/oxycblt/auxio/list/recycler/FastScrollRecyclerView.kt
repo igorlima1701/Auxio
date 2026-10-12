@@ -317,13 +317,9 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         thumbView.layout(thumbLeft, thumbTop, thumbLeft + thumbWidth, thumbTop + thumbHeight)
 
         popupView.layoutDirection = layoutDirection
-        val child = getChildAt(0)
-        val firstAdapterPos =
-            if (child != null) {
-                layoutManager?.getPosition(child) ?: NO_POSITION
-            } else {
-                NO_POSITION
-            }
+        // Fork pessoal: o visor mostra o item que está na mesma altura do marcador (na coluna mais
+        // próxima dele), e não o primeiro item montado, que pode estar fora da tela.
+        val firstAdapterPos = findPopupAdapterPosition(thumbTop + thumbHeight / 2f)
 
         val provider = popupProvider
         val hasPopupProvider = firstAdapterPos != NO_POSITION && provider != null
@@ -494,6 +490,30 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
         lastY = eventY
         return dragging
+    }
+
+    private fun findPopupAdapterPosition(y: Float): Int {
+        val lm = layoutManager ?: return NO_POSITION
+        val probeX = if (layoutDirection == LAYOUT_DIRECTION_RTL) paddingLeft + 1f else width - paddingRight - 1f
+        // Procura na coluna junto ao marcador e, se cair num vão, no centro e no início da fileira.
+        for (x in floatArrayOf(probeX, width / 2f, paddingLeft + 1f)) {
+            val child = findChildViewUnder(x, y) ?: continue
+            val pos = lm.getPosition(child)
+            if (pos != NO_POSITION) return pos
+        }
+        // Sem item exatamente nessa altura: usa o item visível mais próximo.
+        var best = NO_POSITION
+        var bestDistance = Float.MAX_VALUE
+        for (i in 0 until childCount) {
+            val child = getChildAt(i) ?: continue
+            if (child.bottom <= paddingTop || child.top >= height - paddingBottom) continue
+            val distance = abs((child.top + child.bottom) / 2f - y)
+            if (distance < bestDistance) {
+                bestDistance = distance
+                best = lm.getPosition(child)
+            }
+        }
+        return best
     }
 
     private fun scrollToThumbOffset(thumbOffset: Int) {

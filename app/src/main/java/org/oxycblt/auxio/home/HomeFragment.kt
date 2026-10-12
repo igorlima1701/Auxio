@@ -252,9 +252,12 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
         }
 
         // Set up the mapping between the ViewPager and TabLayout.
+        // Fork pessoal: tocar numa aba troca na hora, sem rolar pelas abas do meio.
         TabLayoutMediator(
                 binding.homeTabs,
                 binding.homePager,
+                true,
+                false,
                 NamedTabStrategy(homeModel.currentTabTypes),
             )
             .attach()

@@ -136,6 +136,8 @@ abstract class ViewBindingBottomSheetDialogFragment<VB : ViewBinding> :
 
         override fun onStart() {
             super.onStart()
+            // Fork pessoal: menus e diálogos aparecem e somem na hora, sem deslizar.
+            window?.setWindowAnimations(0)
             if (avoidUnusableCollapsedState) {
                 // skipCollapsed isn't enough, also need to immediately snap to expanded state.
                 behavior.state = BackportBottomSheetBehavior.STATE_EXPANDED

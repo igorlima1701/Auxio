@@ -6,7 +6,7 @@
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_24"
         android:title="@string/lbl_search"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <!-- Fork pessoal: filtro por nota/ano, só na aba Álbuns. -->
     <item
@@ -14,13 +14,13 @@
         android:icon="@drawable/ic_funnel_24"
         android:title="@string/lbl_filter_albums"
         android:visible="false"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_sort"
         android:icon="@drawable/ic_sort_24"
         android:title="@string/lbl_sort"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_settings"
