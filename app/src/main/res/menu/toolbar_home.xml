@@ -14,7 +14,6 @@
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_funnel_24"
         android:title="@string/lbl_filter_albums"
-        android:visible="false"
         app:showAsAction="always" />
 
     <item

@@ -279,7 +279,8 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
             tag = tabType
         }
         // Fork pessoal: o filtro só existe na aba Álbuns.
-        binding.homeNormalToolbar.menu.findItem(R.id.action_filter)?.isVisible =
+        // (a barra do Auxio monta os botões uma vez; por isso o botão é escondido, não o item)
+        binding.homeNormalToolbar.getMenuButton(R.id.action_filter)?.isVisible =
             tabType == MusicType.ALBUMS
 
         // Update the scrolling view in AppBarLayout to align with the current tab's

@@ -18,7 +18,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_queue"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_queue_24" />
 
@@ -29,7 +29,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_playback"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_play_24" />
 
@@ -40,7 +40,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_albums"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_album_24" />
 
@@ -51,7 +51,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_artists"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_artist_24" />
 
@@ -62,7 +62,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_playlists"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_playlist_24" />
 
@@ -73,7 +73,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_search"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_search_24" />
 
@@ -84,7 +84,7 @@ Arrastar a barra para cima também abre o player.
         android:layout_weight="1"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/lbl_more"
-        android:padding="18dp"
+        android:padding="14dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_more_24" />
 
