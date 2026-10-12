@@ -60,7 +60,7 @@ class TagEditDialog : ViewBindingMaterialDialogFragment<DialogTagEditBinding>() 
             .setTitle(if (isBatch) R.string.lbl_edit_album_tags else R.string.lbl_edit_tags)
             .setNegativeButton(R.string.lbl_cancel, null)
             // O clique é tratado em onStart para o diálogo não fechar antes de gravar.
-            .setPositiveButton(R.string.lbl_save, null)
+            .setPositiveButton(R.string.lbl_tag_save, null)
     }
 
     override fun onBindingCreated(binding: DialogTagEditBinding, savedInstanceState: Bundle?) {

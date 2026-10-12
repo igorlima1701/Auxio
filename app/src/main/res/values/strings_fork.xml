@@ -11,6 +11,7 @@
     <string name="desc_rate" translatable="false">Dar nota %d</string>
 
     <!-- Editor de tags -->
+    <string name="lbl_tag_save" translatable="false">Gravar</string>
     <string name="lbl_edit_tags" translatable="false">Editar tags</string>
     <string name="lbl_edit_album_tags" translatable="false">Editar tags do álbum</string>
     <string name="lbl_tag_title" translatable="false">Título</string>
@@ -24,7 +25,6 @@
     <string name="lbl_tag_genre" translatable="false">Gênero</string>
     <string name="lbl_tag_comment" translatable="false">Comentário</string>
     <string name="lbl_tag_mixed" translatable="false">(vários valores: em branco mantém cada um)</string>
-    <string name="lbl_save" translatable="false">Gravar</string>
     <string name="lng_tags_loading" translatable="false">Lendo as tags…</string>
     <string name="fmt_tags_saving" translatable="false">Gravando %1$d de %2$d…</string>
     <string name="fmt_tags_batch" translatable="false">%1$d faixas · %2$s</string>
