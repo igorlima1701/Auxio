@@ -338,6 +338,11 @@ class MainFragment :
             forceHideAllFabs()
         } else {
             if (tabType != MusicType.PLAYLISTS) {
+                // Fork pessoal: sem o botão redondo de aleatório (o sorteio de álbum fica no topo).
+                forceHideAllFabs()
+                return
+            }
+            if (tabType != MusicType.PLAYLISTS) {
                 if (binding.homeShuffleFab.isOrWillBeShown) {
                     return
                 }

@@ -39,4 +39,5 @@
     <string name="lbl_search_artists" translatable="false">Buscar artista…</string>
     <string name="lbl_search_genres" translatable="false">Buscar gênero…</string>
     <string name="lbl_search_playlists" translatable="false">Buscar playlist…</string>
+    <string name="lbl_random_album" translatable="false">Tocar álbum sorteado</string>
 </resources>

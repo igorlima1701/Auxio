@@ -5,87 +5,107 @@ Fila, Player, Álbuns, Artistas, Playlists, Busca e Mais (configurações etc.).
 Arrastar a barra para cima também abre o player.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/spacing_small">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/nav_queue"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_queue"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_queue_24" />
+    <!-- Fork pessoal: linha fina com o andamento da música, como no Musicolet. -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/nav_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="1000"
+        android:visibility="invisible"
+        app:trackCornerRadius="0dp"
+        app:trackStopIndicatorSize="0dp"
+        app:trackThickness="2dp" />
 
-    <ImageButton
-        android:id="@+id/nav_player"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_playback"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_play_24" />
+    <LinearLayout
+            android:id="@+id/nav_row"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_small">
 
-    <ImageButton
-        android:id="@+id/nav_albums"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_albums"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_album_24" />
+        <ImageButton
+            android:id="@+id/nav_queue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_queue"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_queue_24" />
 
-    <ImageButton
-        android:id="@+id/nav_artists"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_artists"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_artist_24" />
+        <ImageButton
+            android:id="@+id/nav_player"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_playback"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_play_24" />
 
-    <ImageButton
-        android:id="@+id/nav_playlists"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_playlists"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_playlist_24" />
+        <ImageButton
+            android:id="@+id/nav_albums"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_albums"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_album_24" />
 
-    <ImageButton
-        android:id="@+id/nav_search"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_search"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_search_24" />
+        <ImageButton
+            android:id="@+id/nav_artists"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_artists"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_artist_24" />
 
-    <ImageButton
-        android:id="@+id/nav_more"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/lbl_more"
-        android:padding="14dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_more_24" />
+        <ImageButton
+            android:id="@+id/nav_playlists"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_playlists"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_playlist_24" />
+
+        <ImageButton
+            android:id="@+id/nav_search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_search"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_search_24" />
+
+        <ImageButton
+            android:id="@+id/nav_more"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_more"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_more_24" />
+
+    </LinearLayout>
 
 </LinearLayout>

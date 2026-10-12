@@ -306,6 +306,9 @@ constructor(
         }
     }
 
+    /** Fork pessoal: sorteia um álbum entre todos os da biblioteca. */
+    fun randomAlbum(): Album? = allAlbums.randomOrNull()
+
     /** Fork pessoal: vai para uma aba da tela inicial. */
     fun showTab(type: MusicType) {
         showTabEvent.put(type)

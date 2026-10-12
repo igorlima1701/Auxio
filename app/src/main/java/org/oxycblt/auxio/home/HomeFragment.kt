@@ -213,6 +213,11 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
                 true
             }
 
+            R.id.action_random_album -> {
+                // Fork pessoal: sorteia um álbum e toca da primeira faixa, em ordem.
+                homeModel.randomAlbum()?.let { playbackModel.play(it) }
+                true
+            }
             R.id.action_filter -> {
                 AlbumFilterDialog().show(childFragmentManager, AlbumFilterDialog.TAG)
                 true
@@ -281,6 +286,8 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
         // Fork pessoal: o filtro só existe na aba Álbuns.
         // (a barra do Auxio monta os botões uma vez; por isso o botão é escondido, não o item)
         binding.homeNormalToolbar.getMenuButton(R.id.action_filter)?.isVisible =
+            tabType == MusicType.ALBUMS
+        binding.homeNormalToolbar.getMenuButton(R.id.action_random_album)?.isVisible =
             tabType == MusicType.ALBUMS
 
         // Update the scrolling view in AppBarLayout to align with the current tab's

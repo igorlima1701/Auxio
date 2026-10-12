@@ -9,6 +9,13 @@
         android:title="@string/lbl_search"
         app:showAsAction="always" />
 
+    <!-- Fork pessoal: toca um álbum sorteado, do começo. Só na aba Álbuns. -->
+    <item
+        android:id="@+id/action_random_album"
+        android:icon="@drawable/ic_shuffle_off_24"
+        android:title="@string/lbl_random_album"
+        app:showAsAction="always" />
+
     <!-- Fork pessoal: filtro por nota/ano, só na aba Álbuns. -->
     <item
         android:id="@+id/action_filter"
