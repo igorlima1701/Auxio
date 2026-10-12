@@ -22,9 +22,25 @@
                 android:id="@+id/home_normal_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:contentInsetStart="@dimen/spacing_medium"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:menu="@menu/toolbar_home"
-                app:title="@string/info_app_name" />
+                app:menu="@menu/toolbar_home">
+
+                <!-- Fork pessoal: busca da aba atual, sempre visível no topo. -->
+                <EditText
+                    android:id="@+id/home_query"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:drawablePadding="@dimen/spacing_medium"
+                    android:hint="@string/lbl_search_albums"
+                    android:imeOptions="actionSearch|flagNoExtractUi"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+            </org.oxycblt.auxio.ui.AuxioToolbar>
 
             <org.oxycblt.auxio.ui.AuxioToolbar
                 android:id="@+id/home_selection_toolbar"

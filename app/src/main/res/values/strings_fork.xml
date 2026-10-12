@@ -32,4 +32,11 @@
     <string name="lng_tags_nothing" translatable="false">Nada foi alterado</string>
     <string name="lng_tags_multi_hint" translatable="false">Vários valores num campo: separe com \"; \"</string>
     <string name="fmt_tags_failed" translatable="false">%1$d de %2$d faixas não foram alteradas:\n%3$s</string>
+
+    <!-- Busca no topo -->
+    <string name="lbl_search_songs" translatable="false">Buscar música…</string>
+    <string name="lbl_search_albums" translatable="false">Buscar álbum…</string>
+    <string name="lbl_search_artists" translatable="false">Buscar artista…</string>
+    <string name="lbl_search_genres" translatable="false">Buscar gênero…</string>
+    <string name="lbl_search_playlists" translatable="false">Buscar playlist…</string>
 </resources>

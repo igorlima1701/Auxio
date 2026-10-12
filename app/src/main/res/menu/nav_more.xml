@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fork pessoal: menu "Mais" da barra de abas. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_more_songs"
+        android:title="@string/lbl_songs" />
+    <item
+        android:id="@+id/nav_more_genres"
+        android:title="@string/lbl_genres" />
+    <item
+        android:id="@+id/nav_more_settings"
+        android:title="@string/set_root_title" />
+    <item
+        android:id="@+id/nav_more_about"
+        android:title="@string/lbl_about" />
+</menu>

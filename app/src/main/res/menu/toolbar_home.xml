@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/action_search"
+        android:visible="false"
         android:icon="@drawable/ic_search_24"
         android:title="@string/lbl_search"
         app:showAsAction="always" />
@@ -24,11 +25,13 @@
 
     <item
         android:id="@+id/action_settings"
+        android:visible="false"
         android:title="@string/set_root_title"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_about"
+        android:visible="false"
         android:title="@string/lbl_about"
         app:showAsAction="never" />
 </menu>

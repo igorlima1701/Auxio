@@ -49,6 +49,7 @@ import org.oxycblt.auxio.databinding.FragmentMainBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.detail.Show
 import org.oxycblt.auxio.home.HomeViewModel
+import org.oxycblt.auxio.home.HomeFragmentDirections
 import org.oxycblt.auxio.home.Outer
 import org.oxycblt.auxio.list.ListViewModel
 import org.oxycblt.auxio.music.IndexingState
@@ -220,7 +221,8 @@ class MainFragment :
         collect(detailModel.toShow.flow, ::handleShow)
         collectImmediately(detailModel.editedPlaylist, detailBackCallback::invalidateEnabled)
         collectImmediately(homeModel.showOuter.flow, ::handleShowOuter)
-        collect(homeModel.showAlbumsTab.flow, ::handleShowAlbumsTab)
+        collect(homeModel.showTabEvent.flow, ::handleShowTab)
+        collect(homeModel.openSearchEvent.flow, ::handleOpenSearch)
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
         collectImmediately(homeModel.songList, homeModel.isFastScrolling, ::updateFab)
         collectImmediately(musicModel.indexingState, ::updateIndexerState)
@@ -376,9 +378,8 @@ class MainFragment :
         binding.queueFragment.isInvisible = binding.queueFragment.alpha == 0f
 
         if (playbackModel.song.value == null) {
-            // Sometimes lingering drags can un-hide the playback sheet even when we intend to
-            // hide it, make sure we keep it hidden.
-            tryHideAllSheets()
+            // Fork pessoal: sem música, o player não abre (a barra de abas continua visível).
+            playbackSheetBehavior.isDraggable = false
         }
 
         // Since the navigation listener is also reliant on the bottom sheets, we must also update
@@ -569,11 +570,25 @@ class MainFragment :
     }
 
     /**
-     * Fork pessoal: ao filtrar álbuns por ano, volta para a tela inicial (saindo de telas de
-     * detalhe) para que a aba Álbuns apareça. Quem troca a aba é o HomeFragment.
+     * Fork pessoal: ao trocar de aba pela barra de baixo, volta para a tela inicial (saindo de telas
+     * de detalhe) e fecha o player. Quem troca a aba é o HomeFragment.
      */
-    private fun handleShowAlbumsTab(show: Unit?) {
-        if (show == null) return
+    private fun handleShowTab(type: MusicType?) {
+        if (type == null) return
+        tryClosePlaybackPanel()
+        popToHome()
+    }
+
+    /** Fork pessoal: busca geral pela barra de baixo. */
+    private fun handleOpenSearch(open: Unit?) {
+        if (open == null) return
+        homeModel.openSearchEvent.consume()
+        tryClosePlaybackPanel()
+        popToHome()
+        requireBinding().exploreNavHost.findNavController().navigateSafe(HomeFragmentDirections.search())
+    }
+
+    private fun popToHome() {
         val navController = requireBinding().exploreNavHost.findNavController()
         if (navController.currentDestination?.id != R.id.home_fragment) {
             navController.popBackStack(R.id.home_fragment, false)
@@ -592,11 +607,27 @@ class MainFragment :
     }
 
     private fun updateSong(song: Song?) {
-        if (song != null) {
-            tryShowSheets()
+        // Fork pessoal: a barra de abas fica sempre visível; sem música, só não dá para abrir o
+        // player.
+        tryShowSheets()
+        if (song == null) {
+            tryClosePlaybackPanel()
+            lockPlaybackSheet()
         } else {
-            tryHideAllSheets()
+            val binding = requireBinding()
+            (binding.playbackSheet.coordinatorLayoutBehavior as PlaybackBottomSheetBehavior)
+                .isDraggable = true
+            (binding.queueSheet.coordinatorLayoutBehavior as QueueBottomSheetBehavior?)
+                ?.isDraggable = true
         }
+    }
+
+    private fun lockPlaybackSheet() {
+        val binding = requireBinding()
+        (binding.playbackSheet.coordinatorLayoutBehavior as PlaybackBottomSheetBehavior)
+            .isDraggable = false
+        (binding.queueSheet.coordinatorLayoutBehavior as QueueBottomSheetBehavior?)?.isDraggable =
+            false
     }
 
     private fun handlePanel(panel: OpenPanel?) {
@@ -655,11 +686,11 @@ class MainFragment :
             binding.playbackSheet.coordinatorLayoutBehavior as PlaybackBottomSheetBehavior
         val queueSheetBehavior =
             (binding.queueSheet.coordinatorLayoutBehavior ?: return) as QueueBottomSheetBehavior
-        if (
-            playbackSheetBehavior.state == BackportBottomSheetBehavior.STATE_EXPANDED &&
-                queueSheetBehavior.targetState == BackportBottomSheetBehavior.STATE_COLLAPSED
-        ) {
-            // Playback sheet is expanded and queue sheet is collapsed, we can expand it.
+        // Fork pessoal: a fila pode ser aberta direto da barra de abas, com o player fechado.
+        if (playbackSheetBehavior.targetState != BackportBottomSheetBehavior.STATE_EXPANDED) {
+            playbackSheetBehavior.state = BackportBottomSheetBehavior.STATE_EXPANDED
+        }
+        if (queueSheetBehavior.targetState == BackportBottomSheetBehavior.STATE_COLLAPSED) {
             queueSheetBehavior.state = BackportBottomSheetBehavior.STATE_EXPANDED
         }
     }

@@ -18,9 +18,12 @@
  
 package org.oxycblt.auxio.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.text.Normalizer
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +35,7 @@ import org.oxycblt.auxio.list.ListSettings
 import org.oxycblt.auxio.list.adapter.UpdateInstructions
 import org.oxycblt.auxio.list.sort.Sort
 import org.oxycblt.auxio.music.MusicType
+import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.playback.PlaySong
 import org.oxycblt.auxio.playback.PlaybackSettings
 import org.oxycblt.auxio.rating.AlbumRatings
@@ -53,6 +57,7 @@ import timber.log.Timber as L
 class HomeViewModel
 @Inject
 constructor(
+    @ApplicationContext private val context: Context,
     private val listSettings: ListSettings,
     private val playbackSettings: PlaybackSettings,
     homeGeneratorFactory: HomeGenerator.Factory,
@@ -93,9 +98,17 @@ constructor(
                 .distinct()
                 .sortedDescending()
 
-    /** Fork pessoal: pedido para ir à aba Álbuns (ex.: ao tocar no ano no player). */
-    val showAlbumsTab: Event<Unit>
+    /** Fork pessoal: pedido para ir a uma aba da tela inicial (barra de abas, ano no player). */
+    val showTabEvent: Event<MusicType>
+        field = MutableEvent<MusicType>()
+
+    /** Fork pessoal: pedido para abrir a busca geral. */
+    val openSearchEvent: Event<Unit>
         field = MutableEvent<Unit>()
+
+    /** Fork pessoal: texto do campo de busca no topo, aplicado à aba atual. */
+    val query: StateFlow<String>
+        field = MutableStateFlow("")
 
     /** Todos os álbuns, antes do filtro por ano. */
     private var allAlbums = listOf<Album>()
@@ -202,7 +215,7 @@ constructor(
         when (type) {
             MusicType.SONGS -> {
                 songInstructions.put(instructions)
-                songList.value = homeGenerator.songs()
+                songList.value = matchQuery(homeGenerator.songs()) { listOf(it.name.resolve(context), it.album.name.resolve(context)) + it.artists.map { a -> a.name.resolve(context) } }
             }
             MusicType.ALBUMS -> {
                 allAlbums = homeGenerator.albums()
@@ -214,15 +227,15 @@ constructor(
             }
             MusicType.ARTISTS -> {
                 artistInstructions.put(instructions)
-                _artistList.value = homeGenerator.artists()
+                _artistList.value = matchQuery(homeGenerator.artists()) { listOf(it.name.resolve(context)) }
             }
             MusicType.GENRES -> {
                 genreInstructions.put(instructions)
-                genreList.value = homeGenerator.genres()
+                genreList.value = matchQuery(homeGenerator.genres()) { listOf(it.name.resolve(context)) }
             }
             MusicType.PLAYLISTS -> {
                 playlistInstructions.put(instructions)
-                playlistList.value = homeGenerator.playlists()
+                playlistList.value = matchQuery(homeGenerator.playlists()) { listOf(it.name.resolve(context)) }
             }
         }
     }
@@ -253,7 +266,7 @@ constructor(
     /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year] (mantendo o filtro de nota). */
     fun showAlbumsOfYear(year: Int) {
         setAlbumFilter(albumFilter.value.copy(years = setOf(year)))
-        showAlbumsTab.put(Unit)
+        showTab(MusicType.ALBUMS)
     }
 
     /** Fork pessoal: troca o filtro da aba Álbuns. */
@@ -273,8 +286,44 @@ constructor(
 
     private fun filterAlbums(albums: List<Album>): List<Album> {
         val filter = albumFilter.value
-        if (filter.isEmpty) return albums
-        return albums.filter(filter::matches)
+        val filtered = if (filter.isEmpty) albums else albums.filter(filter::matches)
+        return matchQuery(filtered) { album ->
+            listOf(album.name.resolve(context)) + album.artists.map { it.name.resolve(context) }
+        }
+    }
+
+    /** Fork pessoal: vai para uma aba da tela inicial. */
+    fun showTab(type: MusicType) {
+        showTabEvent.put(type)
+    }
+
+    /** Fork pessoal: abre a busca geral. */
+    fun openSearch() {
+        openSearchEvent.put(Unit)
+    }
+
+    /** Fork pessoal: atualiza a busca do topo e refaz as listas. */
+    fun setQuery(text: String) {
+        val normalized = normalize(text)
+        if (normalized == query.value) return
+        query.value = normalized
+        for (type in MusicType.entries) invalidateMusic(type, UpdateInstructions.Replace(0))
+    }
+
+    /** Mantém os itens em que algum dos textos contém a busca (sem diferenciar acentos/maiúsculas). */
+    private inline fun <T> matchQuery(items: List<T>, texts: (T) -> List<String>): List<T> {
+        val q = query.value
+        if (q.isEmpty()) return items
+        return items.filter { item -> texts(item).any { normalize(it).contains(q) } }
+    }
+
+    private fun normalize(text: String) =
+        Normalizer.normalize(text.trim(), Normalizer.Form.NFD)
+            .replace(DIACRITICS, "")
+            .lowercase()
+
+    private companion object {
+        val DIACRITICS = Regex("\\p{Mn}+")
     }
 
     /**

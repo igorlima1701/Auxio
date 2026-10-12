@@ -25,6 +25,7 @@ import android.view.MenuItem
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -163,9 +164,15 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
         // re-creating the ViewPager.
         setupPager(binding)
 
+        // Fork pessoal: abre na aba Álbuns e liga a busca do topo.
+        if (savedInstanceState == null) {
+            selectTab(MusicType.ALBUMS)
+        }
+        binding.homeQuery.doAfterTextChanged { homeModel.setQuery(it?.toString() ?: "") }
+
         // --- VIEWMODEL SETUP ---
         collect(homeModel.recreateTabs.flow, ::handleRecreate)
-        collect(homeModel.showAlbumsTab.flow, ::handleShowAlbumsTab)
+        collect(homeModel.showTabEvent.flow, ::handleShowTab)
         collect(homeModel.chooseMusicLocations.flow, ::handleChooseFolders)
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
         collect(detailModel.toShow.flow, ::handleShow)
@@ -237,19 +244,11 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
             HomePagerAdapter(homeModel.currentTabTypes, childFragmentManager, viewLifecycleOwner)
 
         val toolbarParams = binding.homeToolbar.layoutParams as AppBarLayout.LayoutParams
-        if (homeModel.currentTabTypes.size == 1) {
-            // A single tab makes the tab layout redundant, hide it and disable the collapsing
-            // behavior.
-            L.d("Single tab shown, disabling TabLayout")
-            binding.homeTabs.isVisible = false
-            binding.homeAppbar.setExpanded(true, false)
-            toolbarParams.scrollFlags = 0
-        } else {
-            binding.homeTabs.isVisible = true
-            toolbarParams.scrollFlags =
-                AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
-                    AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
-        }
+        // Fork pessoal: sem a faixa de abas no topo (as abas ficam na barra de baixo) e com a busca
+        // sempre visível.
+        binding.homeTabs.isVisible = false
+        binding.homeAppbar.setExpanded(true, false)
+        toolbarParams.scrollFlags = 0
 
         // Set up the mapping between the ViewPager and TabLayout.
         // Fork pessoal: tocar numa aba troca na hora, sem rolar pelas abas do meio.
@@ -265,6 +264,20 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
 
     private fun updateCurrentTab(tabType: MusicType) {
         val binding = requireBinding()
+        // Fork pessoal: cada aba tem sua busca; trocar de aba limpa o texto.
+        binding.homeQuery.apply {
+            setHint(
+                when (tabType) {
+                    MusicType.SONGS -> R.string.lbl_search_songs
+                    MusicType.ALBUMS -> R.string.lbl_search_albums
+                    MusicType.ARTISTS -> R.string.lbl_search_artists
+                    MusicType.GENRES -> R.string.lbl_search_genres
+                    MusicType.PLAYLISTS -> R.string.lbl_search_playlists
+                }
+            )
+            if (tag != null && tag != tabType && !text.isNullOrEmpty()) setText("")
+            tag = tabType
+        }
         // Fork pessoal: o filtro só existe na aba Álbuns.
         binding.homeNormalToolbar.menu.findItem(R.id.action_filter)?.isVisible =
             tabType == MusicType.ALBUMS
@@ -282,11 +295,15 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
             }
     }
 
-    /** Fork pessoal: vai para a aba Álbuns (usado pelo filtro por ano). */
-    private fun handleShowAlbumsTab(show: Unit?) {
-        if (show == null) return
-        homeModel.showAlbumsTab.consume()
-        val idx = homeModel.currentTabTypes.indexOf(MusicType.ALBUMS)
+    /** Fork pessoal: troca a aba pedida pela barra de abas (ou pelo ano no player). */
+    private fun handleShowTab(type: MusicType?) {
+        if (type == null) return
+        homeModel.showTabEvent.consume()
+        selectTab(type)
+    }
+
+    private fun selectTab(type: MusicType) {
+        val idx = homeModel.currentTabTypes.indexOf(type)
         if (idx >= 0) {
             val binding = requireBinding()
             binding.homePager.setCurrentItem(idx, false)

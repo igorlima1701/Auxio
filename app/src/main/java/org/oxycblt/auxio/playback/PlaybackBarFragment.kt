@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Auxio Project
+ * Copyright (c) 2021 Auxio Project
  * PlaybackBarFragment.kt is part of Auxio.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,33 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
- 
+
 package org.oxycblt.auxio.playback
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.R as MR
 import dagger.hilt.android.AndroidEntryPoint
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentPlaybackBarBinding
-import org.oxycblt.auxio.detail.DetailViewModel
-import org.oxycblt.auxio.music.resolve
-import org.oxycblt.auxio.music.resolveNames
-import org.oxycblt.auxio.playback.state.RepeatMode
+import org.oxycblt.auxio.home.HomeViewModel
+import org.oxycblt.auxio.music.MusicType
 import org.oxycblt.auxio.ui.ViewBindingFragment
 import org.oxycblt.auxio.util.collectImmediately
+import org.oxycblt.auxio.util.getAttrColorCompat
 import org.oxycblt.musikr.Song
-import timber.log.Timber as L
 
 /**
- * A [ViewBindingFragment] that shows the current playback state in a compact manner.
+ * Fork pessoal: barra de abas no rodapé, no lugar do mini player.
  *
- * @author Alexander Capehart (OxygenCobalt)
+ * Fila e Player abrem o player; Álbuns, Artistas e Playlists trocam a aba da tela inicial; Busca
+ * abre a busca geral; Mais tem Músicas, Gêneros, Configurações e Sobre.
  */
 @AndroidEntryPoint
 class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
     private val playbackModel: PlaybackViewModel by activityViewModels()
-    private val detailModel: DetailViewModel by activityViewModels()
+    private val homeModel: HomeViewModel by activityViewModels()
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentPlaybackBarBinding.inflate(inflater)
@@ -52,107 +54,62 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
     ) {
         super.onBindingCreated(binding, savedInstanceState)
 
-        // --- UI SETUP ---
-        binding.root.apply {
-            setOnClickListener { playbackModel.openPlayback() }
-            setOnLongClickListener {
-                playbackModel.song.value?.let(detailModel::showAlbum)
-                true
+        binding.navQueue.setOnClickListener {
+            if (playbackModel.song.value != null) playbackModel.openQueue()
+        }
+        binding.navPlayer.setOnClickListener {
+            if (playbackModel.song.value != null) playbackModel.openPlayback()
+        }
+        binding.navAlbums.setOnClickListener { homeModel.showTab(MusicType.ALBUMS) }
+        binding.navArtists.setOnClickListener { homeModel.showTab(MusicType.ARTISTS) }
+        binding.navPlaylists.setOnClickListener { homeModel.showTab(MusicType.PLAYLISTS) }
+        binding.navSearch.setOnClickListener { homeModel.openSearch() }
+        binding.navMore.setOnClickListener { anchor ->
+            PopupMenu(requireContext(), anchor).apply {
+                inflate(R.menu.nav_more)
+                setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.nav_more_songs -> homeModel.showTab(MusicType.SONGS)
+                        R.id.nav_more_genres -> homeModel.showTab(MusicType.GENRES)
+                        R.id.nav_more_settings -> homeModel.showSettings()
+                        R.id.nav_more_about -> homeModel.showAbout()
+                    }
+                    true
+                }
+                show()
             }
         }
 
-        // Set up marquee on song information
-        binding.playbackSong.isSelected = true
-        binding.playbackInfo.isSelected = true
-
-        // Set up actions
-        binding.playbackPlayPause.setOnClickListener { playbackModel.togglePlaying() }
-
-        // -- VIEWMODEL SETUP ---
         collectImmediately(playbackModel.song, ::updateSong)
-        collectImmediately(playbackModel.isPlaying, ::updatePlaying)
-        collectImmediately(playbackModel.positionDs, ::updatePosition)
-        collectImmediately(
-            playbackModel.currentBarAction,
-            playbackModel.repeatMode,
-            playbackModel.isShuffled,
-            ::updateBarAction,
-        )
-    }
-
-    override fun onDestroyBinding(binding: FragmentPlaybackBarBinding) {
-        super.onDestroyBinding(binding)
-        binding.playbackSecondaryAction.clearPendingIcon()
-        // Marquee elements leak if they are not disabled when the views are destroyed.
-        binding.playbackSong.isSelected = false
-        binding.playbackInfo.isSelected = false
+        collectImmediately(homeModel.currentTabType, ::updateTab)
     }
 
     private fun updateSong(song: Song?) {
-        if (song == null) {
-            // Nothing to do.
-            return
+        val binding = requireBinding()
+        val enabled = song != null
+        for (button in listOf(binding.navQueue, binding.navPlayer)) {
+            button.isEnabled = enabled
+            button.alpha = if (enabled) 1f else 0.38f
         }
+    }
 
+    private fun updateTab(tab: MusicType) {
+        val binding = requireBinding()
         val context = requireContext()
-        val binding = requireBinding()
-        binding.playbackCover.bind(song)
-        binding.playbackSong.text = song.name.resolve(context)
-        binding.playbackInfo.text = song.artists.resolveNames(context)
-        binding.playbackProgressBar.max = song.durationMs.msToDs().toInt()
-    }
-
-    private fun updatePlaying(isPlaying: Boolean) {
-        requireBinding().playbackPlayPause.isChecked = isPlaying
-    }
-
-    private fun updatePosition(positionDs: Long) {
-        requireBinding().playbackProgressBar.progress = positionDs.toInt()
-    }
-
-    private fun updateBarAction(
-        actionMode: ActionMode,
-        repeatMode: RepeatMode,
-        isShuffled: Boolean,
-    ) {
-        val binding = requireBinding()
-        when (actionMode) {
-            ActionMode.NEXT -> {
-                L.d("Using skip next action")
-                binding.playbackSecondaryAction.apply {
-                    if (tag != actionMode) {
-                        setIconResource(R.drawable.ic_skip_next_24)
-                        contentDescription = getString(R.string.desc_skip_next)
-                        setOnClickListener { playbackModel.next() }
-                        isChecked = false
-                        tag = actionMode
-                    }
-                }
-            }
-            ActionMode.REPEAT -> {
-                L.d("Using repeat mode action")
-                binding.playbackSecondaryAction.apply {
-                    if (tag != actionMode) {
-                        contentDescription = getString(R.string.desc_change_repeat)
-                        setOnClickListener { playbackModel.toggleRepeatMode() }
-                        tag = actionMode
-                    }
-                    setIconResource(repeatMode.icon)
-                    isChecked = repeatMode != RepeatMode.NONE
-                }
-            }
-            ActionMode.SHUFFLE -> {
-                L.d("Using shuffle action")
-                binding.playbackSecondaryAction.apply {
-                    if (tag != actionMode) {
-                        setIconResource(R.drawable.sel_shuffle_state_24)
-                        contentDescription = getString(R.string.desc_shuffle)
-                        setOnClickListener { playbackModel.toggleShuffled() }
-                        tag = actionMode
-                    }
-                    isChecked = isShuffled
-                }
-            }
+        val active = context.getAttrColorCompat(androidx.appcompat.R.attr.colorPrimary)
+        val inactive = context.getAttrColorCompat(MR.attr.colorOnSurfaceVariant)
+        val tabs =
+            mapOf<ImageButton, MusicType>(
+                binding.navAlbums to MusicType.ALBUMS,
+                binding.navArtists to MusicType.ARTISTS,
+                binding.navPlaylists to MusicType.PLAYLISTS,
+            )
+        for ((button, type) in tabs) {
+            button.imageTintList = if (type == tab) active else inactive
+        }
+        for (button in
+            listOf(binding.navQueue, binding.navPlayer, binding.navSearch, binding.navMore)) {
+            button.imageTintList = inactive
         }
     }
 }
