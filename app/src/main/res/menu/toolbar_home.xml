@@ -11,7 +11,7 @@
     <!-- Fork pessoal: filtro por nota/ano, só na aba Álbuns. -->
     <item
         android:id="@+id/action_filter"
-        android:icon="@drawable/ic_filter_24"
+        android:icon="@drawable/ic_funnel_24"
         android:title="@string/lbl_filter_albums"
         android:visible="false"
         app:showAsAction="ifRoom" />
