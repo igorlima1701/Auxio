@@ -41,6 +41,7 @@ import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentHomeBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.detail.Show
+import org.oxycblt.auxio.home.filter.AlbumFilterDialog
 import org.oxycblt.auxio.home.list.AlbumListFragment
 import org.oxycblt.auxio.home.list.ArtistListFragment
 import org.oxycblt.auxio.home.list.GenreListFragment
@@ -205,6 +206,11 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
                 true
             }
 
+            R.id.action_filter -> {
+                AlbumFilterDialog().show(childFragmentManager, AlbumFilterDialog.TAG)
+                true
+            }
+
             // Handle sort menu
             R.id.action_sort -> {
                 // Junk click event when opening the menu
@@ -256,6 +262,9 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
 
     private fun updateCurrentTab(tabType: MusicType) {
         val binding = requireBinding()
+        // Fork pessoal: o filtro só existe na aba Álbuns.
+        binding.homeNormalToolbar.menu.findItem(R.id.action_filter)?.isVisible =
+            tabType == MusicType.ALBUMS
 
         // Update the scrolling view in AppBarLayout to align with the current tab's
         // scrolling state. This prevents the lift state from being confused as one

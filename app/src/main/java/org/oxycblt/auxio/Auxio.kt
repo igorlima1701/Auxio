@@ -56,6 +56,9 @@ class Auxio : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
+        // Fork pessoal: carrega as notas dos álbuns.
+        org.oxycblt.auxio.rating.AlbumRatings.init(this)
+
         // Migrate any settings that may have changed in an app update.
         imageSettings.migrate()
         playbackSettings.migrate()

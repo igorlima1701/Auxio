@@ -47,5 +47,6 @@ class AlbumSortDialog : SortDialog() {
             Sort.Mode.ByDuration,
             Sort.Mode.ByCount,
             Sort.Mode.ByDateAdded,
+            Sort.Mode.ByRating,
         )
 }

@@ -19,11 +19,13 @@
 package org.oxycblt.auxio.list.menu
 
 import android.view.MenuItem
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import org.oxycblt.auxio.R
+import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.auxio.databinding.DialogMenuBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.list.ListViewModel
@@ -116,6 +118,12 @@ class AlbumMenuDialogFragment : MenuDialogFragment<Menu.ForAlbum>() {
         binding.menuType.text = menu.album.releaseType.resolve(context)
         binding.menuName.text = menu.album.name.resolve(context)
         binding.menuInfo.text = menu.album.artists.resolveNames(context)
+        // Fork pessoal: dar nota direto pelo menu do álbum (toque longo na grade).
+        binding.menuRating.apply {
+            isVisible = true
+            setRating(AlbumRatings.get(menu.album))
+            onRatingChanged = { AlbumRatings.set(menu.album, it) }
+        }
     }
 
     override fun onClick(item: MenuItem, menu: Menu.ForAlbum) {

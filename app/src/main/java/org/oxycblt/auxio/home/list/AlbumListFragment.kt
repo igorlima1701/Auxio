@@ -32,6 +32,8 @@ import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentHomeListBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.home.HomeViewModel
+import org.oxycblt.auxio.home.filter.AlbumFilter
+import org.oxycblt.auxio.home.filter.AlbumFilterDialog
 import org.oxycblt.auxio.image.coil.GridThumbWarmer
 import org.oxycblt.auxio.list.ListFragment
 import org.oxycblt.auxio.list.ListViewModel
@@ -41,6 +43,7 @@ import org.oxycblt.auxio.music.IndexingState
 import org.oxycblt.auxio.music.MusicViewModel
 import org.oxycblt.auxio.playback.PlaybackViewModel
 import org.oxycblt.auxio.playback.formatDurationMsPopup
+import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.auxio.util.collectImmediately
 import org.oxycblt.musikr.Album
 import org.oxycblt.musikr.Music
@@ -100,10 +103,12 @@ class AlbumListFragment :
 
         collectImmediately(homeModel.albumList, ::updateAlbums)
         binding.homeFilterChip.apply {
-            setOnClickListener { homeModel.clearAlbumYearFilter() }
-            setOnCloseIconClickListener { homeModel.clearAlbumYearFilter() }
+            setOnClickListener {
+                AlbumFilterDialog().show(childFragmentManager, AlbumFilterDialog.TAG)
+            }
+            setOnCloseIconClickListener { homeModel.clearAlbumFilter() }
         }
-        collectImmediately(homeModel.albumYearFilter, ::updateYearFilter)
+        collectImmediately(homeModel.albumFilter, ::updateFilter)
         collectImmediately(homeModel.empty, musicModel.indexingState, ::updateNoMusicIndicator)
         collectImmediately(listModel.selected, ::updateSelection)
         collectImmediately(
@@ -160,6 +165,12 @@ class AlbumListFragment :
                 )
             }
 
+            // Fork pessoal: nota
+            is Sort.Mode.ByRating ->
+                FastScrollRecyclerView.PopupProvider.PopupData(
+                    AlbumRatings.get(album)?.let { if (it == 0) "0" else "$it★" } ?: "–"
+                )
+
             // Unsupported sort, error gracefully
             else -> null
         }
@@ -188,21 +199,35 @@ class AlbumListFragment :
         }
     }
 
-    /** Fork pessoal: mostra o chip do ano filtrado e abre espaço para ele no topo da grade. */
-    private fun updateYearFilter(year: Int?) {
+    /** Fork pessoal: mostra o resumo do filtro ativo e abre espaço para ele no topo da grade. */
+    private fun updateFilter(filter: AlbumFilter) {
         val binding = requireBinding()
         val chip = binding.homeFilterChip
-        if (year == null) {
+        if (filter.isEmpty) {
             chip.isVisible = false
             binding.homeRecycler.updatePadding(top = 0)
-        } else {
-            chip.text = getString(R.string.fmt_number, year)
-            chip.isVisible = true
-            binding.homeRecycler.updatePadding(
-                top = resources.getDimensionPixelSize(R.dimen.size_album_filter_space)
-            )
-            binding.homeRecycler.scrollToPosition(0)
+            return
         }
+        val parts = mutableListOf<String>()
+        if (filter.ratings.isNotEmpty()) {
+            parts +=
+                filter.ratings.sorted().joinToString(", ") {
+                    when (it) {
+                        AlbumFilter.NO_RATING -> getString(R.string.lbl_no_rating)
+                        0 -> getString(R.string.lbl_rating_zero)
+                        else -> getString(R.string.fmt_rating_stars, it)
+                    }
+                }
+        }
+        if (filter.years.isNotEmpty()) {
+            parts += filter.years.sortedDescending().joinToString(", ")
+        }
+        chip.text = parts.joinToString(" · ")
+        chip.isVisible = true
+        binding.homeRecycler.updatePadding(
+            top = resources.getDimensionPixelSize(R.dimen.size_album_filter_space)
+        )
+        binding.homeRecycler.scrollToPosition(0)
     }
 
     private fun updateNoMusicIndicator(empty: Boolean, indexingState: IndexingState?) {

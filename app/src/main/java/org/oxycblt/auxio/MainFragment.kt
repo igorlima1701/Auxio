@@ -25,6 +25,7 @@ import android.view.ViewTreeObserver
 import android.view.WindowInsets
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -161,6 +162,12 @@ class MainFragment :
             L.d("Configuring stacked bottom sheets")
             unlikelyToBeNull(binding.queueHandleWrapper).setOnClickListener {
                 playbackModel.openQueue()
+            }
+            // Fork pessoal: sem o balão "Alça de arrastar" que aparecia ao arrastar a fila.
+            for (handle in listOfNotNull(binding.queueHandle, binding.queueHandleWrapper)) {
+                TooltipCompat.setTooltipText(handle, null)
+                handle.contentDescription = null
+                handle.setOnLongClickListener { true }
             }
         } else {
             // Dual-pane mode, manually style the static queue sheet.

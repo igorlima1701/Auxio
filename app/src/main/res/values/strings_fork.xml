@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos do fork pessoal (Auxio+). Só em português, por isso não traduzíveis. -->
+<resources>
+    <string name="lbl_rating" translatable="false">Nota</string>
+    <string name="lbl_no_rating" translatable="false">Sem nota</string>
+    <string name="lbl_year" translatable="false">Ano</string>
+    <string name="lbl_filter_albums" translatable="false">Filtrar álbuns</string>
+    <string name="lbl_clear_filters" translatable="false">Limpar filtros</string>
+    <string name="lbl_rating_zero" translatable="false">0</string>
+    <string name="fmt_rating_stars" translatable="false">%d ★</string>
+    <string name="desc_rate" translatable="false">Dar nota %d</string>
+</resources>

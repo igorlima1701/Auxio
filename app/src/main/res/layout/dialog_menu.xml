@@ -69,12 +69,22 @@
             app:layout_constraintTop_toBottomOf="@+id/menu_name"
             tools:text="Info A" />
 
+        <!-- Fork pessoal: nota do álbum (só aparece no menu de álbuns). -->
+        <org.oxycblt.auxio.rating.AlbumRatingView
+            android:id="@+id/menu_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/menu_cover" />
+
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/menu_mode_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_medium"
-            app:layout_constraintTop_toBottomOf="@+id/menu_cover" />
+            app:layout_constraintTop_toBottomOf="@+id/menu_rating" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

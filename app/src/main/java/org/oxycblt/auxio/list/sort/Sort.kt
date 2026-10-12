@@ -19,6 +19,7 @@
 package org.oxycblt.auxio.list.sort
 
 import org.oxycblt.auxio.IntegerTable
+import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.auxio.R
 import org.oxycblt.musikr.Album
 import org.oxycblt.musikr.Artist
@@ -374,6 +375,20 @@ data class Sort(val mode: Mode, val direction: Direction) {
             }
         }
 
+        /** Fork pessoal: ordena álbuns pela nota (sem nota fica abaixo de 0). */
+        data object ByRating : Mode {
+            override val intCode = IntegerTable.SORT_BY_RATING
+            override val stringRes = R.string.lbl_rating
+
+            override fun sortAlbums(albums: MutableList<Album>, direction: Direction) {
+                albums.sortBy { it.name }
+                when (direction) {
+                    Direction.ASCENDING -> albums.sortBy { AlbumRatings.get(it) ?: -1 }
+                    Direction.DESCENDING -> albums.sortByDescending { AlbumRatings.get(it) ?: -1 }
+                }
+            }
+        }
+
         companion object {
             fun fromIntCode(intCode: Int): Mode? =
                 when (intCode) {
@@ -386,6 +401,7 @@ data class Sort(val mode: Mode, val direction: Direction) {
                     ByDisc.intCode -> ByDisc
                     ByTrack.intCode -> ByTrack
                     ByDateAdded.intCode -> ByDateAdded
+                    ByRating.intCode -> ByRating
                     else -> null
                 }
         }

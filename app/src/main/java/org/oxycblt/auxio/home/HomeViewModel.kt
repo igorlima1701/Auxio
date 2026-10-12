@@ -19,10 +19,14 @@
 package org.oxycblt.auxio.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
+import org.oxycblt.auxio.home.filter.AlbumFilter
 import org.oxycblt.auxio.home.tabs.Tab
 import org.oxycblt.auxio.list.ListSettings
 import org.oxycblt.auxio.list.adapter.UpdateInstructions
@@ -30,6 +34,7 @@ import org.oxycblt.auxio.list.sort.Sort
 import org.oxycblt.auxio.music.MusicType
 import org.oxycblt.auxio.playback.PlaySong
 import org.oxycblt.auxio.playback.PlaybackSettings
+import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.auxio.util.Event
 import org.oxycblt.auxio.util.MutableEvent
 import org.oxycblt.musikr.Album
@@ -76,9 +81,17 @@ constructor(
     val albumInstructions: Event<UpdateInstructions>
         field = MutableEvent<UpdateInstructions>()
 
-    /** Fork pessoal: ano usado para filtrar [albumList], ou null para mostrar todos. */
-    val albumYearFilter: StateFlow<Int?>
-        field = MutableStateFlow<Int?>(null)
+    /** Fork pessoal: filtro (nota e/ou ano) aplicado a [albumList]. */
+    val albumFilter: StateFlow<AlbumFilter>
+        field = MutableStateFlow(AlbumFilter())
+
+    /** Fork pessoal: todos os anos presentes na biblioteca, do mais novo ao mais antigo. */
+    val albumYears: List<Int>
+        get() =
+            allAlbums
+                .flatMap { album -> album.dates?.let { it.min.year..it.max.year } ?: emptyList() }
+                .distinct()
+                .sortedDescending()
 
     /** Fork pessoal: pedido para ir à aba Álbuns (ex.: ao tocar no ano no player). */
     val showAlbumsTab: Event<Unit>
@@ -167,6 +180,14 @@ constructor(
 
     init {
         homeGenerator.attach()
+        // Fork pessoal: quando uma nota muda, reordena (se ordenado por nota) e refiltra.
+        viewModelScope.launch {
+            AlbumRatings.version.drop(1).collect {
+                allAlbums = homeGenerator.albums()
+                albumInstructions.put(UpdateInstructions.Diff)
+                albumList.value = filterAlbums(allAlbums)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -186,8 +207,7 @@ constructor(
             MusicType.ALBUMS -> {
                 allAlbums = homeGenerator.albums()
                 albumInstructions.put(
-                    if (albumYearFilter.value == null) instructions
-                    else UpdateInstructions.Replace(0)
+                    if (albumFilter.value.isEmpty) instructions else UpdateInstructions.Replace(0)
                 )
                 albumList.value = filterAlbums(allAlbums)
             }
@@ -229,19 +249,21 @@ constructor(
         listSettings.albumSort = sort
     }
 
-    /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year]. */
+    /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year] (mantendo o filtro de nota). */
     fun showAlbumsOfYear(year: Int) {
-        albumYearFilter.value = year
-        refilterAlbums()
+        setAlbumFilter(albumFilter.value.copy(years = setOf(year)))
         showAlbumsTab.put(Unit)
     }
 
-    /** Fork pessoal: volta a mostrar todos os álbuns. */
-    fun clearAlbumYearFilter() {
-        if (albumYearFilter.value == null) return
-        albumYearFilter.value = null
+    /** Fork pessoal: troca o filtro da aba Álbuns. */
+    fun setAlbumFilter(filter: AlbumFilter) {
+        if (filter == albumFilter.value) return
+        albumFilter.value = filter
         refilterAlbums()
     }
+
+    /** Fork pessoal: volta a mostrar todos os álbuns. */
+    fun clearAlbumFilter() = setAlbumFilter(AlbumFilter())
 
     private fun refilterAlbums() {
         albumInstructions.put(UpdateInstructions.Replace(0))
@@ -249,11 +271,9 @@ constructor(
     }
 
     private fun filterAlbums(albums: List<Album>): List<Album> {
-        val year = albumYearFilter.value ?: return albums
-        return albums.filter { album ->
-            val dates = album.dates ?: return@filter false
-            year in dates.min.year..dates.max.year
-        }
+        val filter = albumFilter.value
+        if (filter.isEmpty) return albums
+        return albums.filter(filter::matches)
     }
 
     /**
