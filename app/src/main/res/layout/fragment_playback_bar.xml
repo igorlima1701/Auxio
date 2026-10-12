@@ -10,16 +10,78 @@ Arrastar a barra para cima também abre o player.
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- Fork pessoal: linha fina com o andamento da música, como no Musicolet. -->
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/nav_progress"
+    <!-- Fork pessoal: traço sobre o ícone da página atual, como no Musicolet. -->
+    <LinearLayout
+        android:id="@+id/nav_marks"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="1000"
-        android:visibility="invisible"
-        app:trackCornerRadius="0dp"
-        app:trackStopIndicatorSize="0dp"
-        app:trackThickness="2dp" />
+        android:layout_height="3dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_small">
+
+        <View
+            android:id="@+id/nav_mark_queue"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/nav_mark_player"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/nav_mark_albums"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/nav_mark_artists"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/nav_mark_playlists"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/nav_mark_search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/nav_mark_more"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_small"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary"
+            android:visibility="invisible" />
+
+    </LinearLayout>
 
     <LinearLayout
             android:id="@+id/nav_row"

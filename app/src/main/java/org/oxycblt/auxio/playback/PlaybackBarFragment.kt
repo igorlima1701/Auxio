@@ -82,7 +82,6 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
         }
 
         collectImmediately(playbackModel.song, ::updateSong)
-        collectImmediately(playbackModel.song, playbackModel.positionDs, ::updateProgress)
         collectImmediately(homeModel.currentTabType, homeModel.mainPage, ::updateTab)
     }
 
@@ -93,18 +92,6 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
             button.isEnabled = enabled
             button.alpha = if (enabled) 1f else 0.38f
         }
-    }
-
-    /** Linha de progresso acima da barra (0 a 1000). */
-    private fun updateProgress(song: Song?, positionDs: Long) {
-        val progress = requireBinding().navProgress
-        if (song == null) {
-            progress.isInvisible = true
-            return
-        }
-        progress.isInvisible = false
-        val durationDs = song.durationMs.msToDs().coerceAtLeast(1)
-        progress.progress = ((positionDs * 1000) / durationDs).toInt().coerceIn(0, 1000)
     }
 
     private fun updateTab(tab: MusicType, page: HomeViewModel.MainPage) {
@@ -124,6 +111,19 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
                         else -> binding.navMore
                     }
             }
+        val marks =
+            mapOf(
+                binding.navQueue to binding.navMarkQueue,
+                binding.navPlayer to binding.navMarkPlayer,
+                binding.navAlbums to binding.navMarkAlbums,
+                binding.navArtists to binding.navMarkArtists,
+                binding.navPlaylists to binding.navMarkPlaylists,
+                binding.navSearch to binding.navMarkSearch,
+                binding.navMore to binding.navMarkMore,
+            )
+        for ((button, mark) in marks) {
+            mark.isInvisible = button != selected
+        }
         for (button in
             listOf<ImageButton>(
                 binding.navQueue,
