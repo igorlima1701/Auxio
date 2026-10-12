@@ -23,6 +23,7 @@ import android.net.Uri
 import java.io.File
 import java.io.InputStream
 import java.security.MessageDigest
+import org.oxycblt.musikr.util.fixWindows1252
 
 /** Campos editáveis, na mesma ordem e com as mesmas chaves do código nativo. */
 enum class TagField(val key: String) {
@@ -79,7 +80,7 @@ class TagEditor(private val context: Context) {
             val values = mutableMapOf<TagField, String>()
             var i = 1
             while (i + 1 < raw.size) {
-                TagField.fromKey(raw[i])?.let { values[it] = raw[i + 1] }
+                TagField.fromKey(raw[i])?.let { values[it] = raw[i + 1].fixWindows1252() }
                 i += 2
             }
             return TagReadResult.Ok(EditableTags(first, values))

@@ -25,6 +25,7 @@ import java.text.Collator
 import org.oxycblt.musikr.tag.Name
 import org.oxycblt.musikr.tag.Placeholder
 import org.oxycblt.musikr.tag.Token
+import org.oxycblt.musikr.util.fixWindows1252
 
 abstract class Naming {
     fun name(raw: String?, sort: String?, placeholder: Placeholder): Name =
@@ -44,11 +45,13 @@ abstract class Naming {
 }
 
 data object IntelligentNaming : Naming() {
-    override fun name(raw: String, sort: String?): Name.Known = IntelligentKnownName(raw, sort)
+    override fun name(raw: String, sort: String?): Name.Known =
+        IntelligentKnownName(raw.fixWindows1252(), sort?.fixWindows1252())
 }
 
 data object SimpleNaming : Naming() {
-    override fun name(raw: String, sort: String?): Name.Known = SimpleKnownName(raw, sort)
+    override fun name(raw: String, sort: String?): Name.Known =
+        SimpleKnownName(raw.fixWindows1252(), sort?.fixWindows1252())
 }
 
 private val collator: Collator = Collator.getInstance().apply { strength = Collator.PRIMARY }

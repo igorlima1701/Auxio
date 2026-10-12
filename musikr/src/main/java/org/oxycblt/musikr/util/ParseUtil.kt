@@ -71,7 +71,36 @@ internal inline fun String.splitEscaped(selector: (Char) -> Boolean): List<Strin
  * @return A string with trailing whitespace remove,d or null if the [String] was all whitespace or
  *   empty.
  */
-internal fun String.correctWhitespace() = trim().ifBlank { null }
+internal fun String.correctWhitespace() = fixWindows1252().trim().ifBlank { null }
+
+/**
+ * Fork pessoal: muitos programas gravam tags "Latin-1" usando, na verdade, a tabela do Windows
+ * (Windows-1252), onde por exemplo o byte 0x92 é o apóstrofo curvo (’). O TagLib lê esses bytes como
+ * caracteres de controle invisíveis (U+0080 a U+009F), que aparecem como um quadradinho. Como esses
+ * caracteres de controle nunca são usados de propósito em tags, eles são trocados pelos caracteres
+ * equivalentes do Windows-1252, como fazem o Musicolet e o Mp3tag.
+ */
+fun String.fixWindows1252(): String {
+    if (none { it in '\u0080'..'\u009F' }) return this
+    val out = StringBuilder(length)
+    for (c in this) {
+        if (c in '\u0080'..'\u009F') {
+            val mapped = WINDOWS_1252[c.code - 0x80]
+            out.append(if (mapped != '\u0000') mapped else c)
+        } else {
+            out.append(c)
+        }
+    }
+    return out.toString()
+}
+
+private val WINDOWS_1252 =
+    charArrayOf(
+        '\u20AC', '\u0000', '\u201A', '\u0192', '\u201E', '\u2026', '\u2020', '\u2021',
+        '\u02C6', '\u2030', '\u0160', '\u2039', '\u0152', '\u0000', '\u017D', '\u0000',
+        '\u0000', '\u2018', '\u2019', '\u201C', '\u201D', '\u2022', '\u2013', '\u2014',
+        '\u02DC', '\u2122', '\u0161', '\u203A', '\u0153', '\u0000', '\u017E', '\u0178',
+    )
 
 /**
  * Fix trailing whitespace or blank contents within a list of [String]s.

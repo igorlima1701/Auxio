@@ -44,6 +44,7 @@ import org.oxycblt.musikr.Storage
 import org.oxycblt.musikr.cache.MutableCache
 import org.oxycblt.musikr.fs.mediastore.MediaStore
 import org.oxycblt.musikr.fs.saf.SAF
+import org.oxycblt.musikr.fs.snapshot.FSSnapshot
 import org.oxycblt.musikr.playlist.db.StoredPlaylists
 import org.oxycblt.musikr.tag.interpret.Naming
 import org.oxycblt.musikr.tag.interpret.Separators
@@ -249,6 +250,9 @@ constructor(
     private val updateListeners = mutableListOf<MusicRepository.UpdateListener>()
     private val indexingListeners = mutableListOf<MusicRepository.IndexingListener>()
     @Volatile private var indexingWorker: IndexingWorker? = null
+    /** Fork pessoal: abertura rápida a partir da lista de arquivos salva (só uma vez por abertura). */
+    private val fsSnapshot = FSSnapshot(context)
+    @Volatile private var fastStartDone = false
 
     @Volatile override var library: MutableLibrary? = null
     @Volatile private var previousCompletedState: IndexingState.Completed? = null
@@ -398,14 +402,36 @@ constructor(
         L.d("Cache: $cache")
         val covers = settingCovers.mutate(context, newRevision)
         L.d("Covers: $covers")
+        val safQuery = musicSettings.safQuery
         val fs =
             when (musicSettings.locationMode) {
-                LocationMode.SAF -> SAF.from(context, musicSettings.safQuery)
+                // Fork pessoal: a varredura de verdade também salva a lista de arquivos.
+                LocationMode.SAF -> fsSnapshot.recording(SAF.from(context, safQuery), safQuery.source)
                 LocationMode.MEDIA_STORE -> MediaStore.from(context, musicSettings.mediaStoreQuery)
             }
         L.d("FS: $fs")
         val storage = Storage(cache, covers, storedPlaylists)
         val interpretation = Interpretation(nameFactory, separators)
+
+        // Fork pessoal: na primeira carga depois de abrir o app, mostra na hora a biblioteca montada
+        // a partir da lista de arquivos salva e do cache de tags; a varredura completa vem logo
+        // depois e só atualiza a tela se algo tiver mudado.
+        if (withCache && !fastStartDone && musicSettings.locationMode == LocationMode.SAF) {
+            fastStartDone = true
+            val snapshotFs = fsSnapshot.replay(safQuery.source)
+            if (snapshotFs != null) {
+                try {
+                    val quickStart = System.currentTimeMillis()
+                    val quick = Musikr.new(context, Config(snapshotFs, storage, interpretation)).run()
+                    L.d("Quick index finished in ${System.currentTimeMillis() - quickStart}ms")
+                    emitLibrary(quick.library)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    L.w("Quick index failed: $e")
+                }
+            }
+        }
         val config = Config(fs, storage, interpretation)
         L.d("Running index...")
         val start = System.currentTimeMillis()
