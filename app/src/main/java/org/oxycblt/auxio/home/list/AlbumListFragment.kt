@@ -20,7 +20,6 @@ package org.oxycblt.auxio.home.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -32,9 +31,6 @@ import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.home.HomeViewModel
 import org.oxycblt.auxio.list.ListFragment
 import org.oxycblt.auxio.list.ListViewModel
-import org.oxycblt.auxio.list.SelectableListListener
-import org.oxycblt.auxio.list.adapter.SelectionIndicatorAdapter
-import org.oxycblt.auxio.list.recycler.AlbumViewHolder
 import org.oxycblt.auxio.list.recycler.FastScrollRecyclerView
 import org.oxycblt.auxio.list.sort.Sort
 import org.oxycblt.auxio.music.IndexingState
@@ -62,7 +58,7 @@ class AlbumListFragment :
     override val listModel: ListViewModel by activityViewModels()
     override val musicModel: MusicViewModel by activityViewModels()
     override val playbackModel: PlaybackViewModel by activityViewModels()
-    private val albumAdapter = AlbumAdapter(this)
+    private val albumAdapter = AlbumCoverAdapter(this)
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
@@ -72,6 +68,17 @@ class AlbumListFragment :
 
         binding.homeRecycler.apply {
             id = R.id.home_album_recycler
+            // Fork pessoal: grade só de capas, com colunas adaptadas à largura da tela.
+            layoutManager =
+                AlbumGridLayoutManager(
+                    context,
+                    resources.getDimensionPixelSize(R.dimen.size_album_grid_min_cell),
+                )
+            val halfGap = resources.getDimensionPixelSize(R.dimen.spacing_album_grid_half_gap)
+            setPaddingRelative(halfGap, paddingTop, halfGap, paddingBottom)
+            // Mais células prontas para reciclar, para a rolagem rápida não precisar inflar views.
+            recycledViewPool.setMaxRecycledViews(0, 48)
+            setItemViewCacheSize(12)
             adapter = albumAdapter
             popupProvider = this@AlbumListFragment
             listener = this@AlbumListFragment
@@ -180,21 +187,5 @@ class AlbumListFragment :
         // playing song is also contained within.
         val album = (parent as? Album)?.takeIf { song?.album == it }
         albumAdapter.setPlaying(album, isPlaying)
-    }
-
-    /**
-     * A [SelectionIndicatorAdapter] that shows a list of [Album]s using [AlbumViewHolder].
-     *
-     * @param listener An [SelectableListListener] to bind interactions to.
-     */
-    private class AlbumAdapter(private val listener: SelectableListListener<Album>) :
-        SelectionIndicatorAdapter<Album, AlbumViewHolder>(AlbumViewHolder.DIFF_CALLBACK) {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            AlbumViewHolder.from(parent)
-
-        override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
-            holder.bind(getItem(position), listener)
-        }
     }
 }
