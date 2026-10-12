@@ -34,6 +34,7 @@ import org.oxycblt.musikr.Album
 object AlbumRatings {
     const val MIN = 0
     const val MAX = 5
+    private const val PENDING_PREFIX = "pending:"
 
     private lateinit var prefs: SharedPreferences
     private val ratings = ConcurrentHashMap<String, Int>()
@@ -47,12 +48,50 @@ object AlbumRatings {
         prefs = context.getSharedPreferences("album_ratings", Context.MODE_PRIVATE)
         for ((key, value) in prefs.all) {
             if (value is Int && value in MIN..MAX) {
-                ratings[key] = value
+                if (key.startsWith(PENDING_PREFIX)) pending[key] = value else ratings[key] = value
             }
         }
     }
 
+    /**
+     * Notas à espera de um álbum novo: quando o nome ou o artista de um álbum muda (edição de tags),
+     * o identificador do álbum muda junto. A nota fica guardada pelo arquivo de uma das faixas e é
+     * passada para o álbum novo na próxima varredura.
+     */
+    private val pending = ConcurrentHashMap<String, Int>()
+
     fun get(album: Album): Int? = ratings[album.uid.toString()]
+
+    /** Guarda a nota de [album] para ser reaplicada depois de uma edição de tags. */
+    fun rememberForRetag(album: Album) {
+        val rating = get(album) ?: return
+        val song = album.songs.firstOrNull() ?: return
+        val key = PENDING_PREFIX + song.uri
+        pending[key] = rating
+        prefs.edit().putInt(key, rating).apply()
+    }
+
+    /** Reaplica notas pendentes aos álbuns novos. Chamado sempre que a lista de álbuns muda. */
+    fun resolvePending(albums: List<Album>) {
+        if (pending.isEmpty()) return
+        val editor = prefs.edit()
+        var changed = false
+        for (album in albums) {
+            for (song in album.songs) {
+                val key = PENDING_PREFIX + song.uri
+                val rating = pending.remove(key) ?: continue
+                editor.remove(key)
+                val albumKey = album.uid.toString()
+                if (!ratings.containsKey(albumKey)) {
+                    ratings[albumKey] = rating
+                    editor.putInt(albumKey, rating)
+                    changed = true
+                }
+            }
+        }
+        editor.apply()
+        if (changed) version.value = version.value + 1
+    }
 
     fun set(album: Album, rating: Int?) {
         val key = album.uid.toString()

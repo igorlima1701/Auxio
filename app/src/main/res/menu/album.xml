@@ -32,4 +32,9 @@
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_24"
         android:title="@string/lbl_share" />
+    <!-- Fork pessoal -->
+    <item
+        android:id="@+id/action_edit_tags"
+        android:icon="@drawable/ic_edit_24"
+        android:title="@string/lbl_edit_album_tags" />
 </menu>

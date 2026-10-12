@@ -9,4 +9,27 @@
     <string name="lbl_rating_zero" translatable="false">0</string>
     <string name="fmt_rating_stars" translatable="false">%d ★</string>
     <string name="desc_rate" translatable="false">Dar nota %d</string>
+
+    <!-- Editor de tags -->
+    <string name="lbl_edit_tags" translatable="false">Editar tags</string>
+    <string name="lbl_edit_album_tags" translatable="false">Editar tags do álbum</string>
+    <string name="lbl_tag_title" translatable="false">Título</string>
+    <string name="lbl_tag_artist" translatable="false">Artista</string>
+    <string name="lbl_tag_album_artist" translatable="false">Artista do álbum</string>
+    <string name="lbl_tag_album" translatable="false">Álbum</string>
+    <string name="lbl_tag_date" translatable="false">Data (2002 ou 2002-08-27)</string>
+    <string name="lbl_tag_original_date" translatable="false">Data original</string>
+    <string name="lbl_tag_track" translatable="false">Faixa (ex.: 3 ou 3/12)</string>
+    <string name="lbl_tag_disc" translatable="false">Disco (ex.: 1 ou 1/2)</string>
+    <string name="lbl_tag_genre" translatable="false">Gênero</string>
+    <string name="lbl_tag_comment" translatable="false">Comentário</string>
+    <string name="lbl_tag_mixed" translatable="false">(vários valores: em branco mantém cada um)</string>
+    <string name="lbl_save" translatable="false">Gravar</string>
+    <string name="lng_tags_loading" translatable="false">Lendo as tags…</string>
+    <string name="fmt_tags_saving" translatable="false">Gravando %1$d de %2$d…</string>
+    <string name="fmt_tags_batch" translatable="false">%1$d faixas · %2$s</string>
+    <string name="lng_tags_saved" translatable="false">Tags gravadas e conferidas</string>
+    <string name="lng_tags_nothing" translatable="false">Nada foi alterado</string>
+    <string name="lng_tags_multi_hint" translatable="false">Vários valores num campo: separe com \"; \"</string>
+    <string name="fmt_tags_failed" translatable="false">%1$d de %2$d faixas não foram alteradas:\n%3$s</string>
 </resources>

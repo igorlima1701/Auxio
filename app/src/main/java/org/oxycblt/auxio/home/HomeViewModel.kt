@@ -206,6 +206,7 @@ constructor(
             }
             MusicType.ALBUMS -> {
                 allAlbums = homeGenerator.albums()
+                AlbumRatings.resolvePending(allAlbums)
                 albumInstructions.put(
                     if (albumFilter.value.isEmpty) instructions else UpdateInstructions.Replace(0)
                 )

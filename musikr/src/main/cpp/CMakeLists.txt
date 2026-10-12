@@ -52,6 +52,9 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         JObjectRef.cpp
         JStringRef.cpp
         JByteArrayRef.cpp
+        # Fork pessoal: editor de tags
+        TagEditor.cpp
+        TagEditorJNI.cpp
 )
 target_link_options(${CMAKE_PROJECT_NAME}
         # @Tolriq found that these flags can reduce the size of the linked

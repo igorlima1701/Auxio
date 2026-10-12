@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.rating.AlbumRatings
+import org.oxycblt.auxio.tagedit.TagEditDialog
 import org.oxycblt.auxio.databinding.DialogMenuBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.list.ListViewModel
@@ -87,6 +88,7 @@ class SongMenuDialogFragment : MenuDialogFragment<Menu.ForSong>() {
             R.id.action_album_details -> detailModel.showAlbum(menu.song.album)
             R.id.action_share -> requireContext().share(menu.song)
             R.id.action_detail -> detailModel.showSong(menu.song)
+            R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.song)
             else -> error("Unexpected menu item selected $item")
         }
     }
@@ -142,6 +144,7 @@ class AlbumMenuDialogFragment : MenuDialogFragment<Menu.ForAlbum>() {
             R.id.action_artist_details -> detailModel.showArtist(menu.album)
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.album)
             R.id.action_share -> requireContext().share(menu.album)
+            R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.album)
             else -> error("Unexpected menu item selected $item")
         }
     }

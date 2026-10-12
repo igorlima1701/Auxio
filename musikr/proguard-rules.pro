@@ -29,3 +29,6 @@
 -keep class org.oxycblt.musikr.metadata.MetadataResult$NoMetadata { *; }
 -keep class org.oxycblt.musikr.metadata.MetadataResult$NotAudio { *; }
 -keep class org.oxycblt.musikr.metadata.MetadataResult$ProviderFailed { *; }
+
+# Fork pessoal: editor de tags (JNI)
+-keep class org.oxycblt.musikr.tag.edit.TagEditorJNI { *; }
