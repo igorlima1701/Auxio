@@ -15,6 +15,7 @@
         <attr name="iconSize" format="dimension" />
         <attr name="enablePlaybackIndicator" format="boolean" />
         <attr name="enableSelectionBadge" format="boolean" />
+        <attr name="gridThumbnail" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="StepperOverlay">

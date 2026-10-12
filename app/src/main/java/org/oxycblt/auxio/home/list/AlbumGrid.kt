@@ -47,6 +47,18 @@ class AlbumGridLayoutManager(context: Context, private val minCellPx: Int) :
         super.onLayoutChildren(recycler, state)
     }
 
+    /**
+     * Pré-carregamento na rolagem: monta e carrega as capas de uma tela inteira acima e abaixo da
+     * área visível, para elas já estarem prontas quando chegarem à tela.
+     */
+    override fun calculateExtraLayoutSpace(
+        state: RecyclerView.State,
+        extraLayoutSpace: IntArray,
+    ) {
+        extraLayoutSpace[0] = height
+        extraLayoutSpace[1] = height
+    }
+
     /** Lado de uma célula em pixels, ou 0 se ainda não houve layout. */
     fun cellSize(): Int {
         if (width <= 0) return 0

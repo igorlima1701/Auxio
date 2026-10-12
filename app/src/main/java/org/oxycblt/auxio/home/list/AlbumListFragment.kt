@@ -20,15 +20,18 @@ package org.oxycblt.auxio.home.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
+import javax.inject.Inject
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentHomeListBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.home.HomeViewModel
+import org.oxycblt.auxio.image.coil.GridThumbWarmer
 import org.oxycblt.auxio.list.ListFragment
 import org.oxycblt.auxio.list.ListViewModel
 import org.oxycblt.auxio.list.recycler.FastScrollRecyclerView
@@ -59,6 +62,7 @@ class AlbumListFragment :
     override val musicModel: MusicViewModel by activityViewModels()
     override val playbackModel: PlaybackViewModel by activityViewModels()
     private val albumAdapter = AlbumCoverAdapter(this)
+    @Inject lateinit var gridThumbWarmer: GridThumbWarmer
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
@@ -168,6 +172,13 @@ class AlbumListFragment :
 
     private fun updateAlbums(albums: List<Album>) {
         albumAdapter.update(albums, homeModel.albumInstructions.consume())
+        // Gera em segundo plano as miniaturas que faltam, no tamanho exato das células.
+        val recycler = requireBinding().homeRecycler
+        recycler.doOnLayout {
+            val cell = (recycler.layoutManager as? AlbumGridLayoutManager)?.cellSize() ?: 0
+            val halfGap = recycler.resources.getDimensionPixelSize(R.dimen.spacing_album_grid_half_gap)
+            gridThumbWarmer.warm(albums, cell - 2 * halfGap)
+        }
     }
 
     private fun updateNoMusicIndicator(empty: Boolean, indexingState: IndexingState?) {

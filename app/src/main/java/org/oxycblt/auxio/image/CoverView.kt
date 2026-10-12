@@ -46,7 +46,9 @@ import coil3.ImageLoader
 import coil3.asImage
 import coil3.request.ImageRequest
 import coil3.request.target
+import coil3.request.transitionFactory
 import coil3.request.transformations
+import coil3.transition.Transition
 import coil3.util.CoilUtils
 import com.google.android.material.R as MR
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -57,6 +59,8 @@ import javax.inject.Inject
 import kotlin.math.min
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.image.coil.GalleryCoverCollection
+import org.oxycblt.auxio.image.coil.GridThumb
+import org.oxycblt.auxio.image.coil.primaryCover
 import org.oxycblt.auxio.image.coil.RoundedRectTransformation
 import org.oxycblt.auxio.image.coil.SmatteringCoverComposition
 import org.oxycblt.auxio.image.coil.SquareCropTransformation
@@ -105,6 +109,9 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
     private val selectionBadge: ImageView?
     private val iconSize: Int?
 
+    /** Fork pessoal: usa miniaturas em disco do tamanho da célula, sem animação de entrada. */
+    private val gridThumbnail: Boolean
+
     private val checkScaleSpring = Spatial.FAST
     private val checkAlphaSpring = Effect.FAST
     private var fadeAnimators: List<SpringAnimation>? = null
@@ -150,6 +157,7 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
             styledAttrs.getBoolean(R.styleable.CoverView_enablePlaybackIndicator, true)
         val selectionBadgeEnabled =
             styledAttrs.getBoolean(R.styleable.CoverView_enableSelectionBadge, true)
+        gridThumbnail = styledAttrs.getBoolean(R.styleable.CoverView_gridThumbnail, false)
 
         styledAttrs.recycle()
 
@@ -359,16 +367,17 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
      */
     fun bind(album: Album) {
         bindImpl(
-            {
+            { size ->
                 // Generally it's not desirable for many albums to show all of their covers since
                 // unlike artists/genres they don't really change. Therefore just pick the most
                 // "prominent" cover (the one with the most instances) and load that like you
                 // would a song instead.
-                album.covers.covers
-                    .groupBy { it.id }
-                    .maxByOrNull { it.value.size }
-                    ?.value
-                    ?.firstOrNull()
+                val cover = album.primaryCover()
+                if (gridThumbnail && cover != null) {
+                    GridThumb(cover, min(size.width, size.height))
+                } else {
+                    cover
+                }
             },
             context.getString(R.string.desc_album_cover, album.name),
             R.drawable.ic_album_24,
@@ -519,7 +528,11 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         val cornerRadius = shapeAppearanceModel.topLeftCornerSize.getCornerSize(bounds)
         val cornersTransformation = RoundedRectTransformation(cornerRadius)
         val circular = shapeAppearanceModel.topLeftCornerSize is RelativeCornerSize
-        if (circular || imageSettings.forceSquareCovers) {
+        if (gridThumbnail) {
+            // A miniatura já vem quadrada; sem fade, a capa aparece de uma vez.
+            request.transformations(cornersTransformation)
+            request.transitionFactory(Transition.Factory.NONE)
+        } else if (circular || imageSettings.forceSquareCovers) {
             request.transformations(SquareCropTransformation.INSTANCE, cornersTransformation)
         } else {
             request.transformations(cornersTransformation)

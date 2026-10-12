@@ -20,6 +20,7 @@ package org.oxycblt.auxio.image.coil
 
 import android.content.Context
 import coil3.ImageLoader
+import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.request.transitionFactory
 import dagger.Module
@@ -44,6 +45,8 @@ class CoilModule {
         smatteringFetcherFactory: SmatteringCompositionFetcher.Factory,
         stackKeyer: StackCompositionFetcher.Keyer,
         stackFetcherFactory: StackCompositionFetcher.Factory,
+        gridThumbKeyer: GridThumbFetcher.Keyer,
+        gridThumbFactory: GridThumbFetcher.Factory,
     ) =
         ImageLoader.Builder(context)
             .components {
@@ -55,10 +58,14 @@ class CoilModule {
                 add(smatteringFetcherFactory)
                 add(stackKeyer)
                 add(stackFetcherFactory)
+                add(gridThumbKeyer)
+                add(gridThumbFactory)
             }
             // Use our own crossfade with error drawable support
             .transitionFactory(ErrorCrossfadeTransitionFactory())
             // Not downloading anything, so no disk-caching
             .diskCachePolicy(CachePolicy.DISABLED)
+            // Fork pessoal: cache de memória maior, para a grade de capas voltar sem recarregar.
+            .memoryCache { MemoryCache.Builder().maxSizePercent(context, 0.35).build() }
             .build()
 }

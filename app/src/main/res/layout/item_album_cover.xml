@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
+        app:gridThumbnail="true"
         app:iconSize="@dimen/size_icon_large"
         app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Small" />
 
