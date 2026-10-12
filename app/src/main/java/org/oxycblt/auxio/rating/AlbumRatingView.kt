@@ -41,7 +41,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     LinearLayout(context, attrs, defStyleAttr) {
     private val zero: TextView
     private val stars: List<ImageView>
-    private val activeColor = context.getAttrColorCompat(MR.attr.colorPrimary)
+    private val activeColor = context.getAttrColorCompat(androidx.appcompat.R.attr.colorPrimary)
     private val inactiveColor = context.getAttrColorCompat(MR.attr.colorOnSurfaceVariant)
     private var rating: Int? = null
 
