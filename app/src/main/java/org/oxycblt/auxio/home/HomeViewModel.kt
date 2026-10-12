@@ -76,6 +76,17 @@ constructor(
     val albumInstructions: Event<UpdateInstructions>
         field = MutableEvent<UpdateInstructions>()
 
+    /** Fork pessoal: ano usado para filtrar [albumList], ou null para mostrar todos. */
+    val albumYearFilter: StateFlow<Int?>
+        field = MutableStateFlow<Int?>(null)
+
+    /** Fork pessoal: pedido para ir à aba Álbuns (ex.: ao tocar no ano no player). */
+    val showAlbumsTab: Event<Unit>
+        field = MutableEvent<Unit>()
+
+    /** Todos os álbuns, antes do filtro por ano. */
+    private var allAlbums = listOf<Album>()
+
     /** The current [Sort] used for [albumList]. */
     val albumSort: Sort
         get() = listSettings.albumSort
@@ -173,8 +184,12 @@ constructor(
                 songList.value = homeGenerator.songs()
             }
             MusicType.ALBUMS -> {
-                albumInstructions.put(instructions)
-                albumList.value = homeGenerator.albums()
+                allAlbums = homeGenerator.albums()
+                albumInstructions.put(
+                    if (albumYearFilter.value == null) instructions
+                    else UpdateInstructions.Replace(0)
+                )
+                albumList.value = filterAlbums(allAlbums)
             }
             MusicType.ARTISTS -> {
                 artistInstructions.put(instructions)
@@ -212,6 +227,33 @@ constructor(
      */
     fun applyAlbumSort(sort: Sort) {
         listSettings.albumSort = sort
+    }
+
+    /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year]. */
+    fun showAlbumsOfYear(year: Int) {
+        albumYearFilter.value = year
+        refilterAlbums()
+        showAlbumsTab.put(Unit)
+    }
+
+    /** Fork pessoal: volta a mostrar todos os álbuns. */
+    fun clearAlbumYearFilter() {
+        if (albumYearFilter.value == null) return
+        albumYearFilter.value = null
+        refilterAlbums()
+    }
+
+    private fun refilterAlbums() {
+        albumInstructions.put(UpdateInstructions.Replace(0))
+        albumList.value = filterAlbums(allAlbums)
+    }
+
+    private fun filterAlbums(albums: List<Album>): List<Album> {
+        val year = albumYearFilter.value ?: return albums
+        return albums.filter { album ->
+            val dates = album.dates ?: return@filter false
+            year in dates.min.year..dates.max.year
+        }
     }
 
     /**

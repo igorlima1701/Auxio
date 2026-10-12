@@ -164,6 +164,7 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
 
         // --- VIEWMODEL SETUP ---
         collect(homeModel.recreateTabs.flow, ::handleRecreate)
+        collect(homeModel.showAlbumsTab.flow, ::handleShowAlbumsTab)
         collect(homeModel.chooseMusicLocations.flow, ::handleChooseFolders)
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
         collect(detailModel.toShow.flow, ::handleShow)
@@ -267,6 +268,18 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
                 MusicType.GENRES -> R.id.home_genre_recycler
                 MusicType.PLAYLISTS -> R.id.home_playlist_recycler
             }
+    }
+
+    /** Fork pessoal: vai para a aba Álbuns (usado pelo filtro por ano). */
+    private fun handleShowAlbumsTab(show: Unit?) {
+        if (show == null) return
+        homeModel.showAlbumsTab.consume()
+        val idx = homeModel.currentTabTypes.indexOf(MusicType.ALBUMS)
+        if (idx >= 0) {
+            val binding = requireBinding()
+            binding.homePager.setCurrentItem(idx, false)
+            binding.homeAppbar.setExpanded(true, false)
+        }
     }
 
     private fun handleRecreate(recreate: Unit?) {

@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
@@ -97,6 +98,11 @@ class AlbumListFragment :
         binding.homeNoMusicAction.setOnClickListener { homeModel.startChooseMusicLocations() }
 
         collectImmediately(homeModel.albumList, ::updateAlbums)
+        binding.homeFilterChip.apply {
+            setOnClickListener { homeModel.clearAlbumYearFilter() }
+            setOnCloseIconClickListener { homeModel.clearAlbumYearFilter() }
+        }
+        collectImmediately(homeModel.albumYearFilter, ::updateYearFilter)
         collectImmediately(homeModel.empty, musicModel.indexingState, ::updateNoMusicIndicator)
         collectImmediately(listModel.selected, ::updateSelection)
         collectImmediately(
@@ -178,6 +184,23 @@ class AlbumListFragment :
             val cell = (recycler.layoutManager as? AlbumGridLayoutManager)?.cellSize() ?: 0
             val halfGap = recycler.resources.getDimensionPixelSize(R.dimen.spacing_album_grid_half_gap)
             gridThumbWarmer.warm(albums, cell - 2 * halfGap)
+        }
+    }
+
+    /** Fork pessoal: mostra o chip do ano filtrado e abre espaço para ele no topo da grade. */
+    private fun updateYearFilter(year: Int?) {
+        val binding = requireBinding()
+        val chip = binding.homeFilterChip
+        if (year == null) {
+            chip.isVisible = false
+            binding.homeRecycler.updatePadding(top = 0)
+        } else {
+            chip.text = getString(R.string.fmt_number, year)
+            chip.isVisible = true
+            binding.homeRecycler.updatePadding(
+                top = resources.getDimensionPixelSize(R.dimen.size_album_filter_space)
+            )
+            binding.homeRecycler.scrollToPosition(0)
         }
     }
 

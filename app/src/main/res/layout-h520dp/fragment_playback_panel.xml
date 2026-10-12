@@ -65,13 +65,40 @@
             android:fallbackLineSpacing="false"
             tools:text="Artist Name" />
 
-        <TextView
-            android:id="@+id/playback_album"
-            style="@style/Widget.Auxio.TextView.Secondary.Marquee"
+        <!-- Fork pessoal: "Álbum · Ano". Tocar no ano abre os álbuns daquele ano. -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fallbackLineSpacing="false"
-            tools:text="Album Name" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/playback_album"
+                style="@style/Widget.Auxio.TextView.Secondary.Marquee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fallbackLineSpacing="false"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toStartOf="@+id/playback_year"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Album Name" />
+
+            <TextView
+                android:id="@+id/playback_year"
+                style="@style/Widget.Auxio.TextView.Secondary.Base"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fallbackLineSpacing="false"
+                android:maxLines="1"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/playback_album"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text=" · 1997"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

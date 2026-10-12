@@ -59,7 +59,11 @@ class QueueBottomSheetBehavior<V : View>(context: Context, attributeSet: Attribu
         // split-screen resize, where layout happens before insets are re-applied.
         val effectiveBarHeight = if (barHeight > 0) barHeight else getIdealBarHeight(child.context)
         expandedOffset = effectiveBarHeight + barSpacing
-        return super.onLayoutChild(parent, child, layoutDirection)
+        val result = super.onLayoutChild(parent, child, layoutDirection)
+        // Fork pessoal: a fila fica escondida (sem a barra "Fila" no rodapé do player). Ela só
+        // abre pelo ícone no topo do player e fecha arrastando para baixo ou com voltar.
+        peekHeight = 0
+        return result
     }
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View) =
@@ -99,7 +103,8 @@ class QueueBottomSheetBehavior<V : View>(context: Context, attributeSet: Attribu
         }
 
     override fun applyWindowInsets(child: View, insets: WindowInsets): WindowInsets {
-        super.applyWindowInsets(child, insets)
+        // Não chama a implementação base, que recalcularia a altura da barra recolhida.
+        peekHeight = 0
         // Offset our expanded panel by the size of the playback bar, as that is shown when
         // we slide up the panel. Use ideal bar height as fallback when the bar hasn't been
         // measured yet (can occur when window insets are applied before onDependentViewChanged).

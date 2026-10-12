@@ -13,6 +13,20 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/item_song" />
 
+    <!-- Fork pessoal: filtro ativo (ex.: ano) na aba Álbuns. Tocar remove o filtro. -->
+    <com.google.android.material.chip.Chip
+        android:id="@+id/home_filter_chip"
+        style="@style/Widget.Material3.Chip.Input.Elevated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:checkable="false"
+        android:visibility="gone"
+        app:closeIconVisible="true"
+        tools:text="1997"
+        tools:visibility="visible" />
+
 
     <org.oxycblt.auxio.ui.EdgeFrameLayout
         android:layout_width="match_parent"

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_open_queue"
+        android:icon="@drawable/ic_queue_24"
+        android:title="@string/lbl_queue"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_open_equalizer"
         android:icon="@drawable/ic_config_24"
         android:title="@string/lbl_equalizer"

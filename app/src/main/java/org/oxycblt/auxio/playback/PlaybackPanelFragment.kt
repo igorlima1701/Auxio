@@ -30,6 +30,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.activityViewModels
@@ -56,6 +57,9 @@ import org.oxycblt.auxio.util.dampen
 import org.oxycblt.auxio.util.recycler
 import org.oxycblt.auxio.util.showToast
 import org.oxycblt.auxio.util.smoothScrollByPageTo
+import org.oxycblt.auxio.home.HomeViewModel
+import org.oxycblt.auxio.playback.queue.QueueBottomSheetBehavior
+import org.oxycblt.auxio.util.coordinatorLayoutBehavior
 import org.oxycblt.auxio.util.systemBarInsetsCompat
 import org.oxycblt.musikr.MusicParent
 import org.oxycblt.musikr.Song
@@ -79,6 +83,7 @@ class PlaybackPanelFragment :
     private val playbackModel: PlaybackViewModel by activityViewModels()
     private val detailModel: DetailViewModel by activityViewModels()
     private val listModel: ListViewModel by activityViewModels()
+    private val homeModel: HomeViewModel by activityViewModels()
     private val queueModel: QueueViewModel by viewModels()
     private var equalizerLauncher: ActivityResultLauncher<Intent>? = null
     private var userAwarePagerCallback: UserAwarePagerCallback? = null
@@ -109,6 +114,12 @@ class PlaybackPanelFragment :
         binding.playbackToolbar.apply {
             setNavigationOnClickListener { playbackModel.openMain() }
             setOnMenuItemClickListener(this@PlaybackPanelFragment)
+            // Em telas largas a fila já fica sempre visível ao lado; o ícone não é necessário.
+            post {
+                val queueSheet = activity?.findViewById<View>(R.id.queue_sheet)
+                menu.findItem(R.id.action_open_queue)?.isVisible =
+                    queueSheet?.coordinatorLayoutBehavior is QueueBottomSheetBehavior<*>
+            }
         }
 
         binding.playbackPager?.apply {
@@ -230,6 +241,11 @@ class PlaybackPanelFragment :
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_open_queue) {
+            // Fork pessoal: a fila só abre por aqui.
+            playbackModel.openQueue()
+            return true
+        }
         if (item.itemId == R.id.action_open_equalizer) {
             // Launch the system equalizer app, if possible.
             L.d("Launching equalizer")
@@ -269,6 +285,23 @@ class PlaybackPanelFragment :
         binding.playbackSong.text = song.name.resolve(context)
         binding.playbackArtist.text = song.artists.resolveNames(context)
         binding.playbackAlbum?.text = song.album.name.resolve(context)
+        binding.playbackYear?.let { yearView ->
+            // Fork pessoal: "· Ano" depois do álbum; tocar abre os álbuns daquele ano.
+            val dates = song.album.dates
+            if (dates == null) {
+                yearView.isVisible = false
+                yearView.setOnClickListener(null)
+            } else {
+                val min = dates.min.year
+                val max = dates.max.year
+                yearView.text = if (min == max) " · $min" else " · $min–$max"
+                yearView.isVisible = true
+                yearView.setOnClickListener {
+                    homeModel.showAlbumsOfYear(min)
+                    playbackModel.openMain()
+                }
+            }
+        }
         binding.playbackSeekBar?.durationDs = song.durationMs.msToDs()
     }
 
@@ -291,7 +324,8 @@ class PlaybackPanelFragment :
 
     private fun updatePlaying(isPlaying: Boolean) {
         requireBinding().playbackPlayPause.isChecked = isPlaying
-        requireBinding().playbackSeekBar?.setWaveEnabled(isPlaying)
+        // Fork pessoal: barra de progresso sempre reta, sem a onda animada.
+        requireBinding().playbackSeekBar?.setWaveEnabled(false)
     }
 
     private fun updateShuffled(isShuffled: Boolean) {

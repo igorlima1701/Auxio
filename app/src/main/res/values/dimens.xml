@@ -5,6 +5,7 @@
     <!-- Fork pessoal: grade de capas de álbuns -->
     <dimen name="spacing_album_grid_half_gap">2dp</dimen>
     <dimen name="size_album_grid_min_cell">110dp</dimen>
+    <dimen name="size_album_filter_space">52dp</dimen>
     <dimen name="spacing_small">8dp</dimen>
     <dimen name="spacing_mid_medium">12dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>

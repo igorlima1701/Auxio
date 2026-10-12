@@ -213,6 +213,7 @@ class MainFragment :
         collect(detailModel.toShow.flow, ::handleShow)
         collectImmediately(detailModel.editedPlaylist, detailBackCallback::invalidateEnabled)
         collectImmediately(homeModel.showOuter.flow, ::handleShowOuter)
+        collect(homeModel.showAlbumsTab.flow, ::handleShowAlbumsTab)
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
         collectImmediately(homeModel.songList, homeModel.isFastScrolling, ::updateFab)
         collectImmediately(musicModel.indexingState, ::updateIndexerState)
@@ -557,6 +558,18 @@ class MainFragment :
             is Show.GenreDetails,
             is Show.PlaylistDetails,
             null -> {}
+        }
+    }
+
+    /**
+     * Fork pessoal: ao filtrar álbuns por ano, volta para a tela inicial (saindo de telas de
+     * detalhe) para que a aba Álbuns apareça. Quem troca a aba é o HomeFragment.
+     */
+    private fun handleShowAlbumsTab(show: Unit?) {
+        if (show == null) return
+        val navController = requireBinding().exploreNavHost.findNavController()
+        if (navController.currentDestination?.id != R.id.home_fragment) {
+            navController.popBackStack(R.id.home_fragment, false)
         }
     }
 
