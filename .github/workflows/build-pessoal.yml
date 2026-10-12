@@ -1,0 +1,73 @@
+name: APK pessoal
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-pessoal
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instalar ninja
+        run: sudo apt-get install -y ninja-build
+
+      - name: Baixar o código (com submódulos)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "jetbrains"
+          cache: gradle
+
+      - name: Compilar APK release
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew app:assembleRelease --stacktrace 2>&1 | tee build.log
+
+      - name: Publicar APK na release "pessoal"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk Auxio-igor.apk
+          gh release delete pessoal --yes --cleanup-tag || true
+          gh release create pessoal Auxio-igor.apk \
+            --target "$GITHUB_SHA" \
+            --title "Auxio+ build ${GITHUB_RUN_NUMBER}" \
+            --notes "Commit ${GITHUB_SHA::7}. Link fixo do APK: https://github.com/${GITHUB_REPOSITORY}/releases/download/pessoal/Auxio-igor.apk"
+
+      - name: Guardar APK como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: Auxio-igor
+          path: Auxio-igor.apk
+
+      - name: Registrar erro de compilação no commit
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          touch build.log
+          {
+            echo "Falha na compilação (run ${GITHUB_RUN_NUMBER})"
+            echo
+            echo '```'
+            grep -nE '^e: |error:|What went wrong|FAILURE|Exception' build.log | head -n 80
+            echo '---'
+            tail -n 80 build.log
+            echo '```'
+          } > falha.md
+          gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" -F body=@falha.md

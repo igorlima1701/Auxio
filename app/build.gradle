@@ -15,8 +15,9 @@ android {
     namespace "org.oxycblt.auxio"
 
     defaultConfig {
-        applicationId namespace
-        versionName "4.1.5"
+        // Fork pessoal: pacote próprio para instalar ao lado do Auxio oficial.
+        applicationId "io.github.igorlima1701.auxio"
+        versionName "4.1.5-igor" + (System.getenv("GITHUB_RUN_NUMBER") ? "." + System.getenv("GITHUB_RUN_NUMBER") : "")
         versionCode 75
 
         minSdk min_sdk
@@ -40,6 +41,16 @@ android {
         }
     }
 
+    signingConfigs {
+        // Chave fixa do fork pessoal, para que cada APK novo instale por cima do anterior.
+        pessoal {
+            storeFile rootProject.file("keystore/pessoal.jks")
+            storePassword "auxiopessoal"
+            keyAlias "pessoal"
+            keyPassword "auxiopessoal"
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
@@ -47,6 +58,7 @@ android {
         }
 
         release {
+            signingConfig signingConfigs.pessoal
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
