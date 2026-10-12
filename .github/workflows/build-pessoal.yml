@@ -36,7 +36,7 @@ jobs:
         run: |
           NDK=$(grep -oP 'ndk_version = "\K[^"]+' build.gradle)
           for i in 1 2 3; do
-            yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK" > /dev/null && break
+            (yes || true) | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK" > /dev/null && break
             echo "Tentativa $i falhou, repetindo..."
             rm -rf "$ANDROID_SDK_ROOT/ndk/$NDK"
             sleep 10
