@@ -81,7 +81,7 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
         }
 
         collectImmediately(playbackModel.song, ::updateSong)
-        collectImmediately(homeModel.currentTabType, ::updateTab)
+        collectImmediately(homeModel.currentTabType, homeModel.mainPage, ::updateTab)
     }
 
     private fun updateSong(song: Song?) {
@@ -93,23 +93,34 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
         }
     }
 
-    private fun updateTab(tab: MusicType) {
+    private fun updateTab(tab: MusicType, page: HomeViewModel.MainPage) {
         val binding = requireBinding()
         val context = requireContext()
         val active = context.getAttrColorCompat(androidx.appcompat.R.attr.colorPrimary)
         val inactive = context.getAttrColorCompat(MR.attr.colorOnSurfaceVariant)
-        val tabs =
-            mapOf<ImageButton, MusicType>(
-                binding.navAlbums to MusicType.ALBUMS,
-                binding.navArtists to MusicType.ARTISTS,
-                binding.navPlaylists to MusicType.PLAYLISTS,
-            )
-        for ((button, type) in tabs) {
-            button.imageTintList = if (type == tab) active else inactive
-        }
+        val selected =
+            when (page) {
+                HomeViewModel.MainPage.QUEUE -> binding.navQueue
+                HomeViewModel.MainPage.PLAYBACK -> binding.navPlayer
+                HomeViewModel.MainPage.HOME ->
+                    when (tab) {
+                        MusicType.ALBUMS -> binding.navAlbums
+                        MusicType.ARTISTS -> binding.navArtists
+                        MusicType.PLAYLISTS -> binding.navPlaylists
+                        else -> binding.navMore
+                    }
+            }
         for (button in
-            listOf(binding.navQueue, binding.navPlayer, binding.navSearch, binding.navMore)) {
-            button.imageTintList = inactive
+            listOf<ImageButton>(
+                binding.navQueue,
+                binding.navPlayer,
+                binding.navAlbums,
+                binding.navArtists,
+                binding.navPlaylists,
+                binding.navSearch,
+                binding.navMore,
+            )) {
+            button.imageTintList = if (button == selected) active else inactive
         }
     }
 }

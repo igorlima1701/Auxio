@@ -102,6 +102,20 @@ constructor(
     val showTabEvent: Event<MusicType>
         field = MutableEvent<MusicType>()
 
+    /** Fork pessoal: página principal visível (para a barra de abas destacar o ícone certo). */
+    enum class MainPage {
+        HOME,
+        PLAYBACK,
+        QUEUE,
+    }
+
+    val mainPage: StateFlow<MainPage>
+        field = MutableStateFlow(MainPage.HOME)
+
+    fun setMainPage(page: MainPage) {
+        mainPage.value = page
+    }
+
     /** Fork pessoal: pedido para abrir a busca geral. */
     val openSearchEvent: Event<Unit>
         field = MutableEvent<Unit>()
@@ -166,7 +180,7 @@ constructor(
      * A list of [MusicType] corresponding to the current [Tab] configuration, excluding invisible
      * [Tab]s.
      */
-    var currentTabTypes = homeGenerator.tabs()
+    var currentTabTypes = forkTabOrder(homeGenerator.tabs())
         private set
 
     private val _currentTabType = MutableStateFlow(currentTabTypes[0])
@@ -241,7 +255,7 @@ constructor(
     }
 
     override fun invalidateTabs() {
-        currentTabTypes = homeGenerator.tabs()
+        currentTabTypes = forkTabOrder(homeGenerator.tabs())
         recreateTabs.put(Unit)
     }
 
@@ -321,6 +335,19 @@ constructor(
         Normalizer.normalize(text.trim(), Normalizer.Form.NFD)
             .replace(DIACRITICS, "")
             .lowercase()
+
+    /** Ordem das páginas ao deslizar: Álbuns, Artistas, Playlists e depois Músicas e Gêneros. */
+    private fun forkTabOrder(tabs: List<MusicType>): List<MusicType> {
+        val order =
+            listOf(
+                MusicType.ALBUMS,
+                MusicType.ARTISTS,
+                MusicType.PLAYLISTS,
+                MusicType.SONGS,
+                MusicType.GENRES,
+            )
+        return tabs.sortedBy { order.indexOf(it) }
+    }
 
     private companion object {
         val DIACRITICS = Regex("\\p{Mn}+")

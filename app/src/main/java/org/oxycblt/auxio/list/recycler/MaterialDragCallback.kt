@@ -80,7 +80,7 @@ abstract class MaterialDragCallback : ItemTouchHelper.Callback() {
             makeFlag(
                 ItemTouchHelper.ACTION_STATE_DRAG,
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ) or makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.START)
+            ) or makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END) // fork: arrastar para a direita remove (para a esquerda troca de página)
         } else {
             0
         }

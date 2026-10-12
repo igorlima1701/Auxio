@@ -44,6 +44,7 @@ import org.oxycblt.auxio.list.ListViewModel
 import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.music.resolveNames
 import org.oxycblt.auxio.playback.queue.QueueViewModel
+import org.oxycblt.auxio.playback.ui.swiper.PlainCoverTransformer
 import org.oxycblt.auxio.playback.state.RepeatMode
 import org.oxycblt.auxio.playback.ui.StyledSeekBar
 import org.oxycblt.auxio.playback.ui.stepper.Direction
@@ -113,12 +114,6 @@ class PlaybackPanelFragment :
         binding.playbackToolbar.apply {
             setNavigationOnClickListener { playbackModel.openMain() }
             setOnMenuItemClickListener(this@PlaybackPanelFragment)
-            // Em telas largas a fila já fica sempre visível ao lado; o ícone não é necessário.
-            post {
-                val queueSheet = activity?.findViewById<View>(R.id.queue_sheet)
-                menu.findItem(R.id.action_open_queue)?.isVisible =
-                    queueSheet?.coordinatorLayoutBehavior is QueueBottomSheetBehavior<*>
-            }
         }
 
         binding.playbackPager?.apply {
@@ -133,6 +128,7 @@ class PlaybackPanelFragment :
                     }
                     .also { it.attach() }
             // Fork pessoal: troca de capa sem o efeito carrossel.
+            setPageTransformer(PlainCoverTransformer())
             recycler().apply {
                 // Make it possible to collapse the bottom sheet from the ViewPager's touch area.
                 isNestedScrollingEnabled = false
