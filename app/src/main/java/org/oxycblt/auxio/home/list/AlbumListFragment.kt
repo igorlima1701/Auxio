@@ -84,6 +84,7 @@ class AlbumListFragment :
             // Mais células prontas para reciclar, para a rolagem rápida não precisar inflar views.
             recycledViewPool.setMaxRecycledViews(0, 48)
             setItemViewCacheSize(12)
+            itemAnimator = null
             adapter = albumAdapter
             popupProvider = this@AlbumListFragment
             listener = this@AlbumListFragment

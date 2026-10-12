@@ -23,6 +23,7 @@ import coil3.ImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.request.transitionFactory
+import coil3.transition.Transition
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,8 +62,8 @@ class CoilModule {
                 add(gridThumbKeyer)
                 add(gridThumbFactory)
             }
-            // Use our own crossfade with error drawable support
-            .transitionFactory(ErrorCrossfadeTransitionFactory())
+            // Fork pessoal: sem fade; a capa aparece de uma vez assim que fica pronta.
+            .transitionFactory(Transition.Factory.NONE)
             // Not downloading anything, so no disk-caching
             .diskCachePolicy(CachePolicy.DISABLED)
             // Fork pessoal: cache de memória maior, para a grade de capas voltar sem recarregar.

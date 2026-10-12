@@ -26,7 +26,6 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.transition.MaterialSharedAxis
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -62,10 +61,11 @@ abstract class DetailFragment<P : MusicParent, C : Music> :
         lastWasScrolled = savedInstanceState?.getBoolean(KEY_SCROLLED) ?: false
         // Detail transitions are always on the X axis. Shared element transitions are more
         // semantically correct, but are also too buggy to be sensible.
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+        // Fork pessoal: sem animação entre a lista e o álbum/artista; a tela troca na hora.
+        enterTransition = null
+        returnTransition = null
+        exitTransition = null
+        reenterTransition = null
     }
 
     override fun onCreateBinding(inflater: LayoutInflater) = FragmentDetailBinding.inflate(inflater)
@@ -120,7 +120,11 @@ abstract class DetailFragment<P : MusicParent, C : Music> :
             setOnOverflowMenuClick { onOpenParentMenu() }
         }
 
-        binding.detailRecycler.apply { adapter = getDetailListAdapter() }
+        binding.detailRecycler.apply {
+            // Fork pessoal: a lista aparece pronta, sem animar a entrada dos itens.
+            itemAnimator = null
+            adapter = getDetailListAdapter()
+        }
 
         spacingSmall = requireContext().getDimenPixels(R.dimen.spacing_small)
     }
