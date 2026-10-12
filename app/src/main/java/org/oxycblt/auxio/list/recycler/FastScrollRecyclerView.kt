@@ -426,6 +426,9 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
             hidePopup()
             return
         }
+        // Fork pessoal: a lista voltou a ser rolável (ex.: depois de tirar um filtro), então a
+        // barra de rolagem rápida volta a funcionar.
+        fastScrollingPossible = true
         val extentY = computeVerticalScrollExtent()
         val fraction = (offsetY).toFloat() / (computeVerticalScrollRange() - extentY)
         thumbOffset = (thumbOffsetRange * fraction).toInt()
