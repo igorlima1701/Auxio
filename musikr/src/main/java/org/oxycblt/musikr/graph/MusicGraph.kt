@@ -29,6 +29,7 @@ import org.oxycblt.musikr.tag.interpret.PreArtistsFrom
 import org.oxycblt.musikr.tag.interpret.PreGenre
 import org.oxycblt.musikr.tag.interpret.PreSong
 import org.oxycblt.musikr.util.unlikelyToBeNull
+import org.oxycblt.musikr.util.update
 
 internal data class MusicGraph(
     val songVertex: List<SongVertex>,
@@ -187,8 +188,27 @@ private class MusicGraphBuilderImpl : MusicGraph.Builder {
 
     override fun add(preSong: PreSong) {
         val uid = preSong.v363Uid
-        if (songVertices.containsKey(uid)) {
-            return
+        val existing = songVertices[uid]
+        if (existing != null) {
+            val existingPath = existing.preSong.path.components.unixString
+            val newPath = preSong.path.components.unixString
+            if (existingPath == newPath) {
+                // Same file seen twice, nothing to add.
+                return
+            }
+            // Auxio+: two different files whose tags hash to the same UID (the hash ignores
+            // letter case, so "cursor" and "Cursor" collide). Upstream Auxio drops one of them;
+            // here both are kept. The file with the smaller path keeps the original UID so the
+            // outcome does not depend on scan order, and the other one gets a UID derived from
+            // the original plus its own path.
+            if (newPath < existingPath) {
+                songVertices.remove(uid)
+                existing.preSong = existing.preSong.withPathUid(existingPath)
+                songVertices[existing.preSong.v363Uid] = existing
+            } else {
+                add(preSong.withPathUid(newPath))
+                return
+            }
         }
 
         val songGenreVertices =
@@ -238,6 +258,15 @@ private class MusicGraphBuilderImpl : MusicGraph.Builder {
         songGenreVertices.forEach { genreVertex -> genreVertex.songVertices.add(songVertex) }
 
         songVertices[uid] = songVertex
+    }
+
+    private fun PreSong.withPathUid(path: String): PreSong {
+        val pathUid =
+            Music.UID.auxio(Music.UID.Item.SONG) {
+                update(v363Uid.toString())
+                update(path)
+            }
+        return copy(v363Uid = pathUid, v400Uid = pathUid, v401Uid = pathUid)
     }
 
     override fun add(prePlaylist: PrePlaylist) {
@@ -533,7 +562,7 @@ internal interface Vertex {
 }
 
 internal class SongVertex(
-    val preSong: PreSong,
+    var preSong: PreSong,
     var albumVertex: AlbumVertex,
     var artistVertices: MutableList<ArtistVertex>,
     var genreVertices: MutableList<GenreVertex>,
