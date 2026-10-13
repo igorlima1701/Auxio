@@ -58,6 +58,18 @@ class Auxio : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
+        // Fork pessoal: guarda o erro de um fechamento inesperado, para mostrar na próxima abertura.
+        val previousHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, error ->
+            try {
+                java.io.File(filesDir, "last_crash.txt")
+                    .writeText(
+                        BuildConfig.VERSION_NAME + "\n" + android.util.Log.getStackTraceString(error)
+                    )
+            } catch (_: Throwable) {}
+            previousHandler?.uncaughtException(thread, error)
+        }
+
         // Fork pessoal: carrega as notas dos álbuns.
         org.oxycblt.auxio.rating.AlbumRatings.init(this)
         org.oxycblt.auxio.playback.PlayHistory.init(this)

@@ -76,6 +76,16 @@ constructor(
     val toShow: Event<Show>
         field = MutableEvent<Show>()
 
+    /**
+     * Fork pessoal: pedidos feitos fora da tela inicial (no player ou na fila). Só a tela principal
+     * trata estes, montando a tela certa antes de mostrá-la; as telas de detalhe não os veem.
+     */
+    val outsideShow: Event<Show>
+        field = MutableEvent<Show>()
+
+    /** Fork pessoal: true enquanto a página visível não é a tela inicial. */
+    @Volatile var routeOutside = false
+
     // --- SONG ---
 
     /** The current [Song] to display. Null if there is nothing to show. */
@@ -292,6 +302,10 @@ constructor(
     fun showPlaylist(playlist: Playlist) = showImpl(Show.PlaylistDetails(playlist))
 
     private fun showImpl(show: Show) {
+        if (routeOutside) {
+            outsideShow.put(show)
+            return
+        }
         val existing = toShow.flow.value
         if (existing != null) {
             L.d("Already have pending show command $existing, ignoring $show")

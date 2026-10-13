@@ -217,7 +217,7 @@ class MainFragment :
         // by StateFlow over any detail fragment.
         // FIXME: This is a consequence of sharing events across several consumers. There has to be
         //  a better way of doing this.
-        collect(detailModel.toShow.flow, ::handleShow)
+        collectImmediately(detailModel.outsideShow.flow, ::handleShow)
         collectImmediately(detailModel.editedPlaylist, detailBackCallback::invalidateEnabled)
         collectImmediately(homeModel.showOuter.flow, ::handleShowOuter)
         collect(homeModel.showTabEvent.flow, ::handleShowTab)
@@ -231,6 +231,7 @@ class MainFragment :
         // Fork pessoal: várias filas.
         collectImmediately(multiQueue.pendingAdd, ::handlePendingAdd)
         collectImmediately(homeModel.albumFilter, homeModel.currentTabType) { _, _ -> updateYearBack() }
+        showLastCrash()
         // Fork pessoal: aviso da prévia; tocar nele para a prévia.
         binding.previewBanner.setOnClickListener { org.oxycblt.auxio.playback.PreviewPlayer.stop() }
         collectImmediately(org.oxycblt.auxio.playback.PreviewPlayer.current) { song ->
@@ -240,6 +241,35 @@ class MainFragment :
                 banner.text = getString(R.string.lng_preview_banner, song.name.resolve(requireContext()))
             }
         }
+    }
+
+    /** Fork pessoal: se o app fechou com erro da última vez, mostra o erro (para enviar ao Claude). */
+    private fun showLastCrash() {
+        val file = java.io.File(requireContext().filesDir, "last_crash.txt")
+        if (!file.exists()) return
+        val text = runCatching { file.readText() }.getOrDefault("")
+        file.delete()
+        if (text.isBlank()) return
+        val context = requireContext()
+        val view =
+            android.widget.TextView(context).apply {
+                this.text = text
+                setTextIsSelectable(true)
+                textSize = 11f
+                val pad = (16 * resources.displayMetrics.density).toInt()
+                setPadding(pad, pad / 2, pad, 0)
+            }
+        val scroll = android.widget.ScrollView(context).apply { addView(view) }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.lbl_last_crash)
+            .setView(scroll)
+            .setPositiveButton(R.string.lbl_last_crash_copy) { _, _ ->
+                val clipboard =
+                    context.getSystemService(android.content.ClipboardManager::class.java)
+                clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Auxio+ erro", text))
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .show()
     }
 
     private fun handlePendingAdd(songs: List<org.oxycblt.musikr.Song>?) {
@@ -479,18 +509,22 @@ class MainFragment :
 
     private fun handleShow(show: Show?) {
         if (show == null) return
-        // Na tela inicial, a navegação é feita pela própria tela (sem troca de página).
-        if (currentPage == Page.HOME) return
+        detailModel.outsideShow.consume()
+        // Pedido antigo que ficou pendurado não deve ser tratado depois por outra tela.
+        detailModel.toShow.consume()
         // Fork pessoal: vindo do player ou da fila, monta tudo escondido e só então mostra, para
         // não aparecer por um instante a tela que estava aberta antes.
         when (show) {
-            is Show.SongAlbumDetails ->
+            is Show.SongAlbumDetails -> {
                 showDetailFromOutside(
                     MusicType.ALBUMS,
                     R.id.album_detail_fragment,
                     "albumUid",
                     show.song.album.uid,
                 )
+                // Já na tela inicial: o álbum aberto rola até a música.
+                detailModel.showAlbum(show.song)
+            }
             is Show.AlbumDetails ->
                 showDetailFromOutside(
                     MusicType.ALBUMS,
@@ -519,10 +553,20 @@ class MainFragment :
                     "playlistUid",
                     show.playlist.uid,
                 )
-            // Escolha entre artistas: abre a tela inicial e a própria tela mostra a escolha.
-            is Show.SongArtistDecision,
-            is Show.AlbumArtistDecision -> showPage(Page.HOME)
-            is Show.SongDetails -> {}
+            // Escolha entre artistas e detalhes da música: abre a tela inicial e repassa o pedido
+            // para a tela que estiver aberta.
+            is Show.SongArtistDecision -> {
+                showPage(Page.HOME)
+                detailModel.showArtist(show.song)
+            }
+            is Show.AlbumArtistDecision -> {
+                showPage(Page.HOME)
+                detailModel.showArtist(show.album)
+            }
+            is Show.SongDetails -> {
+                showPage(Page.HOME)
+                detailModel.showSong(show.song)
+            }
         }
     }
 
@@ -716,6 +760,7 @@ class MainFragment :
         val target = if (page != Page.HOME && playbackModel.song.value == null) Page.HOME else page
         val binding = requireBinding()
         currentPage = target
+        detailModel.routeOutside = target != Page.HOME
         binding.playbackPage.isInvisible = target != Page.PLAYBACK
         binding.queuePage.isInvisible = target != Page.QUEUE
         binding.mainExplore.isInvisible = target != Page.HOME
