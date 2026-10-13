@@ -327,6 +327,10 @@ constructor(
     val revealAlbumEvent: Event<Album>
         field = MutableEvent<Album>()
 
+    fun revealAlbum(album: Album) {
+        revealAlbumEvent.put(album)
+    }
+
     /** Fork pessoal: a próxima troca de aba deve ir para a lista, não para a tela salva da aba. */
     var nextTabToGrid = false
 

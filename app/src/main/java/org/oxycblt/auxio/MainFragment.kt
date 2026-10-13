@@ -568,7 +568,7 @@ class MainFragment :
                     // Fork pessoal: saindo de um álbum pelo ícone de Álbuns, o grid aparece no
                     // álbum que está tocando.
                     if (type == MusicType.ALBUMS && !toGrid) {
-                        playbackModel.song.value?.album?.let { homeModel.revealAlbumEvent.put(it) }
+                        playbackModel.song.value?.album?.let { homeModel.revealAlbum(it) }
                     }
                     popToHome()
                     flushExploreNav()
