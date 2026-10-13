@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fork pessoal: editor do .lrc da música. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/spacing_large"
+    android:paddingTop="@dimen/spacing_small">
+
+    <TextView
+        android:id="@+id/lyrics_edit_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_small"
+        android:alpha="0.7"
+        android:textSize="13sp" />
+
+    <EditText
+        android:id="@+id/lyrics_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:gravity="top|start"
+        android:hint="@string/lng_lyrics_edit_hint"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:scrollbars="vertical"
+        android:textSize="15sp" />
+
+</LinearLayout>

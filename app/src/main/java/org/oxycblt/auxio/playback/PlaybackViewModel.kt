@@ -448,6 +448,14 @@ constructor(
         playbackManager.seekTo(positionDs.dsToMs())
     }
 
+    /** Fork pessoal: pula para [positionMs] milissegundos (usado pela letra sincronizada). */
+    fun seekToMs(positionMs: Long) {
+        playbackManager.seekTo(positionMs)
+    }
+
+    /** Fork pessoal: posição exata da música agora, em milissegundos. */
+    fun positionMs(): Long = playbackManager.progression.calculateElapsedPositionMs()
+
     /** Step back by 10 seconds in the current song. */
     fun stepBackwards() {
         L.d("Stepping back 10 seconds")

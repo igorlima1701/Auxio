@@ -84,4 +84,20 @@
     <string name="lbl_add_to_playlists" translatable="false">Adicionar a playlists</string>
     <string name="lbl_stop_after" translatable="false">Parar depois desta música</string>
     <string name="lbl_stop_after_cancel" translatable="false">Não parar depois desta música</string>
+    <string name="lbl_refresh_library" translatable="false">Atualizar biblioteca</string>
+    <string name="lng_refreshing" translatable="false">Atualizando a biblioteca…</string>
+    <string name="lbl_lyrics_cover" translatable="false">Voltar para a capa</string>
+    <string name="lbl_lyrics_edit" translatable="false">Editar letra</string>
+    <string name="lbl_lyrics_stamp" translatable="false">Inserir tempo</string>
+    <string name="lbl_lyrics_lrc" translatable="false">LRC</string>
+    <string name="lbl_lyrics_lrc_synced" translatable="false">LRC sincronizado</string>
+    <string name="lbl_lyrics_embedded" translatable="false">Letra embutida na música</string>
+    <string name="lng_lyrics_none" translatable="false">Esta música não tem letra.\nToque no lápis para escrever uma.</string>
+    <string name="lng_lyrics_loading" translatable="false">Carregando…</string>
+    <string name="lng_lyrics_edit_hint" translatable="false">[00:12.34]Primeira linha</string>
+    <string name="lng_lyrics_file" translatable="false">Arquivo: %s</string>
+    <string name="lng_lyrics_new_file" translatable="false">A música não tem letra. Ao salvar, será criado o arquivo %s na pasta da música.</string>
+    <string name="lng_lyrics_from_embedded" translatable="false">Esta é a letra embutida na música. Ao salvar, ela vai para o arquivo %s; a música não é alterada.</string>
+    <string name="lng_lyrics_saved" translatable="false">Letra salva</string>
+    <string name="err_lyrics_save" translatable="false">Não foi possível salvar: %s</string>
 </resources>

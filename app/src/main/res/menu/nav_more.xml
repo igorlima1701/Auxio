@@ -8,6 +8,9 @@
         android:id="@+id/nav_more_genres"
         android:title="@string/lbl_genres" />
     <item
+        android:id="@+id/nav_more_refresh"
+        android:title="@string/lbl_refresh_library" />
+    <item
         android:id="@+id/nav_more_settings"
         android:title="@string/set_root_title" />
     <item

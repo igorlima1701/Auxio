@@ -279,7 +279,8 @@ class AlbumDetailFragment : DetailFragment<Album, Song>() {
 
     private fun updatePlayback(song: Song?, parent: MusicParent?, isPlaying: Boolean) {
         albumListAdapter.setPlaying(
-            song.takeIf { parent == detailModel.currentAlbum.value },
+            // Fork pessoal: destaca a música do álbum mesmo se ela foi tocada de outra lista.
+            song.takeIf { parent == detailModel.currentAlbum.value || it?.album == detailModel.currentAlbum.value },
             isPlaying,
         )
     }
@@ -305,38 +306,20 @@ class AlbumDetailFragment : DetailFragment<Album, Song>() {
         val pos = detailModel.albumSongList.value.indexOf(song)
 
         if (pos != -1) {
-            // Only scroll if the song is within this album.
+            // Fork pessoal: pula direto para a música (sem rolagem animada), deixando-a perto do
+            // meio da tela. A espera pelo layout cobre o caso de o álbum ter acabado de abrir.
             val binding = requireBinding()
-            // RecyclerView will scroll assuming it has the total height of the screen (i.e a
-            // collapsed appbar), so we need to collapse the appbar if that's the case.
-            binding.detailAppbar?.setExpanded(false)
-            if (!binding.detailRecycler.canScroll()) {
-                // Don't scroll if the RecyclerView goes off screen. If we go anyway, overscroll
-                // kicks in and creates a weird bounce effect.
-                return
-            }
             binding.detailRecycler.post {
-                // Use a custom smooth scroller that will settle the item in the middle of
-                // the screen rather than the end.
-                val centerSmoothScroller =
-                    object : LinearSmoothScroller(context) {
-                        init {
-                            targetPosition = pos
-                        }
-
-                        override fun calculateDtToFit(
-                            viewStart: Int,
-                            viewEnd: Int,
-                            boxStart: Int,
-                            boxEnd: Int,
-                            snapPreference: Int,
-                        ) =
-                            (boxStart + (boxEnd - boxStart) / 2) -
-                                (viewStart + (viewEnd - viewStart) / 2)
-                    }
-
-                // Make sure to increment the position to make up for the detail header
-                binding.detailRecycler.layoutManager?.startSmoothScroll(centerSmoothScroller)
+                val recycler = this.binding?.detailRecycler ?: return@post
+                if (!recycler.canScroll()) return@post
+                this.binding?.detailAppbar?.setExpanded(false, false)
+                val manager =
+                    recycler.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager
+                if (manager == null) {
+                    recycler.scrollToPosition(pos)
+                } else {
+                    manager.scrollToPositionWithOffset(pos, recycler.height / 3)
+                }
             }
         }
     }

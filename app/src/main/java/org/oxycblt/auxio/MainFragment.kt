@@ -167,7 +167,7 @@ class MainFragment :
             onSwipe = { direction -> if (direction < 0) showPage(Page.PLAYBACK) }
         }
         binding.playbackPage.apply {
-            excludedIds = listOf(R.id.playback_pager, R.id.playback_seek_bar)
+            excludedIds = listOf(R.id.playback_pager, R.id.playback_seek_bar, R.id.playback_lyrics)
             onSwipe = { direction ->
                 if (direction > 0) {
                     showPage(Page.HOME)

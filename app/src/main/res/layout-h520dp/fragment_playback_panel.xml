@@ -34,6 +34,17 @@
         app:layout_constraintTop_toBottomOf="@+id/playback_toolbar"
         app:layout_constraintVertical_chainStyle="packed" />
 
+    <!-- Fork pessoal: letra no lugar da capa (tocar na capa alterna). Montada no código. -->
+    <FrameLayout
+        android:id="@+id/playback_lyrics"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/playback_pager"
+        app:layout_constraintEnd_toEndOf="@+id/playback_pager"
+        app:layout_constraintStart_toStartOf="@+id/playback_pager"
+        app:layout_constraintTop_toTopOf="@+id/playback_pager" />
+
     <LinearLayout
         android:id="@+id/playback_info_container"
         android:layout_width="0dp"

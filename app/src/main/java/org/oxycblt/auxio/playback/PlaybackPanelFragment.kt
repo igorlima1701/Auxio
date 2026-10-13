@@ -30,17 +30,22 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentPlaybackPanelBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.list.ListViewModel
+import org.oxycblt.auxio.lyrics.LyricsEditDialog
+import org.oxycblt.auxio.lyrics.LyricsFiles
+import org.oxycblt.auxio.lyrics.LyricsPanel
 import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.music.resolveNames
 import org.oxycblt.auxio.playback.queue.QueueViewModel
@@ -51,6 +56,7 @@ import org.oxycblt.auxio.playback.ui.stepper.Direction
 import org.oxycblt.auxio.playback.ui.stepper.StepperOverlay
 import org.oxycblt.auxio.playback.ui.swiper.CoverPagerAdapter
 import org.oxycblt.auxio.playback.ui.swiper.UserAwarePagerCallback
+import org.oxycblt.auxio.tagedit.SongInfoDialog
 import org.oxycblt.auxio.ui.ViewBindingFragment
 import org.oxycblt.auxio.util.collectImmediately
 import org.oxycblt.auxio.util.dampen
@@ -87,6 +93,7 @@ class PlaybackPanelFragment :
     private val queueModel: QueueViewModel by viewModels()
     private var equalizerLauncher: ActivityResultLauncher<Intent>? = null
     private var userAwarePagerCallback: UserAwarePagerCallback? = null
+    private var lyricsPanel: LyricsPanel? = null
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentPlaybackPanelBinding.inflate(inflater)
@@ -179,6 +186,18 @@ class PlaybackPanelFragment :
             }
         }
 
+        // Fork pessoal: letra no lugar da capa.
+        binding.playbackLyrics?.let { container ->
+            lyricsPanel =
+                LyricsPanel(
+                    container,
+                    viewLifecycleOwner.lifecycleScope,
+                    onSeek = { playbackModel.seekToMs(it) },
+                    onClose = { setLyricsShown(false) },
+                    onEdit = { LyricsEditDialog.show(requireActivity(), it) },
+                )
+        }
+
         // --- VIEWMODEL SETUP --
         collectImmediately(playbackModel.song, ::updateSong)
         collectImmediately(playbackModel.parent, ::updateParent)
@@ -187,6 +206,28 @@ class PlaybackPanelFragment :
         collectImmediately(playbackModel.isPlaying, ::updatePlaying)
         collectImmediately(playbackModel.isShuffled, ::updateShuffled)
         collectImmediately(playbackModel.pagerQueue, ::updatePager)
+        collectImmediately(LyricsFiles.version) {
+            if (lyricsShown) lyricsPanel?.bind(playbackModel.song.value)
+        }
+        setLyricsShown(lyricsShown)
+    }
+
+    override fun onCoverTap() {
+        if (lyricsPanel != null) setLyricsShown(!lyricsShown)
+    }
+
+    private fun setLyricsShown(show: Boolean) {
+        val binding = binding ?: return
+        val panel = lyricsPanel
+        val container = binding.playbackLyrics
+        if (panel == null || container == null) return
+        lyricsShown = show
+        container.isVisible = show
+        binding.playbackPager.isInvisible = show
+        if (show) {
+            panel.bind(playbackModel.song.value)
+            panel.onPosition(playbackModel.positionMs())
+        }
     }
 
     // FIXME: Old code!! Maybe not necessary anymore?
@@ -226,6 +267,7 @@ class PlaybackPanelFragment :
 
     override fun onDestroyBinding(binding: FragmentPlaybackPanelBinding) {
         equalizerLauncher = null
+        lyricsPanel = null
         binding.playbackRepeat.clearPendingIcon()
         binding.playbackSong.isSelected = false
         binding.playbackArtist.isSelected = false
@@ -298,6 +340,7 @@ class PlaybackPanelFragment :
             }
         }
         binding.playbackSeekBar?.durationDs = song.durationMs.msToDs()
+        if (lyricsShown) lyricsPanel?.bind(song)
     }
 
     private fun updateParent(parent: MusicParent?) {
@@ -309,6 +352,7 @@ class PlaybackPanelFragment :
 
     private fun updatePosition(positionDs: Long) {
         requireBinding().playbackSeekBar?.positionDs = positionDs
+        if (lyricsShown) lyricsPanel?.onPosition(positionDs * 100)
     }
 
     private fun updateRepeat(repeatMode: RepeatMode) {
@@ -409,7 +453,8 @@ class PlaybackPanelFragment :
     }
 
     private fun navigateToCurrentSong() {
-        playbackModel.song.value?.let(detailModel::showAlbum)
+        // Fork pessoal: o nome da música abre as informações da música.
+        playbackModel.song.value?.let { SongInfoDialog.show(requireActivity(), it) }
     }
 
     private fun navigateToCurrentArtist() {
@@ -417,7 +462,13 @@ class PlaybackPanelFragment :
     }
 
     private fun navigateToCurrentAlbum() {
-        playbackModel.song.value?.let { detailModel.showAlbum(it.album) }
+        // Fork pessoal: abre o álbum já na música que está tocando.
+        playbackModel.song.value?.let(detailModel::showAlbum)
+    }
+
+    private companion object {
+        /** Lembra se a letra estava aberta, para continuar aberta ao voltar ao player. */
+        var lyricsShown = false
     }
 
     override fun seek(direction: Direction) {

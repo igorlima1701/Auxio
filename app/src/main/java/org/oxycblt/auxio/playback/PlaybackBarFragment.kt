@@ -30,9 +30,11 @@ import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentPlaybackBarBinding
 import org.oxycblt.auxio.home.HomeViewModel
 import org.oxycblt.auxio.music.MusicType
+import org.oxycblt.auxio.music.MusicViewModel
 import org.oxycblt.auxio.ui.ViewBindingFragment
 import org.oxycblt.auxio.util.collectImmediately
 import org.oxycblt.auxio.util.getAttrColorCompat
+import org.oxycblt.auxio.util.showToast
 import org.oxycblt.musikr.Song
 
 /**
@@ -45,6 +47,7 @@ import org.oxycblt.musikr.Song
 class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
     private val playbackModel: PlaybackViewModel by activityViewModels()
     private val homeModel: HomeViewModel by activityViewModels()
+    private val musicModel: MusicViewModel by activityViewModels()
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentPlaybackBarBinding.inflate(inflater)
@@ -72,6 +75,10 @@ class PlaybackBarFragment : ViewBindingFragment<FragmentPlaybackBarBinding>() {
                     when (item.itemId) {
                         R.id.nav_more_songs -> homeModel.showTab(MusicType.SONGS)
                         R.id.nav_more_genres -> homeModel.showTab(MusicType.GENRES)
+                        R.id.nav_more_refresh -> {
+                            musicModel.refresh()
+                            requireContext().showToast(R.string.lng_refreshing)
+                        }
                         R.id.nav_more_settings -> homeModel.showSettings()
                         R.id.nav_more_about -> homeModel.showAbout()
                     }

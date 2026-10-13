@@ -620,6 +620,11 @@ namespace tagedit {
         out.push_back({"LYRICIST", first("LYRICIST")});
         out.push_back({"COMMENT", join(currentValues(props, "COMMENT"))});
         out.push_back({"ALBUMRATING", first("ALBUMRATING")});
+        {
+            // Fork pessoal: letra embutida (USLT no MP3, LYRICS no FLAC/Ogg). Só a primeira.
+            auto it = props.find("LYRICS");
+            out.push_back({"LYRICS", it != props.end() && !it->second.isEmpty() ? it->second.front() : String()});
+        }
 
         auto *audio = file->audioProperties();
         if (audio != nullptr) {

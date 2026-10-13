@@ -71,6 +71,9 @@ class StepperOverlay(context: Context, attrs: AttributeSet?) :
 
     interface Listener {
         fun seek(direction: Direction)
+
+        /** Fork pessoal: toque simples na capa (alterna capa e letra). */
+        fun onCoverTap() {}
     }
 
     init {
@@ -136,7 +139,10 @@ class StepperOverlay(context: Context, attrs: AttributeSet?) :
     override fun onTouchEvent(event: MotionEvent): Boolean =
         gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
 
-    override fun onSingleTapConfirmed(e: MotionEvent) = false
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        listener?.onCoverTap()
+        return true
+    }
 
     private fun enter(
         secondsView: SecondsView,
