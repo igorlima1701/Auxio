@@ -191,6 +191,7 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                 dismiss()
                 detailModel.showAlbum(music)
             }
+            else -> {}
         }
     }
 
@@ -235,6 +236,7 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                     b.autoCover.bind(music)
                     b.autoTitle.text = music.name.resolve(b.root.context)
                 }
+                else -> {}
             }
             b.autoSubtitle.text = subtitle(row)
             b.root.setOnClickListener {
