@@ -23,6 +23,11 @@
         android:id="@+id/action_playlist_add"
         android:icon="@drawable/ic_playlist_add_24"
         android:title="@string/lbl_playlist_add" />
+    <!-- Fork pessoal: editar as tags das músicas selecionadas, todas juntas. -->
+    <item
+        android:id="@+id/action_edit_tags"
+        android:icon="@drawable/ic_edit_24"
+        android:title="@string/lbl_edit_tags" />
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_24"

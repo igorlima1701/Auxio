@@ -388,6 +388,7 @@ class SelectionMenuDialogFragment : MenuDialogFragment<Menu.ForSelection>() {
             }
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.songs)
             R.id.action_share -> requireContext().share(menu.songs)
+            R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.songs)
             else -> error("Unexpected menu item selected $item")
         }
     }

@@ -126,6 +126,24 @@ class MainFragment :
     private val tabScroll = mutableMapOf<MusicType, SavedScroll?>()
     private var searchOpen = false
 
+    /** Fork pessoal: "voltar" no grid filtrado pelo ano do player tira o filtro. */
+    private val yearBackCallback =
+        object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                homeModel.clearAlbumFilter()
+                updateYearBack()
+            }
+        }
+
+    private fun updateYearBack() {
+        yearBackCallback.isEnabled =
+            homeModel.yearFilterFromPlayer &&
+                !homeModel.albumFilter.value.isEmpty &&
+                currentPage == Page.HOME &&
+                openStack.isEmpty() &&
+                homeModel.currentTabType.value == MusicType.ALBUMS
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Fork pessoal: sem animação ao abrir configurações/sobre.
@@ -212,6 +230,7 @@ class MainFragment :
         collectImmediately(playbackModel.openPanel.flow, ::handlePanel)
         // Fork pessoal: várias filas.
         collectImmediately(multiQueue.pendingAdd, ::handlePendingAdd)
+        collectImmediately(homeModel.albumFilter, homeModel.currentTabType) { _, _ -> updateYearBack() }
         // Fork pessoal: aviso da prévia; tocar nele para a prévia.
         binding.previewBanner.setOnClickListener { org.oxycblt.auxio.playback.PreviewPlayer.stop() }
         collectImmediately(org.oxycblt.auxio.playback.PreviewPlayer.current) { song ->
@@ -256,6 +275,7 @@ class MainFragment :
             addCallback(viewLifecycleOwner, requireNotNull(selectionBackCallback))
             addCallback(viewLifecycleOwner, requireNotNull(detailBackCallback))
             addCallback(viewLifecycleOwner, requireNotNull(sheetBackCallback))
+            addCallback(viewLifecycleOwner, yearBackCallback)
         }
     }
 
@@ -545,6 +565,11 @@ class MainFragment :
                 tabScroll.remove(type)
                 if (openStack.isNotEmpty()) {
                     if (onHome) binding.mainExplore.isInvisible = true
+                    // Fork pessoal: saindo de um álbum pelo ícone de Álbuns, o grid aparece no
+                    // álbum que está tocando.
+                    if (type == MusicType.ALBUMS && !toGrid) {
+                        playbackModel.song.value?.album?.let { homeModel.revealAlbumEvent.put(it) }
+                    }
                     popToHome()
                     flushExploreNav()
                 }
@@ -646,6 +671,7 @@ class MainFragment :
             if (destination.id == R.id.home_fragment) {
                 openStack.clear()
                 searchOpen = false
+                updateYearBack()
                 return@OnDestinationChangedListener
             }
             val entry = controller.currentBackStackEntry ?: return@OnDestinationChangedListener
@@ -655,6 +681,7 @@ class MainFragment :
             } else {
                 openStack.add(SavedDest(entry.id, destination.id, arguments))
             }
+            updateYearBack()
         }
 
     private fun handleShowOuter(outer: Outer?) {
@@ -701,6 +728,7 @@ class MainFragment :
         )
         requireNotNull(sheetBackCallback) { "PagesBackPressedCallback was not available" }
             .invalidateEnabled()
+        updateYearBack()
         updateFabVisibility(
             binding,
             homeModel.songList.value,

@@ -283,6 +283,8 @@ constructor(
     /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year] (mantendo o filtro de nota). */
     fun showAlbumsOfYear(year: Int) {
         setAlbumFilter(albumFilter.value.copy(years = setOf(year)))
+        // "Voltar" depois disso tira o filtro e mostra o grid completo.
+        yearFilterFromPlayer = true
         // Mostra a lista de álbuns (fecha o álbum que estiver aberto na aba).
         nextTabToGrid = true
         showTab(MusicType.ALBUMS)
@@ -290,6 +292,7 @@ constructor(
 
     /** Fork pessoal: troca o filtro da aba Álbuns. */
     fun setAlbumFilter(filter: AlbumFilter) {
+        yearFilterFromPlayer = false
         if (filter == albumFilter.value) return
         albumFilter.value = filter
         refilterAlbums()
@@ -316,6 +319,13 @@ constructor(
 
     /** Fork pessoal: se a tela inicial está visível (não há álbum/artista aberto por cima). */
     var homeVisible = false
+
+    /** Fork pessoal: o filtro de ano atual veio do toque no ano, no player. */
+    var yearFilterFromPlayer = false
+
+    /** Fork pessoal: pedido para a grade de álbuns mostrar este álbum (o que está tocando). */
+    val revealAlbumEvent: Event<Album>
+        field = MutableEvent<Album>()
 
     /** Fork pessoal: a próxima troca de aba deve ir para a lista, não para a tela salva da aba. */
     var nextTabToGrid = false

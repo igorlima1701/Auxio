@@ -56,8 +56,15 @@ class TagEditDialog : ViewBindingMaterialDialogFragment<DialogTagEditBinding>() 
 
     override fun onConfigDialog(builder: AlertDialog.Builder) {
         super.onConfigDialog(builder)
+        val selectionCount = requireArguments().getInt(ARG_SELECTION_COUNT, 0)
         builder
-            .setTitle(if (isBatch) R.string.lbl_edit_album_tags else R.string.lbl_edit_tags)
+            .setTitle(
+                when {
+                    selectionCount > 1 -> getString(R.string.fmt_edit_tags_n, selectionCount)
+                    isBatch -> getString(R.string.lbl_edit_album_tags)
+                    else -> getString(R.string.lbl_edit_tags)
+                }
+            )
             .setNegativeButton(R.string.lbl_cancel, null)
             // O clique é tratado em onStart para o diálogo não fechar antes de gravar.
             .setPositiveButton(R.string.lbl_tag_save, null)
@@ -186,10 +193,26 @@ class TagEditDialog : ViewBindingMaterialDialogFragment<DialogTagEditBinding>() 
         private const val TAG = "auxio.fork.TAG_EDIT"
         private const val ARG_UIDS = "uids"
         private const val ARG_BATCH = "batch"
+        private const val ARG_SELECTION_COUNT = "selection_count"
 
         fun show(activity: FragmentActivity, song: Song) = show(activity, song.uid, false)
 
         fun show(activity: FragmentActivity, album: Album) = show(activity, album.uid, true)
+
+        /** Fork pessoal: várias músicas selecionadas, editadas juntas (como o álbum). */
+        fun show(activity: FragmentActivity, songs: List<Song>) {
+            if (songs.isEmpty()) return
+            TagEditDialog()
+                .apply {
+                    arguments =
+                        bundleOf(
+                            ARG_UIDS to ArrayList(songs.map { it.uid.toString() }.distinct()),
+                            ARG_BATCH to (songs.size > 1),
+                            ARG_SELECTION_COUNT to songs.size,
+                        )
+                }
+                .show(activity.supportFragmentManager, TAG)
+        }
 
         private fun show(activity: FragmentActivity, uid: Music.UID, batch: Boolean) {
             TagEditDialog()

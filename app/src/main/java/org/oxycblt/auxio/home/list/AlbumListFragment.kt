@@ -102,6 +102,7 @@ class AlbumListFragment :
         binding.homeNoMusicAction.setOnClickListener { homeModel.startChooseMusicLocations() }
 
         collectImmediately(homeModel.albumList, ::updateAlbums)
+        collectImmediately(homeModel.revealAlbumEvent.flow, ::revealAlbum)
         binding.homeFilterChip.apply {
             setOnClickListener {
                 AlbumFilterDialog().show(childFragmentManager, AlbumFilterDialog.TAG)
@@ -117,6 +118,28 @@ class AlbumListFragment :
             playbackModel.isPlaying,
             ::updatePlayback,
         )
+    }
+
+    /**
+     * Fork pessoal: rola o grid até [album] (o que está tocando), se ele não estiver à vista. Sem
+     * animação; se já estiver na tela, o grid não se mexe.
+     */
+    private fun revealAlbum(album: Album?) {
+        if (album == null) return
+        homeModel.revealAlbumEvent.consume()
+        val idx = homeModel.albumList.value.indexOf(album)
+        if (idx < 0) return
+        val recycler = requireBinding().homeRecycler
+        recycler.post {
+            val lm =
+                recycler.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager
+                    ?: return@post
+            val first = lm.findFirstCompletelyVisibleItemPosition()
+            val last = lm.findLastCompletelyVisibleItemPosition()
+            if (first == androidx.recyclerview.widget.RecyclerView.NO_POSITION || idx !in first..last) {
+                lm.scrollToPositionWithOffset(idx, recycler.height / 3)
+            }
+        }
     }
 
     override fun onDestroyBinding(binding: FragmentHomeListBinding) {

@@ -138,4 +138,5 @@
     <string name="fmt_queue_selected" translatable="false">%d selecionadas</string>
     <string name="lng_queue_added_to" translatable="false">Adicionado a \"%s\"</string>
     <string name="lng_queue_created_named" translatable="false">Criada a fila \"%s\"</string>
+    <string name="fmt_edit_tags_n" translatable="false">Editar tags de %d músicas</string>
 </resources>

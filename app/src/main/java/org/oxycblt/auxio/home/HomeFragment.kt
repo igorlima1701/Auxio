@@ -166,7 +166,9 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
             // limit to the maximum amount possible. This will prevent the tab ripple from
             // bugging out due to dynamically inflating each fragment, at the cost of slower
             // debug UI performance.
-            offscreenPageLimit = Tab.MAX_SEQUENCE_IDX + 1
+            // Fork pessoal: monta só a aba que aparece (as outras quando forem abertas). Montar as
+            // cinco de uma vez deixava lento voltar de um álbum e trocar de aba.
+            offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 
             dampen()
             // Fork pessoal: as abas trocam só pela barra de baixo (sem deslizar).
