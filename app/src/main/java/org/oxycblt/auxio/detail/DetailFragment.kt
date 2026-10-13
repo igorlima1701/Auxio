@@ -123,6 +123,8 @@ abstract class DetailFragment<P : MusicParent, C : Music> :
             itemAnimator = null
             adapter = getDetailListAdapter()
         }
+        // Fork pessoal: arrastar uma música para a esquerda toca a prévia.
+        org.oxycblt.auxio.list.recycler.PreviewSwipe.attach(binding.detailRecycler)
 
         spacingSmall = requireContext().getDimenPixels(R.dimen.spacing_small)
     }

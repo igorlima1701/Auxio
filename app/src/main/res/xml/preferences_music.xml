@@ -14,6 +14,12 @@
             app:summary="@string/set_separators_desc"
             app:title="@string/set_separators" />
 
+        <!-- Fork pessoal: nomes que nunca são separados. -->
+        <Preference
+            app:key="fork_separator_exceptions_pref"
+            app:summary="@string/set_separator_exceptions_desc"
+            app:title="@string/set_separator_exceptions" />
+
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="@string/set_key_auto_sort_names"

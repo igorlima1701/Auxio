@@ -62,6 +62,7 @@ import org.oxycblt.auxio.list.ListViewModel
 import org.oxycblt.auxio.music.IndexingState
 import org.oxycblt.auxio.music.MusicType
 import org.oxycblt.auxio.music.MusicViewModel
+import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.playback.OpenPanel
 import org.oxycblt.auxio.playback.PlaybackBottomSheetBehavior
 import org.oxycblt.auxio.playback.PlaybackViewModel
@@ -214,6 +215,15 @@ class MainFragment :
             org.oxycblt.auxio.playback.queue.QueueTabs.render(requireBinding().queueTabs, it, multiQueue)
         }
         collectImmediately(multiQueue.pendingAdd, ::handlePendingAdd)
+        // Fork pessoal: aviso da prévia; tocar nele para a prévia.
+        binding.previewBanner.setOnClickListener { org.oxycblt.auxio.playback.PreviewPlayer.stop() }
+        collectImmediately(org.oxycblt.auxio.playback.PreviewPlayer.current) { song ->
+            val banner = requireBinding().previewBanner
+            banner.isVisible = song != null
+            if (song != null) {
+                banner.text = getString(R.string.lng_preview_banner, song.name.resolve(requireContext()))
+            }
+        }
     }
 
     private fun handlePendingAdd(songs: List<org.oxycblt.musikr.Song>?) {

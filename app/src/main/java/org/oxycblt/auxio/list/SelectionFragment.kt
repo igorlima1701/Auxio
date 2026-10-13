@@ -23,6 +23,7 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.viewbinding.ViewBinding
 import org.oxycblt.auxio.R
+import org.oxycblt.musikr.Music
 import org.oxycblt.auxio.music.MusicViewModel
 import org.oxycblt.auxio.playback.PlaybackViewModel
 import org.oxycblt.auxio.ui.AuxioToolbar
@@ -41,6 +42,25 @@ abstract class SelectionFragment<VB : ViewBinding> :
     protected abstract val playbackModel: PlaybackViewModel
 
     open fun getSelectionToolbar(binding: VB): AuxioToolbar? = null
+
+    /** Fork pessoal: os itens da lista mostrada, na ordem da tela (para tudo/inverter/intervalo). */
+    protected open fun selectableItems(): List<Music> = emptyList()
+
+    /** Itens do mesmo tipo dos já selecionados (música com música, álbum com álbum…). */
+    private fun itemsLikeSelection(): List<Music> {
+        val items = selectableItems()
+        val first = listModel.selected.value.firstOrNull() ?: return items
+        fun kind(m: Music) =
+            when (m) {
+                is org.oxycblt.musikr.Song -> 0
+                is org.oxycblt.musikr.Album -> 1
+                is org.oxycblt.musikr.Artist -> 2
+                is org.oxycblt.musikr.Genre -> 3
+                is org.oxycblt.musikr.Playlist -> 4
+                else -> 5
+            }
+        return items.filter { kind(it) == kind(first) }
+    }
 
     override fun onBindingCreated(binding: VB, savedInstanceState: Bundle?) {
         super.onBindingCreated(binding, savedInstanceState)
@@ -68,6 +88,18 @@ abstract class SelectionFragment<VB : ViewBinding> :
             }
             R.id.action_selection_playlist_add -> {
                 musicModel.addToPlaylist(listModel.takeSelection())
+                true
+            }
+            R.id.action_selection_all -> {
+                listModel.selectAll(itemsLikeSelection())
+                true
+            }
+            R.id.action_selection_invert -> {
+                listModel.invertSelection(itemsLikeSelection())
+                true
+            }
+            R.id.action_selection_range -> {
+                listModel.selectRange(itemsLikeSelection())
                 true
             }
             else -> false

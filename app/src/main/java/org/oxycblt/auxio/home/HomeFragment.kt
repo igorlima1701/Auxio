@@ -81,6 +81,16 @@ import timber.log.Timber as L
  */
 @AndroidEntryPoint
 class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
+
+    // Fork pessoal: itens da aba atual para selecionar tudo/inverter/intervalo.
+    override fun selectableItems(): List<org.oxycblt.musikr.Music> =
+        when (homeModel.currentTabType.value) {
+            MusicType.SONGS -> homeModel.songList.value
+            MusicType.ALBUMS -> homeModel.albumList.value
+            MusicType.ARTISTS -> homeModel.artistList.value
+            MusicType.GENRES -> homeModel.genreList.value
+            MusicType.PLAYLISTS -> homeModel.playlistList.value
+        }
     override val listModel: ListViewModel by activityViewModels()
     override val musicModel: MusicViewModel by activityViewModels()
     override val playbackModel: PlaybackViewModel by activityViewModels()

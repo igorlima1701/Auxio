@@ -51,21 +51,57 @@ interface Separators {
          *   checked for when splitting a string list.
          * @return A new [Separators] instance reflecting the separators.
          */
-        fun from(chars: String) =
+        fun from(chars: String) = from(chars, emptyList())
+
+        /**
+         * Fork pessoal: como [from], mas os nomes em [exceptions] (ex.: "Tyler, The Creator") nunca
+         * são separados, sem precisar da barra invertida na tag.
+         */
+        fun from(chars: String, exceptions: List<String>) =
             if (chars.isNotEmpty()) {
-                CharSeparators(chars.toSet())
+                CharSeparators(chars.toSet(), exceptions.map { it.trim() }.filter { it.isNotEmpty() })
             } else {
                 NoSeparators
             }
     }
 }
 
-private data class CharSeparators(private val chars: Set<Char>) : Separators {
+private data class CharSeparators(
+    private val chars: Set<Char>,
+    private val exceptions: List<String> = emptyList(),
+) : Separators {
+    // Só as exceções que têm algum separador ativo; as maiores primeiro.
+    private val guarded =
+        exceptions.filter { e -> e.any { chars.contains(it) } }.sortedByDescending { it.length }
+
     override fun split(strings: List<String>) =
         if (strings.size == 1) splitImpl(strings.first()) else strings
 
     private fun splitImpl(string: String) =
-        string.splitEscaped { chars.contains(it) }.correctWhitespace()
+        protect(string).splitEscaped { chars.contains(it) }.correctWhitespace()
+
+    /** Escapa os separadores dentro dos nomes da lista de exceções. */
+    private fun protect(string: String): String {
+        if (guarded.isEmpty() || string.none { chars.contains(it) }) return string
+        var out = string
+        for (name in guarded) {
+            var from = 0
+            while (true) {
+                val idx = out.indexOf(name, from, ignoreCase = true)
+                if (idx < 0) break
+                val escaped =
+                    buildString {
+                        for (c in out.substring(idx, idx + name.length)) {
+                            if (chars.contains(c)) append('\\')
+                            append(c)
+                        }
+                    }
+                out = out.substring(0, idx) + escaped + out.substring(idx + name.length)
+                from = idx + escaped.length
+            }
+        }
+        return out
+    }
 }
 
 private object NoSeparators : Separators {

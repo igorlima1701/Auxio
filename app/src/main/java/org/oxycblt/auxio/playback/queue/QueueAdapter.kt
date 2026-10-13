@@ -153,6 +153,8 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
     @SuppressLint("ClickableViewAccessibility")
     fun bind(song: Song, listener: EditClickListListener<Song>) {
         listener.bind(song, this, body, binding.songDragHandle)
+        // Fork pessoal: a linha guarda a música para a prévia (arrastar para a esquerda).
+        itemView.setTag(org.oxycblt.auxio.R.id.tag_preview_song, song)
         // Fork pessoal: segurar o dedo na música abre as opções dela.
         body.setOnLongClickListener {
             (listener as? QueueMenuOpener)?.openQueueMenu(song, bindingAdapterPosition)

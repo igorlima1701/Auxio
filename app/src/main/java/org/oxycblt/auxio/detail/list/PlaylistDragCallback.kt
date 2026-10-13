@@ -39,6 +39,10 @@ class PlaylistDragCallback(private val detailModel: DetailViewModel) : MaterialD
         )
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        if (isPreviewSwipe(direction)) {
+            org.oxycblt.auxio.list.recycler.PreviewSwipe.preview(viewHolder)
+            return
+        }
         detailModel.removePlaylistSong(viewHolder.bindingAdapterPosition)
     }
 }

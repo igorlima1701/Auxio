@@ -62,6 +62,10 @@ import timber.log.Timber as L
 @AndroidEntryPoint
 class PlaylistDetailFragment :
     DetailFragment<Playlist, Song>(), PlaylistDetailListAdapter.Listener {
+
+    // Fork pessoal: itens para selecionar tudo/inverter/intervalo.
+    override fun selectableItems(): List<org.oxycblt.musikr.Music> =
+        detailModel.playlistSongList.value.filterIsInstance<org.oxycblt.musikr.Music>()
     // Information about what playlist to display is initially within the navigation arguments
     // as a UID, as that is the only safe way to parcel an playlist.
     private val args: PlaylistDetailFragmentArgs by navArgs()

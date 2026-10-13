@@ -67,6 +67,8 @@ class SongListFragment :
     override fun onBindingCreated(binding: FragmentHomeListBinding, savedInstanceState: Bundle?) {
         super.onBindingCreated(binding, savedInstanceState)
 
+        // Fork pessoal: arrastar para a esquerda toca a prévia.
+        org.oxycblt.auxio.list.recycler.PreviewSwipe.attach(binding.homeRecycler)
         binding.homeRecycler.apply {
             id = R.id.home_song_recycler
             adapter = songAdapter

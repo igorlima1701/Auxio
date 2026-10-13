@@ -40,6 +40,10 @@ class QueueDragCallback(private val queueModel: QueueViewModel) : MaterialDragCa
         )
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        if (isPreviewSwipe(direction)) {
+            org.oxycblt.auxio.list.recycler.PreviewSwipe.preview(viewHolder)
+            return
+        }
         queueModel.removeQueueDataItem(viewHolder.bindingAdapterPosition)
     }
 }

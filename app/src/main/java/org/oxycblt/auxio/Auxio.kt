@@ -44,6 +44,7 @@ class Auxio : Application() {
     @Inject lateinit var uiSettings: UISettings
     @Inject lateinit var homeSettings: HomeSettings
     @Inject lateinit var albumRatingTagSync: org.oxycblt.auxio.rating.AlbumRatingTagSync
+    @Inject lateinit var playbackStateManager: org.oxycblt.auxio.playback.state.PlaybackStateManager
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +61,7 @@ class Auxio : Application() {
         // Fork pessoal: carrega as notas dos álbuns.
         org.oxycblt.auxio.rating.AlbumRatings.init(this)
         org.oxycblt.auxio.playback.PlayHistory.init(this)
+        org.oxycblt.auxio.playback.PreviewPlayer.attach(this, playbackStateManager)
         albumRatingTagSync.attach()
 
         // Migrate any settings that may have changed in an app update.

@@ -261,6 +261,8 @@ private constructor(private val binding: ItemEditableSongBinding) :
     fun bind(song: Song, listener: PlaylistDetailListAdapter.Listener) {
         listener.bind(song, this, binding.interactBody, menuButton = binding.songMenu)
         listener.bind(this, binding.songDragHandle)
+        // Fork pessoal: a linha guarda a música para a prévia (arrastar para a esquerda).
+        itemView.setTag(org.oxycblt.auxio.R.id.tag_preview_song, song)
         binding.songAlbumCover.bind(song)
         binding.songName.text = song.name.resolve(binding.context)
         binding.songInfo.text = song.artists.resolveNames(binding.context)

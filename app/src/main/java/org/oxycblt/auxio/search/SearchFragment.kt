@@ -76,6 +76,10 @@ import timber.log.Timber as L
  */
 @AndroidEntryPoint
 class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
+
+    // Fork pessoal: itens para selecionar tudo/inverter/intervalo.
+    override fun selectableItems(): List<Music> =
+        searchModel.searchResults.value.filterIsInstance<Music>()
     private val searchModel: SearchViewModel by viewModels()
     private val detailModel: DetailViewModel by activityViewModels()
     override val listModel: ListViewModel by activityViewModels()
@@ -170,6 +174,8 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
             }
         }
 
+        // Fork pessoal: arrastar para a esquerda toca a prévia.
+        org.oxycblt.auxio.list.recycler.PreviewSwipe.attach(binding.searchRecycler)
         binding.searchRecycler.apply {
             adapter = searchAdapter
             (layoutManager as GridLayoutManager).setFullWidthLookup {

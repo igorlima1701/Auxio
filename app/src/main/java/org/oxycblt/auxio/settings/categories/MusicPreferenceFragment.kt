@@ -40,6 +40,50 @@ import timber.log.Timber as L
 class MusicPreferenceFragment : BasePreferenceFragment(R.xml.preferences_music) {
     private val musicModel: MusicViewModel by viewModels()
     @Inject lateinit var imageLoader: ImageLoader
+    @Inject lateinit var musicSettings: org.oxycblt.auxio.music.MusicSettings
+
+    /** Fork pessoal: edita a lista de nomes que nunca são separados (um por linha). */
+    private fun showSeparatorExceptions() {
+        val context = requireContext()
+        val input =
+            android.widget.EditText(context).apply {
+                setText(musicSettings.separatorExceptions)
+                minLines = 6
+                maxLines = 14
+                gravity = android.view.Gravity.TOP or android.view.Gravity.START
+                inputType =
+                    android.text.InputType.TYPE_CLASS_TEXT or
+                        android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+                        android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            }
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val frame =
+            android.widget.FrameLayout(context).apply {
+                setPadding(pad, pad / 2, pad, 0)
+                addView(input)
+            }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.set_separator_exceptions)
+            .setMessage(R.string.lng_separator_exceptions_help)
+            .setView(frame)
+            .setPositiveButton(R.string.lbl_tag_save) { _, _ ->
+                val text =
+                    input.text
+                        ?.toString()
+                        ?.lines()
+                        ?.map { it.trim() }
+                        ?.filter { it.isNotEmpty() }
+                        ?.joinToString("\n") ?: ""
+                if (text != musicSettings.separatorExceptions) {
+                    musicSettings.separatorExceptions = text
+                    musicModel.refresh()
+                }
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .show()
+            .window
+            ?.setWindowAnimations(0)
+    }
 
     override fun onOpenDialogPreference(preference: WrappedDialogPreference) {
         if (preference.key == getString(R.string.set_key_separators)) {
@@ -49,6 +93,13 @@ class MusicPreferenceFragment : BasePreferenceFragment(R.xml.preferences_music) 
     }
 
     override fun onSetupPreference(preference: Preference) {
+        if (preference.key == "fork_separator_exceptions_pref") {
+            preference.onPreferenceClickListener =
+                Preference.OnPreferenceClickListener {
+                    showSeparatorExceptions()
+                    true
+                }
+        }
         if (preference.key == getString(R.string.set_key_cover_mode)) {
             L.d("Configuring cover mode setting")
             preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->

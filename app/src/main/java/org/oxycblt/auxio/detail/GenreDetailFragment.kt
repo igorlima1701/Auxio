@@ -52,6 +52,10 @@ import timber.log.Timber as L
  */
 @AndroidEntryPoint
 class GenreDetailFragment : DetailFragment<Genre, Music>() {
+
+    // Fork pessoal: itens para selecionar tudo/inverter/intervalo.
+    override fun selectableItems(): List<Music> =
+        detailModel.genreSongList.value.filterIsInstance<Music>()
     // Information about what genre to display is initially within the navigation arguments
     // as a UID, as that is the only safe way to parcel an genre.
     private val args: GenreDetailFragmentArgs by navArgs()

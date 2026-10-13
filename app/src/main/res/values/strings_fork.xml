@@ -115,4 +115,11 @@
     <string name="lbl_lyrics_search" translatable="false">Buscar letra</string>
     <string name="lbl_lyrics_search_go" translatable="false">Buscar</string>
     <string name="lng_lyrics_search_word" translatable="false">Busca no Google por \"%s\" mais a palavra abaixo:</string>
+    <string name="set_separator_exceptions" translatable="false">Nomes que não se separam</string>
+    <string name="set_separator_exceptions_desc" translatable="false">Artistas com vírgula, &amp; ou / no nome que nunca devem virar dois (ex.: Tyler, The Creator)</string>
+    <string name="lng_separator_exceptions_help" translatable="false">Um nome por linha. Maiúsculas e minúsculas não importam.</string>
+    <string name="lng_preview_banner" translatable="false">Prévia: %s · toque para parar</string>
+    <string name="lbl_select_all" translatable="false">Selecionar tudo</string>
+    <string name="lbl_select_invert" translatable="false">Inverter seleção</string>
+    <string name="lbl_select_range" translatable="false">Selecionar intervalo</string>
 </resources>

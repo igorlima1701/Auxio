@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fork pessoal: ids usados como chave de tag nas linhas das listas. -->
+<resources>
+    <item name="tag_preview_song" type="id" />
+</resources>

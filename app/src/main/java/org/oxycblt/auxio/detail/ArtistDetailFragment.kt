@@ -54,6 +54,10 @@ import timber.log.Timber as L
  */
 @AndroidEntryPoint
 class ArtistDetailFragment : DetailFragment<Artist, Music>() {
+
+    // Fork pessoal: itens para selecionar tudo/inverter/intervalo.
+    override fun selectableItems(): List<Music> =
+        detailModel.artistSongList.value.filterIsInstance<Music>()
     // Information about what artist to display is initially within the navigation arguments
     // as a UID, as that is the only safe way to parcel an artist.
     private val args: ArtistDetailFragmentArgs by navArgs()

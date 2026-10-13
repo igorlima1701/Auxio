@@ -150,6 +150,21 @@ Deslizar para os lados troca de página: Fila ↔ Player ↔ Álbuns ↔ Artista
 
         </FrameLayout>
 
+        <!-- Fork pessoal: aviso da prévia (arrastar uma música para a esquerda). -->
+        <TextView
+            android:id="@+id/preview_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSecondaryContainer"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/spacing_medium"
+            android:paddingVertical="@dimen/spacing_small"
+            android:textColor="?attr/colorOnSecondaryContainer"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/playback_bar_fragment"
             android:name="org.oxycblt.auxio.playback.PlaybackBarFragment"

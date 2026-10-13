@@ -80,7 +80,12 @@ abstract class MaterialDragCallback : ItemTouchHelper.Callback() {
             makeFlag(
                 ItemTouchHelper.ACTION_STATE_DRAG,
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ) or makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END) // fork: arrastar para a direita remove (para a esquerda troca de página)
+            ) or
+                // Fork pessoal: para a direita remove; para a esquerda toca a prévia.
+                makeFlag(
+                    ItemTouchHelper.ACTION_STATE_SWIPE,
+                    ItemTouchHelper.END or ItemTouchHelper.START,
+                )
         } else {
             0
         }
@@ -154,7 +159,8 @@ abstract class MaterialDragCallback : ItemTouchHelper.Callback() {
         // not being swiped. This issue is also the reason why the background is not merged with
         // the FrameLayout within the item.
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            holder.delete.isInvisible = dX == 0f
+            // Fork pessoal: o fundo de "apagar" só aparece ao arrastar para a direita (remover).
+            holder.delete.isInvisible = dX <= 0f
         }
 
         // Update other translations. We do not call the default implementation, so we must do
@@ -215,6 +221,10 @@ abstract class MaterialDragCallback : ItemTouchHelper.Callback() {
         /** The drawable of the [body] background that can be rounded when dragging. */
         val roundableBackground: Drawable
     }
+
+    /** Fork pessoal: true se o arrasto foi para a esquerda (prévia), não para a direita (remover). */
+    protected fun isPreviewSwipe(direction: Int) =
+        direction == ItemTouchHelper.START || direction == ItemTouchHelper.LEFT
 
     companion object {
         const val MINIMUM_INITIAL_DRAG_VELOCITY = 10

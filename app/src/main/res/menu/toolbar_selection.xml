@@ -11,6 +11,22 @@
         android:icon="@drawable/ic_playlist_add_24"
         android:title="@string/lbl_playlist_add"
         app:showAsAction="ifRoom" />
+    <!-- Fork pessoal: selecionar tudo, intervalo e inverter. -->
+    <item
+        android:id="@+id/action_selection_range"
+        android:icon="@drawable/ic_select_range_24"
+        android:title="@string/lbl_select_range"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_selection_invert"
+        android:icon="@drawable/ic_select_invert_24"
+        android:title="@string/lbl_select_invert"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_selection_all"
+        android:icon="@drawable/ic_select_all_24"
+        android:title="@string/lbl_select_all"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/placeholder"
         android:title=""

@@ -58,6 +58,9 @@ interface MusicSettings : Settings<MusicSettings.Listener> {
     /** A [String] of characters representing the desired characters to denote multi-value tags. */
     var separators: String
 
+    /** Fork pessoal: nomes que nunca são separados (ex.: "Tyler, The Creator"), um por linha. */
+    var separatorExceptions: String
+
     /** Whether to enable more advanced sorting by articles and numbers. */
     val intelligentSorting: Boolean
 
@@ -103,6 +106,17 @@ class MusicSettingsImpl @Inject constructor(@ApplicationContext private val cont
         set(value) {
             sharedPreferences.edit {
                 putString(getString(R.string.set_key_separators), value)
+                apply()
+            }
+        }
+
+    override var separatorExceptions: String
+        get() =
+            sharedPreferences.getString(KEY_SEPARATOR_EXCEPTIONS, null)
+                ?: DEFAULT_SEPARATOR_EXCEPTIONS
+        set(value) {
+            sharedPreferences.edit {
+                putString(KEY_SEPARATOR_EXCEPTIONS, value)
                 apply()
             }
         }
@@ -295,3 +309,55 @@ class MusicSettingsImpl @Inject constructor(@ApplicationContext private val cont
         return split
     }
 }
+
+/** Fork pessoal: chave e lista padrão das exceções dos separadores. */
+private const val KEY_SEPARATOR_EXCEPTIONS = "fork_separator_exceptions"
+
+private val DEFAULT_SEPARATOR_EXCEPTIONS =
+    listOf(
+            "Tyler, The Creator",
+            "Earth, Wind & Fire",
+            "Crosby, Stills, Nash & Young",
+            "Crosby, Stills & Nash",
+            "Emerson, Lake & Palmer",
+            "Blood, Sweat & Tears",
+            "Peter, Paul and Mary",
+            "Black Country, New Road",
+            "10,000 Maniacs",
+            "AC/DC",
+            "Simon & Garfunkel",
+            "Hall & Oates",
+            "Daryl Hall & John Oates",
+            "Florence + The Machine",
+            "Mumford & Sons",
+            "Belle & Sebastian",
+            "Echo & The Bunnymen",
+            "Kool & The Gang",
+            "Sly & The Family Stone",
+            "Bob Marley & The Wailers",
+            "Tom Petty & The Heartbreakers",
+            "Huey Lewis & The News",
+            "Iron & Wine",
+            "Angus & Julia Stone",
+            "Ike & Tina Turner",
+            "Sam & Dave",
+            "Brooks & Dunn",
+            "Chitãozinho & Xororó",
+            "Zezé Di Camargo & Luciano",
+            "Jorge & Mateus",
+            "Henrique & Juliano",
+            "Maiara & Maraisa",
+            "Sandy & Junior",
+            "Kleiton & Kledir",
+            "Victor & Leo",
+            "Bruno & Marrone",
+            "Matogrosso & Mathias",
+            "Milionário & José Rico",
+            "Edson & Hudson",
+            "Simone & Simaria",
+            "Zé Neto & Cristiano",
+            "Gian & Giovani",
+            "João Bosco & Vinícius",
+            "César Menotti & Fabiano",
+        )
+        .joinToString("\n")

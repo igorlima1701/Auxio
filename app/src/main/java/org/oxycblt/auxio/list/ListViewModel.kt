@@ -105,6 +105,28 @@ constructor(private val listSettings: ListSettings, private val musicRepository:
         this.selected.value = selected
     }
 
+    /** Fork pessoal: seleciona todos os [items] (mantendo os já selecionados). */
+    fun selectAll(items: List<Music>) {
+        val current = selected.value
+        val set = current.toSet()
+        selected.value = current + items.filter { it !in set }
+    }
+
+    /** Fork pessoal: inverte a seleção dentro de [items] (marca os outros, desmarca os marcados). */
+    fun invertSelection(items: List<Music>) {
+        val set = selected.value.toSet()
+        selected.value = items.filter { it !in set }
+    }
+
+    /** Fork pessoal: seleciona tudo o que estiver entre o primeiro e o último marcados em [items]. */
+    fun selectRange(items: List<Music>) {
+        val current = selected.value
+        val indices = current.map { items.indexOf(it) }.filter { it >= 0 }
+        if (indices.isEmpty()) return
+        val set = current.toSet()
+        selected.value = current + items.subList(indices.min(), indices.max() + 1).filter { it !in set }
+    }
+
     /**
      * Clear the current selection and return it.
      *

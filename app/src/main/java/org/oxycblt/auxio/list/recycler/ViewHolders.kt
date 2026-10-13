@@ -60,6 +60,8 @@ class SongViewHolder private constructor(private val binding: ItemSongBinding) :
     fun bind(song: Song, listener: SelectableListListener<Song>) {
         listener.bind(song, this, menuButton = binding.songMenu)
         binding.songAlbumCover.bind(song)
+        // Fork pessoal: a linha guarda a música para a prévia (arrastar para a esquerda).
+        itemView.setTag(org.oxycblt.auxio.R.id.tag_preview_song, song)
         binding.songName.text = song.name.resolve(binding.context)
         binding.songInfo.text = song.artists.resolveNames(binding.context)
     }

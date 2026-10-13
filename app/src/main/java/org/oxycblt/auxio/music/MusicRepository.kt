@@ -386,7 +386,8 @@ constructor(
     private suspend fun indexImpl(withCache: Boolean) {
         L.d("Index requested, initializing")
         // Obtain configuration information
-        val separators = Separators.from(musicSettings.separators)
+        val separators =
+            Separators.from(musicSettings.separators, musicSettings.separatorExceptions.lines())
         L.d("Separators: $separators")
         val nameFactory =
             if (musicSettings.intelligentSorting) {

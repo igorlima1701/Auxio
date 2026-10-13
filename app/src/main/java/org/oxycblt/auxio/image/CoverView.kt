@@ -391,6 +391,9 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         // stack of vinyl.
         bindImpl(
             { size ->
+                // Fork pessoal: quem só participa de músicas (sem álbum próprio) mostra o ícone
+                // neutro, em vez da capa do álbum de outro artista.
+                if (artist.explicitAlbums.isEmpty()) return@bindImpl null
                 SmatteringCoverComposition(
                     artist.covers,
                     responsiveCornerRatio(size),
