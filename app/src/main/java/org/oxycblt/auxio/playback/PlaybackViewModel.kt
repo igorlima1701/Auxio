@@ -568,7 +568,7 @@ constructor(
      */
     fun addToQueue(album: Album) {
         L.d("Adding $album to queue")
-        multiQueue.requestAdd(listSettings.albumSongSort.songs(album.songs))
+        multiQueue.requestAdd(listSettings.albumSongSort.songs(album.songs), album)
     }
 
     /**
@@ -578,7 +578,7 @@ constructor(
      */
     fun addToQueue(artist: Artist) {
         L.d("Adding $artist to queue")
-        multiQueue.requestAdd(listSettings.artistSongSort.songs(artist.songs))
+        multiQueue.requestAdd(listSettings.artistSongSort.songs(artist.songs), artist)
     }
 
     /**
@@ -588,7 +588,7 @@ constructor(
      */
     fun addToQueue(genre: Genre) {
         L.d("Adding $genre to queue")
-        multiQueue.requestAdd(listSettings.genreSongSort.songs(genre.songs))
+        multiQueue.requestAdd(listSettings.genreSongSort.songs(genre.songs), genre)
     }
 
     /**
@@ -598,7 +598,7 @@ constructor(
      */
     fun addToQueue(playlist: Playlist) {
         L.d("Adding $playlist to queue")
-        multiQueue.requestAdd(playlist.songs)
+        multiQueue.requestAdd(playlist.songs, playlist)
     }
 
     /**

@@ -118,13 +118,16 @@ class QueueItemMenuDialog : DialogFragment() {
         option(R.drawable.ic_playlist_add_24, getString(R.string.lbl_add_to_playlists)) {
             musicModel.addToPlaylist(song)
         }
-        divider()
-        val stopping = StopAfterSong.target.value == song.uid
-        option(
-            R.drawable.ic_stop_after_24,
-            getString(if (stopping) R.string.lbl_stop_after_cancel else R.string.lbl_stop_after),
-        ) {
-            StopAfterSong.toggle(song.uid)
+        // "Parar depois desta música" só vale na fila que está tocando.
+        if (queueModel.viewingActive.value) {
+            divider()
+            val stopping = StopAfterSong.target.value == song.uid
+            option(
+                R.drawable.ic_stop_after_24,
+                getString(if (stopping) R.string.lbl_stop_after_cancel else R.string.lbl_stop_after),
+            ) {
+                StopAfterSong.toggle(song.uid)
+            }
         }
 
         return builder.setView(list).create()

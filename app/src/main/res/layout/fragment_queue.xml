@@ -1,20 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Fork pessoal: topo com o nome da fila (menu suspenso das filas), ▶ para tocar uma fila parada e
+     ⋮ com as opções da fila. Na seleção de várias músicas, o topo vira a barra da seleção. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/queue_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <org.oxycblt.auxio.list.recycler.AuxioRecyclerView
-        android:id="@+id/queue_recycler"
-        style="@style/Widget.Auxio.RecyclerView.Linear"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_editable_song" />
+        android:layout_height="@dimen/size_touchable_medium">
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/queue_divider"
+        <LinearLayout
+            android:id="@+id/queue_header"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/queue_switcher"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/spacing_medium"
+                android:paddingEnd="@dimen/spacing_small">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/queue_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        tools:text="Fila 1" />
+
+                    <TextView
+                        android:id="@+id/queue_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.7"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textSize="12sp"
+                        tools:text="12 músicas · tocando" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_down_24"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/queue_play"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_queue_play"
+                android:src="@drawable/ic_play_24"
+                android:visibility="gone"
+                app:tint="?attr/colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/queue_more"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_queue_options"
+                android:src="@drawable/ic_more_24"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/queue_selection_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSecondaryContainer"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/queue_sel_close"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_cancel"
+                android:src="@drawable/ic_close_24"
+                app:tint="?attr/colorOnSecondaryContainer" />
+
+            <TextView
+                android:id="@+id/queue_sel_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                tools:text="3 selecionadas" />
+
+            <ImageButton
+                android:id="@+id/queue_sel_range"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_select_range"
+                android:src="@drawable/ic_select_range_24"
+                app:tint="?attr/colorOnSecondaryContainer" />
+
+            <ImageButton
+                android:id="@+id/queue_sel_invert"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_select_invert"
+                android:src="@drawable/ic_select_invert_24"
+                app:tint="?attr/colorOnSecondaryContainer" />
+
+            <ImageButton
+                android:id="@+id/queue_sel_all"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_select_all"
+                android:src="@drawable/ic_select_all_24"
+                app:tint="?attr/colorOnSecondaryContainer" />
+
+            <ImageButton
+                android:id="@+id/queue_sel_actions"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_queue_options"
+                android:src="@drawable/ic_more_24"
+                app:tint="?attr/colorOnSecondaryContainer" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-</FrameLayout>
+        <org.oxycblt.auxio.list.recycler.AuxioRecyclerView
+            android:id="@+id/queue_recycler"
+            style="@style/Widget.Auxio.RecyclerView.Linear"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_editable_song" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/queue_divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -29,6 +29,28 @@ import org.oxycblt.auxio.list.recycler.MaterialDragCallback
  * @author Alexander Capehart (OxygenCobalt)
  */
 class QueueDragCallback(private val queueModel: QueueViewModel) : MaterialDragCallback() {
+    // Fork pessoal: lembra de onde a música saiu, para levar as selecionadas juntas no fim.
+    private var dragging: RecyclerView.ViewHolder? = null
+    private var dragStart = RecyclerView.NO_POSITION
+
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
+            dragging = viewHolder
+            dragStart = viewHolder.bindingAdapterPosition
+        } else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+            val holder = dragging
+            val start = dragStart
+            dragging = null
+            dragStart = RecyclerView.NO_POSITION
+            val end = holder?.bindingAdapterPosition ?: RecyclerView.NO_POSITION
+            if (start != RecyclerView.NO_POSITION && end != RecyclerView.NO_POSITION) {
+                // Depois do quadro atual, para o ItemTouchHelper terminar de soltar a linha.
+                holder?.itemView?.post { queueModel.onDragEnd(start, end) }
+            }
+        }
+    }
+
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,

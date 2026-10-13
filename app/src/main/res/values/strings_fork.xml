@@ -122,4 +122,20 @@
     <string name="lbl_select_all" translatable="false">Selecionar tudo</string>
     <string name="lbl_select_invert" translatable="false">Inverter seleção</string>
     <string name="lbl_select_range" translatable="false">Selecionar intervalo</string>
+    <string name="fmt_queue_name_more" translatable="false">%1$s e mais %2$d</string>
+    <string name="lbl_queue_play" translatable="false">Tocar esta fila</string>
+    <string name="lbl_queue_options" translatable="false">Opções da fila</string>
+    <string name="lng_queue_state_playing" translatable="false">tocando</string>
+    <string name="lng_queue_state_stopped" translatable="false">parada · toque numa música ou em ▶ para tocar</string>
+    <string name="lbl_queue_rename" translatable="false">Renomear fila</string>
+    <string name="lbl_queue_move_up" translatable="false">Subir na lista de filas</string>
+    <string name="lbl_queue_move_down" translatable="false">Descer na lista de filas</string>
+    <string name="lbl_queue_save_playlist" translatable="false">Salvar como playlist</string>
+    <string name="lbl_queue_delete_named" translatable="false">Apagar a fila \"%s\"</string>
+    <string name="lbl_queue_delete_short" translatable="false">Apagar</string>
+    <string name="lng_queue_delete_confirm" translatable="false">Apagar a fila \"%s\"? As músicas continuam na biblioteca.</string>
+    <string name="lng_queue_saved_playlist" translatable="false">Playlist \"%s\" criada</string>
+    <string name="fmt_queue_selected" translatable="false">%d selecionadas</string>
+    <string name="lng_queue_added_to" translatable="false">Adicionado a \"%s\"</string>
+    <string name="lng_queue_created_named" translatable="false">Criada a fila \"%s\"</string>
 </resources>

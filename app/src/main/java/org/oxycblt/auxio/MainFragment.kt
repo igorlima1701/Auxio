@@ -211,9 +211,6 @@ class MainFragment :
         collectImmediately(playbackModel.song, ::updateSong)
         collectImmediately(playbackModel.openPanel.flow, ::handlePanel)
         // Fork pessoal: várias filas.
-        collectImmediately(multiQueue.info) {
-            org.oxycblt.auxio.playback.queue.QueueTabs.render(requireBinding().queueTabs, it, multiQueue)
-        }
         collectImmediately(multiQueue.pendingAdd, ::handlePendingAdd)
         // Fork pessoal: aviso da prévia; tocar nele para a prévia.
         binding.previewBanner.setOnClickListener { org.oxycblt.auxio.playback.PreviewPlayer.stop() }

@@ -53,6 +53,8 @@ class QueueAdapter(private val listener: EditClickListListener<Song>) :
     // with an index value instead.
     private var currentIndex = 0
     private var isPlaying = false
+    // Fork pessoal: posições marcadas na seleção de várias músicas.
+    private var selectedPositions = emptySet<Int>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         QueueSongViewHolder.from(parent)
@@ -71,6 +73,17 @@ class QueueAdapter(private val listener: EditClickListListener<Song>) :
 
         viewHolder.isFuture = position > currentIndex
         viewHolder.updatePlayingIndicator(position == currentIndex, isPlaying)
+        viewHolder.setMultiSelected(position in selectedPositions)
+    }
+
+    /** Fork pessoal: marca as posições selecionadas. */
+    fun setSelectedPositions(positions: Set<Int>) {
+        if (positions == selectedPositions) return
+        val changed = (positions - selectedPositions) + (selectedPositions - positions)
+        selectedPositions = positions
+        for (p in changed) {
+            if (p in 0 until itemCount) notifyItemChanged(p, PAYLOAD_UPDATE_POSITION)
+        }
     }
 
     /**
@@ -142,6 +155,35 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
 
     init {
         binding.body.background = LayerDrawable(arrayOf(roundableBackground, liftableBackground))
+        // Fork pessoal: na fila, o ⋮ (menu da música) fica ao lado da alça de arrastar.
+        binding.songMenu.visibility = android.view.View.VISIBLE
+        val set = androidx.constraintlayout.widget.ConstraintSet()
+        set.clone(binding.interactBody)
+        set.clear(binding.songMenu.id, androidx.constraintlayout.widget.ConstraintSet.START)
+        set.connect(
+            binding.songMenu.id,
+            androidx.constraintlayout.widget.ConstraintSet.END,
+            binding.songDragHandle.id,
+            androidx.constraintlayout.widget.ConstraintSet.START,
+        )
+        set.connect(
+            binding.songName.id,
+            androidx.constraintlayout.widget.ConstraintSet.END,
+            binding.songMenu.id,
+            androidx.constraintlayout.widget.ConstraintSet.START,
+        )
+        set.connect(
+            binding.songInfo.id,
+            androidx.constraintlayout.widget.ConstraintSet.END,
+            binding.songMenu.id,
+            androidx.constraintlayout.widget.ConstraintSet.START,
+        )
+        set.applyTo(binding.interactBody)
+    }
+
+    /** Fork pessoal: aparência de música marcada na seleção de várias. */
+    fun setMultiSelected(selected: Boolean) {
+        binding.root.isActivated = selected
     }
 
     /**
@@ -155,9 +197,12 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
         listener.bind(song, this, body, binding.songDragHandle)
         // Fork pessoal: a linha guarda a música para a prévia (arrastar para a esquerda).
         itemView.setTag(org.oxycblt.auxio.R.id.tag_preview_song, song)
-        // Fork pessoal: segurar o dedo na música abre as opções dela.
-        body.setOnLongClickListener {
+        // Fork pessoal: o ⋮ abre as opções da música; segurar o dedo começa a seleção de várias.
+        binding.songMenu.setOnClickListener {
             (listener as? QueueMenuOpener)?.openQueueMenu(song, bindingAdapterPosition)
+        }
+        body.setOnLongClickListener {
+            (listener as? QueueMenuOpener)?.onItemLongPress(bindingAdapterPosition)
             true
         }
         binding.songAlbumCover.bind(song)
@@ -190,7 +235,9 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
     }
 }
 
-/** Fork pessoal: abre o menu de opções de uma música da fila. */
+/** Fork pessoal: menu de uma música da fila e seleção de várias. */
 interface QueueMenuOpener {
     fun openQueueMenu(song: Song, index: Int)
+
+    fun onItemLongPress(index: Int)
 }
