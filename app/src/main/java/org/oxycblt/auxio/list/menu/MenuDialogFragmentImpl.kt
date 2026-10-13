@@ -82,7 +82,6 @@ class SongMenuDialogFragment : MenuDialogFragment<Menu.ForSong>() {
             }
             R.id.action_queue_add -> {
                 playbackModel.addToQueue(menu.song)
-                requireContext().showToast(R.string.lng_queue_added)
             }
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.song)
             R.id.action_artist_details -> detailModel.showArtist(menu.song)
@@ -141,7 +140,6 @@ class AlbumMenuDialogFragment : MenuDialogFragment<Menu.ForAlbum>() {
             }
             R.id.action_queue_add -> {
                 playbackModel.addToQueue(menu.album)
-                requireContext().showToast(R.string.lng_queue_added)
             }
             R.id.action_artist_details -> detailModel.showArtist(menu.album)
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.album)
@@ -217,7 +215,6 @@ class ArtistMenuDialogFragment : MenuDialogFragment<Menu.ForArtist>() {
             }
             R.id.action_queue_add -> {
                 playbackModel.addToQueue(menu.artist)
-                requireContext().showToast(R.string.lng_queue_added)
             }
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.artist)
             R.id.action_share -> requireContext().share(menu.artist)
@@ -269,7 +266,6 @@ class GenreMenuDialogFragment : MenuDialogFragment<Menu.ForGenre>() {
             }
             R.id.action_queue_add -> {
                 playbackModel.addToQueue(menu.genre)
-                requireContext().showToast(R.string.lng_queue_added)
             }
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.genre)
             R.id.action_share -> requireContext().share(menu.genre)
@@ -336,7 +332,6 @@ class PlaylistMenuDialogFragment : MenuDialogFragment<Menu.ForPlaylist>() {
             }
             R.id.action_queue_add -> {
                 playbackModel.addToQueue(menu.playlist)
-                requireContext().showToast(R.string.lng_queue_added)
             }
             R.id.action_rename -> musicModel.renamePlaylist(menu.playlist)
             R.id.action_import -> musicModel.importPlaylist(target = menu.playlist)
@@ -390,7 +385,6 @@ class SelectionMenuDialogFragment : MenuDialogFragment<Menu.ForSelection>() {
             }
             R.id.action_queue_add -> {
                 playbackModel.addToQueue(menu.songs)
-                requireContext().showToast(R.string.lng_queue_added)
             }
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.songs)
             R.id.action_share -> requireContext().share(menu.songs)

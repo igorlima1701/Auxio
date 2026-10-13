@@ -105,6 +105,8 @@ class MainFragment :
     private var maxScaleXDistance = 0f
     private var sheetRising: Boolean? = null
     @Inject lateinit var uiSettings: UISettings
+    @Inject lateinit var multiQueue: org.oxycblt.auxio.playback.queue.MultiQueue
+    private var queuePicker: androidx.appcompat.app.AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -213,6 +215,21 @@ class MainFragment :
         collectImmediately(listModel.selected, selectionBackCallback::invalidateEnabled)
         collectImmediately(playbackModel.song, ::updateSong)
         collectImmediately(playbackModel.openPanel.flow, ::handlePanel)
+        // Fork pessoal: várias filas.
+        collectImmediately(multiQueue.info) {
+            org.oxycblt.auxio.playback.queue.QueueTabs.render(requireBinding().queueTabs, it, multiQueue)
+        }
+        collectImmediately(multiQueue.pendingAdd, ::handlePendingAdd)
+    }
+
+    private fun handlePendingAdd(songs: List<org.oxycblt.musikr.Song>?) {
+        if (songs == null) {
+            queuePicker = null
+            return
+        }
+        if (queuePicker?.isShowing == true) return
+        queuePicker =
+            org.oxycblt.auxio.playback.queue.QueueTabs.showPicker(requireContext(), songs, multiQueue)
     }
 
     override fun onStart() {
@@ -250,6 +267,9 @@ class MainFragment :
 
     override fun onDestroyBinding(binding: FragmentMainBinding) {
         super.onDestroyBinding(binding)
+        queuePicker?.setOnDismissListener(null)
+        queuePicker?.dismiss()
+        queuePicker = null
         speedDialBackCallback = null
         sheetBackCallback = null
         detailBackCallback = null

@@ -114,7 +114,6 @@ class QueueItemMenuDialog : DialogFragment() {
         }
         option(R.drawable.ic_queue_24, getString(R.string.lbl_add_to_queue)) {
             playbackModel.addToQueue(song)
-            activity.showToast(R.string.lng_queue_added)
         }
         option(R.drawable.ic_playlist_add_24, getString(R.string.lbl_add_to_playlists)) {
             musicModel.addToPlaylist(song)

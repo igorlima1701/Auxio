@@ -193,6 +193,11 @@ fun Context.showToast(@StringRes stringRes: Int) {
     Toast.makeText(applicationContext, getString(stringRes), Toast.LENGTH_SHORT).show()
 }
 
+/** Fork pessoal: toast com texto já montado. */
+fun Context.showToast(text: String) {
+    Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT).show()
+}
+
 /** Create a [PendingIntent] that will launch the app activity when launched. */
 fun Context.newMainPendingIntent(): PendingIntent =
     PendingIntent.getActivity(

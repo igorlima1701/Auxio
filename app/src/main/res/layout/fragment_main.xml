@@ -112,13 +112,24 @@ Deslizar para os lados troca de página: Fila ↔ Player ↔ Álbuns ↔ Artista
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/queue_title"
+                    <!-- Fork pessoal: abas numeradas das filas (como no Musicolet). Montadas no código. -->
+                    <HorizontalScrollView
+                        android:id="@+id/queue_tabs_scroll"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/size_touchable_medium"
-                        android:gravity="center"
-                        android:text="@string/lbl_queue"
-                        android:textAppearance="?attr/textAppearanceTitleMedium" />
+                        android:fillViewport="true"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/queue_tabs"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="@dimen/spacing_small" />
+
+                    </HorizontalScrollView>
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/queue_fragment"

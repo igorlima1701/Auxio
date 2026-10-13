@@ -100,4 +100,14 @@
     <string name="lng_lyrics_from_embedded" translatable="false">Esta é a letra embutida na música. Ao salvar, ela vai para o arquivo %s; a música não é alterada.</string>
     <string name="lng_lyrics_saved" translatable="false">Letra salva</string>
     <string name="err_lyrics_save" translatable="false">Não foi possível salvar: %s</string>
+    <string name="lbl_queue_n" translatable="false">Fila %d</string>
+    <string name="lng_queue_playing" translatable="false">(atual)</string>
+    <string name="fmt_queue_one_song" translatable="false">1 música</string>
+    <string name="fmt_queue_songs" translatable="false">%d músicas</string>
+    <string name="lbl_queue_new" translatable="false">+ Nova fila</string>
+    <string name="lbl_queue_delete" translatable="false">Apagar fila %d</string>
+    <string name="lng_queue_added_n" translatable="false">Adicionado à fila %d</string>
+    <string name="lng_queue_created_n" translatable="false">Criada a fila %d</string>
+    <string name="err_queue_max" translatable="false">Já existem 20 filas</string>
+    <string name="err_queue_library" translatable="false">A biblioteca ainda está carregando; tente de novo</string>
 </resources>

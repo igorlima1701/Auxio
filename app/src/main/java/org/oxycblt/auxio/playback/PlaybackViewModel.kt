@@ -63,6 +63,7 @@ constructor(
     private val playbackSettings: PlaybackSettings,
     private val commandFactory: PlaybackCommand.Factory,
     private val listSettings: ListSettings,
+    private val multiQueue: org.oxycblt.auxio.playback.queue.MultiQueue,
 ) : ViewModel(), PlaybackStateManager.Listener, PlaybackSettings.Listener {
     private var lastPositionJob: Job? = null
 
@@ -557,7 +558,7 @@ constructor(
      */
     fun addToQueue(song: Song) {
         L.d("Adding $song to queue")
-        playbackManager.addToQueue(song)
+        multiQueue.requestAdd(listOf(song))
     }
 
     /**
@@ -567,7 +568,7 @@ constructor(
      */
     fun addToQueue(album: Album) {
         L.d("Adding $album to queue")
-        playbackManager.addToQueue(listSettings.albumSongSort.songs(album.songs))
+        multiQueue.requestAdd(listSettings.albumSongSort.songs(album.songs))
     }
 
     /**
@@ -577,7 +578,7 @@ constructor(
      */
     fun addToQueue(artist: Artist) {
         L.d("Adding $artist to queue")
-        playbackManager.addToQueue(listSettings.artistSongSort.songs(artist.songs))
+        multiQueue.requestAdd(listSettings.artistSongSort.songs(artist.songs))
     }
 
     /**
@@ -587,7 +588,7 @@ constructor(
      */
     fun addToQueue(genre: Genre) {
         L.d("Adding $genre to queue")
-        playbackManager.addToQueue(listSettings.genreSongSort.songs(genre.songs))
+        multiQueue.requestAdd(listSettings.genreSongSort.songs(genre.songs))
     }
 
     /**
@@ -597,7 +598,7 @@ constructor(
      */
     fun addToQueue(playlist: Playlist) {
         L.d("Adding $playlist to queue")
-        playbackManager.addToQueue(playlist.songs)
+        multiQueue.requestAdd(playlist.songs)
     }
 
     /**
@@ -607,7 +608,7 @@ constructor(
      */
     fun addToQueue(songs: List<Song>) {
         L.d("Adding ${songs.size} songs to queue")
-        playbackManager.addToQueue(songs)
+        multiQueue.requestAdd(songs)
     }
 
     // --- STATUS FUNCTIONS ---
