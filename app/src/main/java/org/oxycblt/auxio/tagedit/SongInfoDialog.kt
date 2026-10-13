@@ -141,6 +141,13 @@ class SongInfoDialog : ViewBindingMaterialDialogFragment<DialogSongInfoBinding>(
         row(rows, R.string.lbl_info_disc, song.disc?.number?.toString() ?: unknown)
         row(rows, R.string.lbl_info_year, song.date?.toString() ?: unknown)
         row(rows, R.string.lbl_info_comment, text(info["COMMENT"]))
+        // Fork pessoal: a nota do álbum como está gravada no arquivo (tag ALBUMRATING).
+        row(
+            rows,
+            R.string.lbl_info_rating_tag,
+            info["ALBUMRATING"]?.takeIf { it.isNotBlank() }
+                ?: if (info.isEmpty()) "…" else getString(R.string.lng_info_rating_tag_none),
+        )
         divider(rows)
         row(rows, R.string.lbl_info_duration, song.durationMs.formatDurationMs(true))
         row(rows, R.string.lbl_info_bitrate, getString(R.string.fmt_bitrate, song.bitrateKbps))

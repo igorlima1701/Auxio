@@ -29,7 +29,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.oxycblt.auxio.R
 import org.oxycblt.auxio.playback.state.PlaybackStateManager
 import org.oxycblt.musikr.Album
 import org.oxycblt.musikr.Song
@@ -61,6 +63,7 @@ constructor(
     /** Faixas ainda por gravar: song uid -> (música, valor). */
     private val pending = ConcurrentHashMap<String, Pair<Song, String>>()
     private var retryJob: Job? = null
+    @Volatile private var resyncStarted = false
     private val importPrefs = context.getSharedPreferences("album_ratings_meta", Context.MODE_PRIVATE)
 
     fun attach() {
@@ -79,16 +82,61 @@ constructor(
             }
     }
 
-    private suspend fun flush() {
+    private val flushLock = kotlinx.coroutines.sync.Mutex()
+
+    // Uma gravação por vez (a conferência da abertura e as mudanças de nota podem coincidir).
+    private suspend fun flush() = flushLock.withLock { flushImpl() }
+
+    private suspend fun flushImpl() {
         val playingUid = withContext(Dispatchers.Main) { playbackManager.currentSong?.uid }
+        var written = 0
+        val errors = mutableListOf<String>()
         for ((key, entry) in pending.entries.toList()) {
             val (song, value) = entry
             if (song.uid == playingUid) continue
             val error = editor.write(song.uri, song.path.name ?: "", mapOf(TagField.ALBUM_RATING to value))
-            if (error != null) L.w("ALBUMRATING não gravado em ${song.path.name}: $error")
+            if (error != null) {
+                L.w("ALBUMRATING não gravado em ${song.path.name}: $error")
+                errors += error
+            } else {
+                written++
+            }
             pending.remove(key, entry)
         }
+        // Fork pessoal: avisa na tela o resultado, para não falhar em silêncio.
+        if (written > 0 || errors.isNotEmpty()) {
+            val text =
+                if (errors.isEmpty()) {
+                    context.getString(R.string.lng_rating_tag_saved, written)
+                } else {
+                    context.getString(R.string.lng_rating_tag_failed, errors.size, errors.first())
+                }
+            withContext(Dispatchers.Main) {
+                android.widget.Toast.makeText(context, text, android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
         if (pending.isNotEmpty()) scheduleRetry()
+    }
+
+    /**
+     * Fork pessoal: confere, uma vez por abertura do app, se os álbuns com nota têm a tag certa
+     * (lê a primeira faixa de cada um) e regrava os que estiverem diferentes, como os que não
+     * puderam ser gravados antes.
+     */
+    fun resyncIfNeeded(albums: List<Album>) {
+        if (resyncStarted) return
+        resyncStarted = true
+        scope.launch {
+            delay(RESYNC_DELAY_MS)
+            for (album in albums) {
+                val rating = AlbumRatings.get(album) ?: continue
+                val song = album.songs.firstOrNull() ?: continue
+                val tag = editor.info(song.uri)["ALBUMRATING"]?.trim().orEmpty()
+                if (tag == rating.toString()) continue
+                for (s in album.songs) pending[s.uid.toString()] = s to rating.toString()
+            }
+            if (pending.isNotEmpty()) flush()
+        }
     }
 
     private fun scheduleRetry() {
@@ -129,6 +177,7 @@ constructor(
     private companion object {
         const val DEBOUNCE_MS = 4000L
         const val RETRY_MS = 15000L
+        const val RESYNC_DELAY_MS = 8000L
         const val KEY_IMPORTED = "imported_from_tags"
     }
 }

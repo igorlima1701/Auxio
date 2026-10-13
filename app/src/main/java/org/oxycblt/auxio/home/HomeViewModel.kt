@@ -236,7 +236,10 @@ constructor(
             MusicType.ALBUMS -> {
                 allAlbums = homeGenerator.albums()
                 AlbumRatings.resolvePending(allAlbums)
-                if (allAlbums.isNotEmpty()) albumRatingTagSync.importIfNeeded(allAlbums)
+                if (allAlbums.isNotEmpty()) {
+                    albumRatingTagSync.importIfNeeded(allAlbums)
+                    albumRatingTagSync.resyncIfNeeded(allAlbums)
+                }
                 albumInstructions.put(
                     if (albumFilter.value.isEmpty) instructions else UpdateInstructions.Replace(0)
                 )

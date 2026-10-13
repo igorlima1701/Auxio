@@ -142,4 +142,8 @@
     <string name="fmt_queue_group" translatable="false">%d músicas</string>
     <string name="fmt_queue_group_move" translatable="false">Mover %d músicas para esta posição</string>
     <string name="lng_queue_search" translatable="false">Buscar nesta fila…</string>
+    <string name="lng_rating_tag_saved" translatable="false">Nota gravada em %d músicas</string>
+    <string name="lng_rating_tag_failed" translatable="false">Nota não gravada em %1$d músicas: %2$s</string>
+    <string name="lbl_info_rating_tag" translatable="false">Nota do álbum (tag)</string>
+    <string name="lng_info_rating_tag_none" translatable="false">sem a tag</string>
 </resources>

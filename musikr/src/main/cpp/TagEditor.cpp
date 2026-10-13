@@ -19,6 +19,7 @@
 #include "TagEditor.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <map>
 #include <memory>
@@ -565,6 +566,199 @@ namespace tagedit {
             return "";
         }
 
+        // ---------- Fork pessoal: edição direta dos quadros ID3v2 ----------
+        //
+        // Duas situações em que mexer nos bytes é mais fiel que regravar pelo TagLib:
+        // 1. Nota do álbum (TXXX "ALBUMRATING"): só esse quadro entra ou sai; todos os outros bytes
+        //    da tag ficam idênticos.
+        // 2. ID3v2.3 com a data completa no TYER ("2026-06-17", como o Mp3tag grava): o TagLib, ao
+        //    regravar, troca por TYER "2026" + TDAT "1706". Quando a data não foi editada, os quadros
+        //    de data originais voltam byte a byte.
+
+        struct RawFrame {
+            std::string id;
+            std::vector<unsigned char> bytes; // cabeçalho (10) + conteúdo
+        };
+
+        struct RawTag {
+            int major = 0;
+            size_t end = 0; // fim da tag (onde começa o áudio)
+            std::vector<RawFrame> frames;
+        };
+
+        size_t frameSize(int major, const unsigned char *p) {
+            if (major == 4) {
+                return (size_t(p[0] & 0x7F) << 21) | (size_t(p[1] & 0x7F) << 14) |
+                       (size_t(p[2] & 0x7F) << 7) | size_t(p[3] & 0x7F);
+            }
+            return (size_t(p[0]) << 24) | (size_t(p[1]) << 16) | (size_t(p[2]) << 8) | size_t(p[3]);
+        }
+
+        /** Lê uma tag ID3v2.3/2.4 simples (sem cabeçalho estendido, sem dessincronização, sem rodapé). */
+        bool readRawTag(const std::vector<unsigned char> &d, RawTag &tag) {
+            if (d.size() < 10 || d[0] != 'I' || d[1] != 'D' || d[2] != '3') return false;
+            tag.major = d[3];
+            if (tag.major != 3 && tag.major != 4) return false;
+            if (d[5] != 0) return false;
+            size_t size = (size_t(d[6] & 0x7F) << 21) | (size_t(d[7] & 0x7F) << 14) |
+                          (size_t(d[8] & 0x7F) << 7) | size_t(d[9] & 0x7F);
+            tag.end = 10 + size;
+            if (tag.end > d.size()) return false;
+            size_t pos = 10;
+            while (pos + 10 <= tag.end) {
+                if (d[pos] == 0) break; // preenchimento
+                for (int i = 0; i < 4; i++) {
+                    unsigned char c = d[pos + i];
+                    if (!((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))) return false;
+                }
+                size_t fs = frameSize(tag.major, &d[pos + 4]);
+                if (pos + 10 + fs > tag.end) return false;
+                RawFrame f;
+                f.id.assign(reinterpret_cast<const char *>(&d[pos]), 4);
+                f.bytes.assign(d.begin() + pos, d.begin() + pos + 10 + fs);
+                tag.frames.push_back(std::move(f));
+                pos += 10 + fs;
+            }
+            return true;
+        }
+
+        /** Descrição de um quadro TXXX, em ASCII (vazia se não der para ler). */
+        std::string txxxDescription(const RawFrame &f) {
+            if (f.id != "TXXX" || f.bytes.size() < 11) return "";
+            unsigned char enc = f.bytes[10];
+            std::string out;
+            size_t i = 11;
+            if (enc == 0 || enc == 3) {
+                while (i < f.bytes.size() && f.bytes[i] != 0) out += char(f.bytes[i++]);
+            } else {
+                bool bigEndian = enc == 2;
+                if (i + 1 < f.bytes.size() && f.bytes[i] == 0xFF && f.bytes[i + 1] == 0xFE) {
+                    bigEndian = false;
+                    i += 2;
+                } else if (i + 1 < f.bytes.size() && f.bytes[i] == 0xFE && f.bytes[i + 1] == 0xFF) {
+                    bigEndian = true;
+                    i += 2;
+                }
+                while (i + 1 < f.bytes.size()) {
+                    unsigned int c = bigEndian ? (f.bytes[i] << 8) | f.bytes[i + 1]
+                                               : (f.bytes[i + 1] << 8) | f.bytes[i];
+                    i += 2;
+                    if (c == 0) break;
+                    out += c < 128 ? char(c) : '?';
+                }
+            }
+            for (auto &c: out) c = char(std::toupper(static_cast<unsigned char>(c)));
+            return out;
+        }
+
+        /** Grava [tag] + o restante de [source] (a partir de [audioStart]) em [path]. */
+        bool writeRawTag(const char *path, int major, const std::vector<RawFrame> &frames,
+                size_t minArea, const std::vector<unsigned char> &source, size_t audioStart) {
+            size_t area = 0;
+            for (const auto &f: frames) area += f.bytes.size();
+            // Mantém o tamanho da tag quando cabe (o resto vira preenchimento); se crescer, deixa
+            // uma folga para as próximas edições.
+            if (area <= minArea) area = minArea;
+            else area += 1024;
+            if (area > 0x0FFFFFFF) return false;
+            std::vector<unsigned char> out;
+            out.reserve(10 + area + (source.size() - audioStart));
+            unsigned char header[10] = {'I', 'D', '3', static_cast<unsigned char>(major), 0, 0,
+                                        static_cast<unsigned char>((area >> 21) & 0x7F),
+                                        static_cast<unsigned char>((area >> 14) & 0x7F),
+                                        static_cast<unsigned char>((area >> 7) & 0x7F),
+                                        static_cast<unsigned char>(area & 0x7F)};
+            out.insert(out.end(), header, header + 10);
+            for (const auto &f: frames) out.insert(out.end(), f.bytes.begin(), f.bytes.end());
+            out.resize(10 + area, 0);
+            out.insert(out.end(), source.begin() + audioStart, source.end());
+            FILE *fp = std::fopen(path, "wb");
+            if (fp == nullptr) return false;
+            size_t written = std::fwrite(out.data(), 1, out.size(), fp);
+            bool ok = written == out.size();
+            ok = (std::fclose(fp) == 0) && ok;
+            return ok;
+        }
+
+        /**
+         * Põe (ou tira, se [value] vazio) o TXXX [desc] direto nos bytes da tag de [original],
+         * gravando o resultado em [work]. Retorna false se a tag não for do tipo simples (aí o
+         * TagLib cuida).
+         */
+        bool rawSetTxxx(const char *original, const char *work, const std::string &desc,
+                const String &value) {
+            RawFile src;
+            if (!src.load(original)) return false;
+            RawTag tag;
+            if (!readRawTag(src.data, tag)) return false;
+            std::vector<RawFrame> frames;
+            for (const auto &f: tag.frames) {
+                if (f.id == "TXXX" && txxxDescription(f) == desc) continue;
+                frames.push_back(f);
+            }
+            std::string v = value.stripWhiteSpace().to8Bit(true);
+            if (!v.empty()) {
+                for (unsigned char c: v) if (c >= 128) return false; // só números
+                std::vector<unsigned char> body;
+                body.push_back(0); // Latin-1
+                body.insert(body.end(), desc.begin(), desc.end());
+                body.push_back(0);
+                body.insert(body.end(), v.begin(), v.end());
+                RawFrame f;
+                f.id = "TXXX";
+                size_t n = body.size();
+                unsigned char h[10] = {'T', 'X', 'X', 'X', 0, 0, 0, 0, 0, 0};
+                if (tag.major == 4) {
+                    h[4] = (n >> 21) & 0x7F;
+                    h[5] = (n >> 14) & 0x7F;
+                    h[6] = (n >> 7) & 0x7F;
+                    h[7] = n & 0x7F;
+                } else {
+                    h[4] = (n >> 24) & 0xFF;
+                    h[5] = (n >> 16) & 0xFF;
+                    h[6] = (n >> 8) & 0xFF;
+                    h[7] = n & 0xFF;
+                }
+                f.bytes.assign(h, h + 10);
+                f.bytes.insert(f.bytes.end(), body.begin(), body.end());
+                frames.push_back(std::move(f));
+            }
+            return writeRawTag(work, tag.major, frames, tag.end - 10, src.data, tag.end);
+        }
+
+        bool isDateFrame(const std::string &id) {
+            return id == "TYER" || id == "TDAT" || id == "TIME" || id == "TRDA" || id == "TORY";
+        }
+
+        /**
+         * Depois de o TagLib regravar um ID3v2.3, devolve os quadros de data originais (quando a
+         * data não foi editada). Retorna string vazia se deu certo ou se não havia o que fazer.
+         */
+        String restoreRawDateFrames(const char *original, const char *work) {
+            RawFile src, dst;
+            if (!src.load(original) || !dst.load(work)) return U("não foi possível reler o arquivo");
+            RawTag a, b;
+            if (!readRawTag(src.data, a) || !readRawTag(dst.data, b)) return "";
+            if (a.major != 3 || b.major != 3) return "";
+            std::vector<RawFrame> origDates, workDates, frames;
+            for (const auto &f: a.frames) if (isDateFrame(f.id)) origDates.push_back(f);
+            for (const auto &f: b.frames) {
+                if (isDateFrame(f.id)) workDates.push_back(f);
+                else frames.push_back(f);
+            }
+            auto same = [](const std::vector<RawFrame> &x, const std::vector<RawFrame> &y) {
+                if (x.size() != y.size()) return false;
+                for (size_t i = 0; i < x.size(); i++) if (x[i].bytes != y[i].bytes) return false;
+                return true;
+            };
+            if (same(origDates, workDates)) return "";
+            frames.insert(frames.end(), origDates.begin(), origDates.end());
+            if (!writeRawTag(work, 3, frames, b.end - 10, dst.data, b.end)) {
+                return U("não foi possível gravar o arquivo");
+            }
+            return "";
+        }
+
         std::unique_ptr<TagLib::FileRef> open(const char *path) {
             auto ref = std::make_unique<TagLib::FileRef>(path, false);
             if (ref->isNull()) return nullptr;
@@ -679,7 +873,20 @@ namespace tagedit {
 
         Kind kind;
         TagLib::PropertyMap before;
-        {
+        // Fork pessoal: só a nota do álbum num MP3 com tag simples -> mexe só naquele quadro.
+        bool rawDone = false;
+        if (edits.size() == 1 && edits[0].key == "ALBUMRATING") {
+            auto probe = open(work);
+            if (probe != nullptr && kindOf(probe->file()) == Kind::Mp3) {
+                before = probe->file()->properties();
+                probe.reset();
+                if (rawSetTxxx(original, work, "ALBUMRATING", edits[0].value)) {
+                    kind = Kind::Mp3;
+                    rawDone = true;
+                }
+            }
+        }
+        if (!rawDone) {
             auto ref = open(work);
             if (ref == nullptr) return U("não foi possível abrir a cópia do arquivo");
             kind = kindOf(ref->file());
@@ -710,6 +917,15 @@ namespace tagedit {
             }
             if (!error.isEmpty()) return error;
         } // fecha o arquivo antes de conferir
+
+        if (!rawDone && kind == Kind::Mp3) {
+            bool dateEdited = false;
+            for (const auto &e: edits) dateEdited = dateEdited || e.key == "DATE" || e.key == "ORIGINALDATE";
+            if (!dateEdited) {
+                String restoreError = restoreRawDateFrames(original, work);
+                if (!restoreError.isEmpty()) return restoreError;
+            }
+        }
 
         String audioError = verifyAudio(kind, original, work);
         if (!audioError.isEmpty()) return audioError;
