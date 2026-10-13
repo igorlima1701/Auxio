@@ -80,6 +80,28 @@ class PlaylistListFragment :
         }
         binding.homeNoMusicMsg.text = getString(R.string.lng_empty_playlists)
 
+        // Fork pessoal: playlists automáticas (pelo histórico de execuções) no topo.
+        binding.homeAutoBar.visibility = android.view.View.VISIBLE
+        binding.homeRecycler.setPadding(
+            binding.homeRecycler.paddingLeft,
+            resources.getDimensionPixelSize(R.dimen.size_album_filter_space),
+            binding.homeRecycler.paddingRight,
+            binding.homeRecycler.paddingBottom,
+        )
+        binding.homeRecycler.clipToPadding = false
+        val kinds =
+            mapOf(
+                binding.homeAutoRecent to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.RECENT,
+                binding.homeAutoMost to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.MOST,
+                binding.homeAutoNotPlayed to
+                    org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.NOT_PLAYED,
+            )
+        for ((chip, kind) in kinds) {
+            chip.setOnClickListener {
+                org.oxycblt.auxio.home.auto.AutoPlaylistDialog.show(childFragmentManager, kind)
+            }
+        }
+
         collectImmediately(homeModel.playlistList, ::updatePlaylists)
         collectImmediately(
             homeModel.empty,

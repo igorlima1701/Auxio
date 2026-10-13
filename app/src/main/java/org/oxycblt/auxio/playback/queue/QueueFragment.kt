@@ -135,6 +135,33 @@ class QueueFragment :
         )
         binding.queueSearchClear.setOnClickListener { binding.queueSearch.setText("") }
 
+        // Fork pessoal: com o teclado aberto, a busca sobe junto (a lista encolhe).
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(imeLayoutListener)
+        androidx.core.view.ViewCompat.setWindowInsetsAnimationCallback(
+            binding.root,
+            object :
+                androidx.core.view.WindowInsetsAnimationCompat.Callback(
+                    androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
+                ) {
+                override fun onProgress(
+                    insets: androidx.core.view.WindowInsetsCompat,
+                    running: MutableList<androidx.core.view.WindowInsetsAnimationCompat>,
+                ): androidx.core.view.WindowInsetsCompat {
+                    applyImePadding(
+                        insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
+                    )
+                    return insets
+                }
+
+                override fun onEnd(animation: androidx.core.view.WindowInsetsAnimationCompat) {
+                    updateImePadding()
+                }
+            },
+        )
+        binding.queueSearch.setOnFocusChangeListener { v, _ ->
+            v.postDelayed({ updateImePadding() }, 300)
+        }
+
         // --- VIEWMODEL SETUP ----
         collectImmediately(
             queueModel.queue,
@@ -153,8 +180,30 @@ class QueueFragment :
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, selectionBack)
     }
 
+    private val imeLayoutListener =
+        android.view.ViewTreeObserver.OnGlobalLayoutListener { updateImePadding() }
+
+    private fun updateImePadding() {
+        val root = view ?: return
+        val insets = androidx.core.view.ViewCompat.getRootWindowInsets(root) ?: return
+        applyImePadding(insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom)
+    }
+
+    /** Espaço embaixo para o teclado, descontando o que já fica abaixo da fila (barra de abas). */
+    private fun applyImePadding(ime: Int) {
+        val root = view ?: return
+        val location = IntArray(2)
+        root.getLocationInWindow(location)
+        val below = root.rootView.height - (location[1] + root.height)
+        val pad = (ime - below).coerceAtLeast(0)
+        if (root.paddingBottom != pad) {
+            root.setPadding(root.paddingLeft, root.paddingTop, root.paddingRight, pad)
+        }
+    }
+
     override fun onDestroyBinding(binding: FragmentQueueBinding) {
         super.onDestroyBinding(binding)
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(imeLayoutListener)
         touchHelper = null
         binding.queueRecycler.adapter = null
         // Avoid possible race conditions that could cause a bad instruction to be consumed
@@ -276,25 +325,111 @@ class QueueFragment :
         binding.queuePlay.isVisible = viewing != info.active
     }
 
-    /** Lista das filas (menu suspenso); tocar numa só mostra a fila, sem tocá-la. */
+    /**
+     * Lista das filas; tocar numa só mostra a fila, sem tocá-la. O ✕ de cada linha apaga a fila na
+     * hora, e o fim da lista tem "Apagar as outras filas".
+     */
     private fun showQueueList() {
-        val info = multiQueue.info.value
-        PopupMenu(requireContext(), requireBinding().queueSwitcher).apply {
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        val list =
+            android.widget.LinearLayout(context).apply {
+                orientation = android.widget.LinearLayout.VERTICAL
+            }
+        val scroll = android.widget.ScrollView(context).apply { addView(list) }
+        val dialog =
+            MaterialAlertDialogBuilder(context)
+                .setView(scroll)
+                .setNegativeButton(R.string.lbl_cancel, null)
+                .create()
+
+        fun fill() {
+            list.removeAllViews()
+            val info = multiQueue.info.value
+            val rowHeight = (52 * density).toInt()
+            val pad = (20 * density).toInt()
             for (i in 0 until info.count) {
-                val marker = if (i == info.active) "▶ " else "    "
-                val title = marker + info.names[i] + "  (" + info.sizes.getOrElse(i) { 0 } + ")"
-                menu.add(0, i, i, title).apply {
-                    isCheckable = true
-                    isChecked = i == info.viewing
+                val row =
+                    android.widget.LinearLayout(context).apply {
+                        orientation = android.widget.LinearLayout.HORIZONTAL
+                        gravity = android.view.Gravity.CENTER_VERTICAL
+                        minimumHeight = rowHeight
+                        setPaddingRelative(pad, 0, (4 * density).toInt(), 0)
+                        val bg = android.util.TypedValue()
+                        context.theme.resolveAttribute(android.R.attr.selectableItemBackground, bg, true)
+                        setBackgroundResource(bg.resourceId)
+                        setOnClickListener {
+                            multiQueue.view(i)
+                            dialog.dismiss()
+                        }
+                    }
+                val text =
+                    android.widget.TextView(context).apply {
+                        val marker = if (i == info.active) "▶ " else ""
+                        this.text = marker + info.names[i] + "  (" + info.sizes.getOrElse(i) { 0 } + ")"
+                        textSize = 16f
+                        maxLines = 2
+                        ellipsize = android.text.TextUtils.TruncateAt.END
+                        if (i == info.viewing) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    }
+                row.addView(
+                    text,
+                    android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+                )
+                if (info.count > 1) {
+                    val close =
+                        android.widget.ImageButton(context).apply {
+                            setImageResource(R.drawable.ic_close_24)
+                            val bg = android.util.TypedValue()
+                            context.theme.resolveAttribute(
+                                android.R.attr.selectableItemBackgroundBorderless,
+                                bg,
+                                true,
+                            )
+                            setBackgroundResource(bg.resourceId)
+                            contentDescription = getString(R.string.lbl_queue_delete_short)
+                            setOnClickListener {
+                                if (!multiQueue.deleteQuick(i)) {
+                                    context.showToast(R.string.err_queue_library)
+                                }
+                                fill()
+                            }
+                        }
+                    row.addView(
+                        close,
+                        android.widget.LinearLayout.LayoutParams(rowHeight, rowHeight),
+                    )
                 }
+                list.addView(row)
             }
-            menu.setGroupCheckable(0, true, true)
-            setOnMenuItemClickListener { item ->
-                multiQueue.view(item.itemId)
-                true
+            if (info.count > 1) {
+                val others =
+                    android.widget.TextView(context).apply {
+                        this.text = getString(R.string.lbl_queue_delete_others)
+                        textSize = 15f
+                        gravity = android.view.Gravity.CENTER_VERTICAL
+                        minimumHeight = rowHeight
+                        setPaddingRelative(pad, 0, pad, 0)
+                        setTextColor(
+                            com.google.android.material.color.MaterialColors.getColor(
+                                this,
+                                androidx.appcompat.R.attr.colorError,
+                            )
+                        )
+                        val bg = android.util.TypedValue()
+                        context.theme.resolveAttribute(android.R.attr.selectableItemBackground, bg, true)
+                        setBackgroundResource(bg.resourceId)
+                        setOnClickListener {
+                            multiQueue.deleteOthers()
+                            dialog.dismiss()
+                        }
+                    }
+                list.addView(others)
             }
-            show()
         }
+        fill()
+        dialog.show()
+        dialog.window?.setWindowAnimations(0)
     }
 
     private fun showQueueOptions() {

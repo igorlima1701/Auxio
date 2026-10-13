@@ -172,4 +172,23 @@
     <string name="lbl_play_shuffled" translatable="false">Tocar aleatório</string>
     <string name="err_play_filter" translatable="false">Não deu para criar a fila (limite de 20 filas ou biblioteca carregando).</string>
     <string name="lbl_queue_shuffle" translatable="false">Embaralhar a fila</string>
+    <!-- Filas automáticas, playlists automáticas, cópia de segurança -->
+    <string name="lbl_queue_delete_others" translatable="false">Apagar as outras filas</string>
+    <string name="lbl_auto_recent" translatable="false">Tocadas recentemente</string>
+    <string name="lbl_auto_most" translatable="false">Mais tocadas</string>
+    <string name="lbl_auto_not_played" translatable="false">Não tocadas</string>
+    <string name="lbl_auto_never" translatable="false">Nunca</string>
+    <string name="fmt_auto_days" translatable="false">Há mais de %d dias</string>
+    <string name="lng_auto_never_played" translatable="false">nunca tocada</string>
+    <string name="fmt_auto_plays" translatable="false">%1$d× · %2$s</string>
+    <string name="lng_auto_empty" translatable="false">Nada aqui ainda. Uma música conta depois de ouvida por metade da duração (ou 4 minutos).</string>
+    <string name="lng_auto_loading" translatable="false">Carregando…</string>
+    <string name="set_fork_backup" translatable="false">Cópia de segurança (Auxio+)</string>
+    <string name="set_fork_backup_export" translatable="false">Exportar dados</string>
+    <string name="set_fork_backup_export_desc" translatable="false">Histórico de execuções, configurações, notas e coleções num arquivo .json</string>
+    <string name="set_fork_backup_import" translatable="false">Importar dados</string>
+    <string name="set_fork_backup_import_desc" translatable="false">Junta o histórico do arquivo ao atual e aplica as configurações, notas e coleções dele</string>
+    <string name="fmt_fork_backup_exported" translatable="false">Cópia salva: %1$d execuções e %2$d itens de configuração.</string>
+    <string name="fmt_fork_backup_imported" translatable="false">Importado: %1$d execuções novas e %2$d itens de configuração. O app vai fechar para aplicar; é só abrir de novo.</string>
+    <string name="fmt_fork_backup_failed" translatable="false">Não deu certo: %s</string>
 </resources>

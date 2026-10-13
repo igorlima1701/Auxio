@@ -184,6 +184,9 @@ interface PlaybackStateManager {
      */
     fun shuffled(shuffled: Boolean)
 
+    /** Fork pessoal: chamado logo antes de uma reprodução nova (para as várias filas). */
+    var beforeNewPlayback: ((PlaybackCommand) -> Unit)?
+
     /**
      * Acknowledges that an event has happened that modified the state held by the current
      * [PlaybackStateHolder].
@@ -347,6 +350,8 @@ class PlaybackStateManagerImpl @Inject constructor() : PlaybackStateManager {
 
     private val listeners = mutableListOf<Listener>()
 
+    @Volatile override var beforeNewPlayback: ((PlaybackCommand) -> Unit)? = null
+
     @Volatile
     private var stateMirror =
         StateMirror(
@@ -452,6 +457,11 @@ class PlaybackStateManagerImpl @Inject constructor() : PlaybackStateManager {
         L.d("Playing $command")
         // Played something, so we are initialized now
         isInitialized = true
+        try {
+            beforeNewPlayback?.invoke(command)
+        } catch (e: Exception) {
+            L.w(e, "Falha ao preparar a fila nova")
+        }
         stateHolder.newPlayback(command)
     }
 

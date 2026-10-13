@@ -227,6 +227,9 @@ class AlbumListFragment :
             }
         }
         pendingSnapshotTap = null
+        if (binding != null) {
+            updateNoMusicIndicator(homeModel.empty.value, musicModel.indexingState.value)
+        }
         // Um instante para as capas da grade de verdade aparecerem por baixo.
         overlay.postDelayed(
             {
@@ -367,6 +370,12 @@ class AlbumListFragment :
 
     private fun updateNoMusicIndicator(empty: Boolean, indexingState: IndexingState?) {
         val binding = requireBinding()
+        // Fork pessoal: com a foto da grade na tela (abertura), nada de aviso de biblioteca vazia.
+        if (snapshotView != null) {
+            binding.homeNoMusic.isInvisible = true
+            binding.homeNoMusicAction.isVisible = false
+            return
+        }
         binding.homeRecycler.isInvisible = empty
         binding.homeNoMusic.isInvisible = !empty
         binding.homeNoMusicAction.isVisible =

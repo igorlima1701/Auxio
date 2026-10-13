@@ -20,6 +20,8 @@ package org.oxycblt.auxio.settings
 
 import android.os.Bundle
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -40,6 +42,66 @@ import timber.log.Timber as L
 @AndroidEntryPoint
 class RootPreferenceFragment : BasePreferenceFragment(R.xml.preferences_root) {
     private val musicModel: MusicViewModel by activityViewModels()
+
+    // Fork pessoal: exportar / importar a cópia de segurança.
+    private val exportLauncher =
+        registerForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.CreateDocument(
+                "application/json"
+            )
+        ) { uri ->
+            if (uri != null) runBackup(export = true, uri = uri)
+        }
+
+    private val importLauncher =
+        registerForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+        ) { uri ->
+            if (uri != null) runBackup(export = false, uri = uri)
+        }
+
+    private fun runBackup(export: Boolean, uri: android.net.Uri) {
+        val context = requireContext().applicationContext
+        viewLifecycleOwner.lifecycleScope.launch {
+            val outcome =
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    try {
+                        if (export) ForkBackup.export(context, uri) else ForkBackup.import(context, uri)
+                    } catch (e: Exception) {
+                        L.w(e, "Cópia de segurança falhou")
+                        e
+                    }
+                }
+            val activity = activity ?: return@launch
+            val builder = com.google.android.material.dialog.MaterialAlertDialogBuilder(activity)
+            when (outcome) {
+                is ForkBackup.Result ->
+                    if (export) {
+                        builder.setMessage(
+                            getString(R.string.fmt_fork_backup_exported, outcome.plays, outcome.settings)
+                        )
+                        builder.setPositiveButton(R.string.lbl_ok, null)
+                    } else {
+                        // Notas, coleções e configurações são lidas na abertura: o app reinicia.
+                        builder.setMessage(
+                            getString(R.string.fmt_fork_backup_imported, outcome.plays, outcome.settings)
+                        )
+                        builder.setCancelable(false)
+                        builder.setPositiveButton(R.string.lbl_ok) { _, _ ->
+                            activity.finishAffinity()
+                            android.os.Process.killProcess(android.os.Process.myPid())
+                        }
+                    }
+                is Exception -> {
+                    builder.setMessage(
+                        getString(R.string.fmt_fork_backup_failed, outcome.message ?: outcome.toString())
+                    )
+                    builder.setPositiveButton(R.string.lbl_ok, null)
+                }
+            }
+            builder.show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +146,14 @@ class RootPreferenceFragment : BasePreferenceFragment(R.xml.preferences_root) {
             }
             getString(R.string.set_key_reindex) -> musicModel.refresh()
             getString(R.string.set_key_rescan) -> musicModel.rescan()
+            "fork_backup_export" -> {
+                val stamp =
+                    java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                        .format(java.util.Date())
+                exportLauncher.launch("auxio-igor-$stamp.json")
+            }
+            "fork_backup_import" ->
+                importLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/*"))
             else -> return super.onPreferenceTreeClick(preference)
         }
 

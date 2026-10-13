@@ -18,7 +18,6 @@
  
 package org.oxycblt.auxio.playback.service
 
-import org.oxycblt.auxio.playback.PlayHistory
 import org.oxycblt.auxio.playback.StopAfterSong
 
 import android.content.Context
@@ -99,13 +98,19 @@ class ExoPlaybackStateHolder(
         playbackManager.registerStateHolder(this)
         musicRepository.addUpdateListener(this)
         player.addListener(this)
+        // Fork pessoal: histórico de execuções pelo tempo ouvido.
+        playTracker = PlayTracker(player).also { player.addListener(it) }
         StopAfterSong.listener = { updatePauseOnRepeat() }
         replayGainProcessor.attach()
         playbackSettings.registerListener(this)
         imageSettings.registerListener(this)
     }
 
+    private var playTracker: PlayTracker? = null
+
     fun release() {
+        playTracker?.release()
+        playTracker = null
         saveJob.cancel()
         playbackManager.unregisterStateHolder(this)
         musicRepository.removeUpdateListener(this)
@@ -470,19 +475,11 @@ class ExoPlaybackStateHolder(
 
     // --- PLAYER OVERRIDES ---
 
-    /** Fork pessoal: música já contada no histórico ao pausar no fim dela. */
-    private var countedAtPause: org.oxycblt.musikr.Music.UID? = null
-
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
         super.onPlayWhenReadyChanged(playWhenReady, reason)
 
         // Fork pessoal: a música marcada terminou e o player pausou; a marcação vale só uma vez.
         if (!playWhenReady && reason == Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
-            // Pausou no fim da música (parar depois desta / pausar ao repetir): ela tocou inteira.
-            playbackManager.currentSong?.let {
-                PlayHistory.record(it.uid)
-                countedAtPause = it.uid
-            }
             if (StopAfterSong.target.value != null) StopAfterSong.set(null)
         }
 
@@ -508,10 +505,6 @@ class ExoPlaybackStateHolder(
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
 
-        if (playbackState == Player.STATE_ENDED) {
-            // Fork pessoal: a última música da fila tocou até o fim.
-            playbackManager.currentSong?.let { PlayHistory.record(it.uid) }
-        }
         if (playbackState == Player.STATE_ENDED && player.repeatMode == Player.REPEAT_MODE_OFF) {
             goto(0)
             player.pause()
@@ -521,17 +514,6 @@ class ExoPlaybackStateHolder(
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
 
-        if (
-            reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO ||
-                reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
-        ) {
-            // Fork pessoal: a música anterior tocou até o fim; conta no histórico (a não ser que já
-            // tenha sido contada ao pausar no fim dela).
-            playbackManager.currentSong?.let {
-                if (it.uid != countedAtPause) PlayHistory.record(it.uid)
-            }
-            countedAtPause = null
-        }
         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
             playbackManager.ack(this, StateAck.IndexMoved)
             deferSave()

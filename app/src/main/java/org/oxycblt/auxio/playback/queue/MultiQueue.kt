@@ -35,6 +35,7 @@ import org.oxycblt.auxio.R
 import org.oxycblt.auxio.music.MusicRepository
 import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.playback.persist.PersistenceRepository
+import org.oxycblt.auxio.playback.state.PlaybackCommand
 import org.oxycblt.auxio.playback.state.PlaybackStateManager
 import org.oxycblt.auxio.playback.state.QueueChange
 import org.oxycblt.musikr.Music
@@ -75,7 +76,7 @@ constructor(
     }
 
     /** Nome da fila. [auto] = nome automático (acompanha o conteúdo); [sig] = conteúdo que o gerou. */
-    private data class Meta(val name: String, val auto: Boolean, val sig: Int)
+    private data class Meta(val name: String, val auto: Boolean, val sig: Int, val used: Long = 0L)
 
     /** Resumo para a tela. */
     data class Info(
@@ -110,6 +111,82 @@ constructor(
     init {
         load()
         playbackManager.addListener(this)
+        playbackManager.beforeNewPlayback = ::beforeNewPlayback
+        publish()
+    }
+
+    /**
+     * Fork pessoal: cada reprodução nova vinda da biblioteca (álbum, artista, playlist, música de
+     * uma lista) ganha uma fila nova; a anterior fica guardada na lista. Tocar de novo o mesmo
+     * conteúdo da fila atual não cria outra. Passando de [MAX], some a fila usada há mais tempo
+     * (as renomeadas por você só saem se não houver outra).
+     */
+    private fun beforeNewPlayback(command: PlaybackCommand) {
+        if (switching) return
+        val current = playbackManager.queue
+        if (current.isEmpty() || command.queue.isEmpty()) return
+        val newSet = command.queue.mapTo(HashSet()) { it.uid }
+        if (newSet == current.mapTo(HashSet()) { it.uid }) return
+        val now = System.currentTimeMillis()
+        slots[active] = playbackManager.toSavedState()?.let(::fromSaved)
+        metas[active] = metas[active].copy(used = now)
+        while (slots.size >= MAX) {
+            if (!evictOldest()) break
+        }
+        slots.add(null)
+        metas.add(Meta(defaultName(slots.size - 1), true, 0, now))
+        active = slots.size - 1
+        viewingSlot = active
+        bumpStored()
+        persist()
+        publish()
+    }
+
+    /** Apaga a fila parada usada há mais tempo (as automáticas primeiro). */
+    private fun evictOldest(): Boolean {
+        val candidates = slots.indices.filter { it != active }
+        if (candidates.isEmpty()) return false
+        val victim =
+            candidates.filter { metas[it].auto }.minByOrNull { metas[it].used }
+                ?: candidates.minByOrNull { metas[it].used }
+                ?: return false
+        removeStoppedSlot(victim)
+        return true
+    }
+
+    private fun removeStoppedSlot(slot: Int) {
+        if (slot == active || slot !in slots.indices) return
+        slots.removeAt(slot)
+        metas.removeAt(slot)
+        if (active > slot) active--
+        if (viewingSlot == slot) viewingSlot = active else if (viewingSlot > slot) viewingSlot--
+    }
+
+    /** Fork pessoal: apaga na hora a fila [slot] (a que está tocando passa para outra). */
+    fun deleteQuick(slot: Int): Boolean = if (slot == active) delete(slot) else {
+        if (slot !in slots.indices) false
+        else {
+            removeStoppedSlot(slot)
+            bumpStored()
+            persist()
+            publish()
+            true
+        }
+    }
+
+    /** Fork pessoal: apaga todas as filas menos a que está tocando. */
+    fun deleteOthers() {
+        if (slots.size <= 1) return
+        val keepSlot = slots[active]
+        val keepMeta = metas[active]
+        slots.clear()
+        metas.clear()
+        slots.add(keepSlot)
+        metas.add(keepMeta)
+        active = 0
+        viewingSlot = 0
+        bumpStored()
+        persist()
         publish()
     }
 
@@ -178,14 +255,23 @@ constructor(
      * passa a tocá-la. A fila que estava tocando fica guardada. Retorna false se já há [MAX] filas
      * ou se a biblioteca ainda não carregou.
      */
-    fun playInNewQueue(songs: List<Song>, name: String, shuffle: Boolean): Boolean {
-        if (songs.isEmpty() || slots.size >= MAX) return false
+    fun playInNewQueue(
+        songs: List<Song>,
+        name: String,
+        shuffle: Boolean,
+        startIndex: Int = 0,
+    ): Boolean {
+        if (songs.isEmpty() || musicRepository.library == null) return false
+        while (slots.size >= MAX) {
+            if (!evictOldest()) return false
+        }
         val order = if (shuffle) songs.shuffled() else songs
+        val start = if (shuffle) 0 else startIndex.coerceIn(0, order.lastIndex)
         val uids = order.map { it.uid.toString() }
-        slots.add(Stored(uids, emptyList(), 0, uids.first(), 0, null))
-        metas.add(Meta(name, false, sigOf(order)))
+        slots.add(Stored(uids, emptyList(), start, uids[start], 0, null))
+        metas.add(Meta(name, true, sigOf(order), System.currentTimeMillis()))
         val slot = slots.size - 1
-        if (!activate(slot, 0)) {
+        if (!activate(slot, start)) {
             slots.removeAt(slot)
             metas.removeAt(slot)
             publish()
@@ -239,6 +325,7 @@ constructor(
             return true
         }
         if (!load(slot, keepPlaying = false, index = index)) return false
+        metas[active] = metas[active].copy(used = System.currentTimeMillis())
         playbackManager.playing(true)
         viewingSlot = slot
         saveEngineNow()
@@ -432,9 +519,10 @@ constructor(
             val sig = sigOf(queue)
             val meta = metas[active]
             if (sig != meta.sig) {
+                val now = System.currentTimeMillis()
                 metas[active] =
-                    if (meta.auto) Meta(autoName(parent, queue, active), true, sig)
-                    else meta.copy(sig = sig)
+                    if (meta.auto) Meta(autoName(parent, queue, active), true, sig, now)
+                    else meta.copy(sig = sig, used = now)
                 persist()
             }
         }
@@ -544,6 +632,7 @@ constructor(
                                     put("name", meta?.name ?: defaultName(i))
                                     put("auto", meta?.auto ?: true)
                                     put("sig", meta?.sig ?: 0)
+                                    put("used", meta?.used ?: 0L)
                                     if (s != null && i != active) {
                                         put("heap", JSONArray(s.heap))
                                         put("mapping", JSONArray(s.mapping))
@@ -590,6 +679,7 @@ constructor(
                         o.optString("name").ifBlank { defaultName(i) },
                         o.optBoolean("auto", true),
                         o.optInt("sig", 0),
+                        o.optLong("used", 0L),
                     )
                 )
                 if (!o.has("heap")) {

@@ -51,6 +51,49 @@
     </LinearLayout>
 
 
+    <!-- Fork pessoal: playlists automáticas no topo da aba Playlists. -->
+    <HorizontalScrollView
+        android:id="@+id/home_auto_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/spacing_medium">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/home_auto_recent"
+                style="@style/Widget.Material3.Chip.Assist.Elevated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbl_auto_recent" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/home_auto_most"
+                style="@style/Widget.Material3.Chip.Assist.Elevated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_tiny"
+                android:text="@string/lbl_auto_most" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/home_auto_not_played"
+                style="@style/Widget.Material3.Chip.Assist.Elevated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_tiny"
+                android:text="@string/lbl_auto_not_played" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
     <org.oxycblt.auxio.ui.EdgeFrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

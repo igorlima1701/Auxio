@@ -45,4 +45,19 @@
 
     </PreferenceCategory>
 
+    <!-- Fork pessoal: cópia de segurança (histórico, configurações, notas, coleções). -->
+    <PreferenceCategory app:title="@string/set_fork_backup">
+
+        <Preference
+            app:key="fork_backup_export"
+            app:summary="@string/set_fork_backup_export_desc"
+            app:title="@string/set_fork_backup_export" />
+
+        <Preference
+            app:key="fork_backup_import"
+            app:summary="@string/set_fork_backup_import_desc"
+            app:title="@string/set_fork_backup_import" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
