@@ -40,6 +40,14 @@ object PreviewSwipe {
     /** Toca a prévia da música da linha e devolve a linha ao lugar. */
     fun preview(holder: RecyclerView.ViewHolder) {
         songOf(holder)?.let(PreviewPlayer::start)
+        // A linha ficou arrastada para fora da tela; sem animação de lista, ela não volta sozinha.
+        if (holder is MaterialDragCallback.ViewHolder) {
+            holder.body.translationX = 0f
+            holder.root.translationY = 0f
+            holder.delete.visibility = android.view.View.INVISIBLE
+        } else {
+            ItemTouchHelper.Callback.getDefaultUIUtil().clearView(holder.itemView)
+        }
         val pos = holder.bindingAdapterPosition
         if (pos != RecyclerView.NO_POSITION) holder.bindingAdapter?.notifyItemChanged(pos)
     }
