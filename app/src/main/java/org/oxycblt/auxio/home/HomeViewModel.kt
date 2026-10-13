@@ -38,6 +38,7 @@ import org.oxycblt.auxio.music.MusicType
 import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.playback.PlaySong
 import org.oxycblt.auxio.playback.PlaybackSettings
+import org.oxycblt.auxio.rating.AlbumCollections
 import org.oxycblt.auxio.rating.AlbumRatingTagSync
 import org.oxycblt.auxio.rating.AlbumRatings
 import org.oxycblt.auxio.util.Event
@@ -217,6 +218,16 @@ constructor(
                 albumList.value = filterAlbums(allAlbums)
             }
         }
+        // Fork pessoal: coleções mudaram -> refiltra (se o filtro usa coleções).
+        viewModelScope.launch {
+            AlbumCollections.version.drop(1).collect {
+                val f = albumFilter.value
+                if (f.collections.isNotEmpty() || f.notCollections.isNotEmpty()) {
+                    albumInstructions.put(UpdateInstructions.Diff)
+                    albumList.value = filterAlbums(allAlbums)
+                }
+            }
+        }
     }
 
     override fun onCleared() {
@@ -236,6 +247,7 @@ constructor(
             MusicType.ALBUMS -> {
                 allAlbums = homeGenerator.albums()
                 AlbumRatings.resolvePending(allAlbums)
+                AlbumCollections.resolvePending(allAlbums)
                 if (allAlbums.isNotEmpty()) {
                     albumRatingTagSync.importIfNeeded(allAlbums)
                     albumRatingTagSync.resyncIfNeeded(allAlbums)
@@ -285,7 +297,7 @@ constructor(
 
     /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year] (mantendo o filtro de nota). */
     fun showAlbumsOfYear(year: Int) {
-        setAlbumFilter(albumFilter.value.copy(years = setOf(year)))
+        setAlbumFilter(albumFilter.value.copy(years = setOf(year), notYears = emptySet()))
         // "Voltar" depois disso tira o filtro e mostra o grid completo.
         yearFilterFromPlayer = true
         // Mostra a lista de álbuns (fecha o álbum que estiver aberto na aba).
@@ -317,8 +329,28 @@ constructor(
         }
     }
 
-    /** Fork pessoal: sorteia um álbum entre todos os da biblioteca. */
-    fun randomAlbum(): Album? = allAlbums.randomOrNull()
+    private var lastRandom: Album? = null
+
+    /**
+     * Fork pessoal: sorteia um álbum entre os que estão aparecendo (respeita filtros e busca), sem
+     * repetir o último sorteado.
+     */
+    fun randomAlbum(): Album? {
+        val shown = albumList.value
+        val pool = if (shown.size > 1) shown - setOfNotNull(lastRandom) else shown
+        return pool.randomOrNull()?.also { lastRandom = it }
+    }
+
+    /** Fork pessoal: músicas dos álbuns que estão aparecendo, álbum por álbum, na ordem do disco. */
+    fun shownAlbumSongs(): List<Song> =
+        albumList.value.flatMap { listSettings.albumSongSort.songs(it.songs) }
+
+    /** Fork pessoal: uma coleção foi renomeada (ou excluída, se [new] for null). */
+    fun renameCollectionInFilter(old: String, new: String?) {
+        val current = albumFilter.value
+        val next = current.renameCollection(old, new)
+        if (next != current) setAlbumFilter(next) else refilterAlbums()
+    }
 
     /** Fork pessoal: se a tela inicial está visível (não há álbum/artista aberto por cima). */
     var homeVisible = false

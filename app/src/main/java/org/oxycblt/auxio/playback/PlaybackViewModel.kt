@@ -422,6 +422,13 @@ constructor(
         playImpl(commandFactory.songs(songs, ShuffleMode.ON))
     }
 
+    /**
+     * Fork pessoal: toca [songs] numa fila nova chamada [name] (embaralhadas se [shuffle]). Retorna
+     * false se não deu (limite de filas ou biblioteca carregando).
+     */
+    fun playInNewQueue(songs: List<Song>, name: String, shuffle: Boolean): Boolean =
+        multiQueue.playInNewQueue(songs, name, shuffle)
+
     private fun playImpl(command: PlaybackCommand?) {
         playbackManager.play(requireNotNull(command) { "Invalid playback parameters" })
     }

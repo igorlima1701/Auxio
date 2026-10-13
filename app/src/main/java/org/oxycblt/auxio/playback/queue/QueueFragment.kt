@@ -115,6 +115,7 @@ class QueueFragment :
 
         binding.queueSwitcher.setOnClickListener { showQueueList() }
         binding.queuePlay.setOnClickListener { queueModel.playShown() }
+        binding.queueShuffle.setOnClickListener { queueModel.shuffleShown() }
         binding.queueMore.setOnClickListener { showQueueOptions() }
         binding.queueSelClose.setOnClickListener { queueModel.clearSelection() }
         binding.queueSelAll.setOnClickListener { queueModel.selectAll() }

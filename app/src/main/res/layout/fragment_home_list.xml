@@ -13,19 +13,42 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/item_song" />
 
-    <!-- Fork pessoal: filtro ativo (ex.: ano) na aba Álbuns. Tocar remove o filtro. -->
-    <com.google.android.material.chip.Chip
-        android:id="@+id/home_filter_chip"
-        style="@style/Widget.Material3.Chip.Input.Elevated"
+    <!-- Fork pessoal: filtro ativo (ex.: ano) na aba Álbuns. Tocar abre o filtro, o X remove;
+         o ▶ ao lado toca os álbuns filtrados numa fila nova. -->
+    <LinearLayout
+        android:id="@+id/home_filter_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="@dimen/spacing_tiny"
-        android:checkable="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:visibility="gone"
-        app:closeIconVisible="true"
-        tools:text="1997"
-        tools:visibility="visible" />
+        tools:visibility="visible">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/home_filter_chip"
+            style="@style/Widget.Material3.Chip.Input.Elevated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="false"
+            android:ellipsize="end"
+            android:maxWidth="260dp"
+            app:closeIconVisible="true"
+            tools:text="1997" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/home_filter_play"
+            style="@style/Widget.Material3.Chip.Assist.Elevated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_tiny"
+            android:contentDescription="@string/lbl_play_filter"
+            android:text="@string/lbl_play"
+            app:chipIcon="@drawable/ic_play_24"
+            app:chipIconVisible="true" />
+
+    </LinearLayout>
 
 
     <org.oxycblt.auxio.ui.EdgeFrameLayout

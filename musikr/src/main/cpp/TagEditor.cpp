@@ -49,7 +49,7 @@ namespace tagedit {
 
     const char *const KEYS[] = {"TITLE", "ARTIST", "ALBUMARTIST", "ALBUM", "DATE",
                                 "ORIGINALDATE", "TRACKNUMBER", "DISCNUMBER", "GENRE", "COMMENT",
-                                "ALBUMRATING"};
+                                "ALBUMRATING", "ALBUMCOLLECTION"};
     const int KEY_COUNT = sizeof(KEYS) / sizeof(KEYS[0]);
 
     namespace {
@@ -64,6 +64,11 @@ namespace tagedit {
 
         String join(const StringList &values) {
             return values.toString(SEPARATOR);
+        }
+
+        // Fork pessoal: campos próprios do app, gravados como TXXX de um valor só.
+        bool isCustomKey(const String &key) {
+            return key == "ALBUMRATING" || key == "ALBUMCOLLECTION";
         }
 
         // Só divide em vários valores se o campo original já tinha vários valores.
@@ -247,17 +252,17 @@ namespace tagedit {
             if (hadId3v2 && tag->header()->majorVersion() == 4) version = TagLib::ID3v2::v4;
 
             for (const auto &edit: edits) {
-                bool multi = currentValues(before, edit.key).size() > 1;
+                bool multi = !isCustomKey(edit.key) && currentValues(before, edit.key).size() > 1;
                 StringList values = toValues(edit.value, multi);
                 removeTxxxFor(tag, edit.key);
                 if (edit.key == "COMMENT") {
                     setId3Comment(tag, edit.value.stripWhiteSpace(), version);
-                } else if (edit.key == "ALBUMRATING") {
-                    // Campo personalizado: quadro TXXX "ALBUMRATING" (o antigo já foi removido).
+                } else if (isCustomKey(edit.key)) {
+                    // Campo personalizado: quadro TXXX com o nome do campo (o antigo já foi removido).
                     if (!values.isEmpty()) {
                         auto *txxx = new TagLib::ID3v2::UserTextIdentificationFrame(
                                 encodingFor(nullptr, values, version));
-                        txxx->setDescription("ALBUMRATING");
+                        txxx->setDescription(edit.key);
                         txxx->setText(values);
                         tag->addFrame(txxx);
                     }
@@ -297,7 +302,7 @@ namespace tagedit {
                 const std::vector<Field> &edits, const TagLib::PropertyMap &before) {
             if (xc == nullptr) return U("o arquivo não tem comentários Vorbis");
             for (const auto &edit: edits) {
-                bool multi = currentValues(before, edit.key).size() > 1;
+                bool multi = !isCustomKey(edit.key) && currentValues(before, edit.key).size() > 1;
                 setXiph(xc, edit.key, toValues(edit.value, multi));
             }
             if (!file->save()) return U("não foi possível gravar o arquivo");
@@ -528,7 +533,7 @@ namespace tagedit {
 
             // Os campos editados têm de ter exatamente os novos valores.
             for (const auto &e: edits) {
-                bool multi = currentValues(before, e.key).size() > 1;
+                bool multi = !isCustomKey(e.key) && currentValues(before, e.key).size() > 1;
                 StringList expected = toValues(e.value, multi);
                 StringList got = currentValues(pb, e.key);
                 if (got != expected) {
@@ -696,14 +701,32 @@ namespace tagedit {
                 if (f.id == "TXXX" && txxxDescription(f) == desc) continue;
                 frames.push_back(f);
             }
-            std::string v = value.stripWhiteSpace().to8Bit(true);
-            if (!v.empty()) {
-                for (unsigned char c: v) if (c >= 128) return false; // só números
+            String trimmed = value.stripWhiteSpace();
+            if (!trimmed.isEmpty()) {
                 std::vector<unsigned char> body;
-                body.push_back(0); // Latin-1
-                body.insert(body.end(), desc.begin(), desc.end());
-                body.push_back(0);
-                body.insert(body.end(), v.begin(), v.end());
+                bool ascii = true;
+                std::string v8 = trimmed.to8Bit(true);
+                for (unsigned char c: v8) if (c >= 128) ascii = false;
+                if (ascii) {
+                    body.push_back(0); // Latin-1
+                    body.insert(body.end(), desc.begin(), desc.end());
+                    body.push_back(0);
+                    body.insert(body.end(), v8.begin(), v8.end());
+                } else if (tag.major == 4) {
+                    body.push_back(3); // UTF-8
+                    body.insert(body.end(), desc.begin(), desc.end());
+                    body.push_back(0);
+                    body.insert(body.end(), v8.begin(), v8.end());
+                } else {
+                    // ID3v2.3: UTF-16 com BOM, como o TagLib e o Mp3tag gravam.
+                    body.push_back(1);
+                    ByteVector d = U(desc.c_str()).data(String::UTF16);
+                    ByteVector t = trimmed.data(String::UTF16);
+                    body.insert(body.end(), d.begin(), d.end());
+                    body.push_back(0);
+                    body.push_back(0);
+                    body.insert(body.end(), t.begin(), t.end());
+                }
                 RawFrame f;
                 f.id = "TXXX";
                 size_t n = body.size();
@@ -814,6 +837,7 @@ namespace tagedit {
         out.push_back({"LYRICIST", first("LYRICIST")});
         out.push_back({"COMMENT", join(currentValues(props, "COMMENT"))});
         out.push_back({"ALBUMRATING", first("ALBUMRATING")});
+        out.push_back({"ALBUMCOLLECTION", first("ALBUMCOLLECTION")});
         {
             // Fork pessoal: letra embutida (USLT no MP3, LYRICS no FLAC/Ogg). Só a primeira.
             auto it = props.find("LYRICS");
@@ -875,12 +899,12 @@ namespace tagedit {
         TagLib::PropertyMap before;
         // Fork pessoal: só a nota do álbum num MP3 com tag simples -> mexe só naquele quadro.
         bool rawDone = false;
-        if (edits.size() == 1 && edits[0].key == "ALBUMRATING") {
+        if (edits.size() == 1 && isCustomKey(edits[0].key)) {
             auto probe = open(work);
             if (probe != nullptr && kindOf(probe->file()) == Kind::Mp3) {
                 before = probe->file()->properties();
                 probe.reset();
-                if (rawSetTxxx(original, work, "ALBUMRATING", edits[0].value)) {
+                if (rawSetTxxx(original, work, edits[0].key.to8Bit(true), edits[0].value)) {
                     kind = Kind::Mp3;
                     rawDone = true;
                 }

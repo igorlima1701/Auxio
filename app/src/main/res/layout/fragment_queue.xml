@@ -68,6 +68,15 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/queue_shuffle"
+                android:layout_width="@dimen/size_touchable_medium"
+                android:layout_height="@dimen/size_touchable_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/lbl_queue_shuffle"
+                android:src="@drawable/ic_shuffle_off_24"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
+            <ImageButton
                 android:id="@+id/queue_play"
                 android:layout_width="@dimen/size_touchable_medium"
                 android:layout_height="@dimen/size_touchable_medium"

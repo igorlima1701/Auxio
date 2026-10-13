@@ -173,6 +173,38 @@ constructor(
         return slots.size
     }
 
+    /**
+     * Fork pessoal: cria uma fila nova chamada [name] com [songs] (embaralhadas se [shuffle]) e
+     * passa a tocá-la. A fila que estava tocando fica guardada. Retorna false se já há [MAX] filas
+     * ou se a biblioteca ainda não carregou.
+     */
+    fun playInNewQueue(songs: List<Song>, name: String, shuffle: Boolean): Boolean {
+        if (songs.isEmpty() || slots.size >= MAX) return false
+        val order = if (shuffle) songs.shuffled() else songs
+        val uids = order.map { it.uid.toString() }
+        slots.add(Stored(uids, emptyList(), 0, uids.first(), 0, null))
+        metas.add(Meta(name, false, sigOf(order)))
+        val slot = slots.size - 1
+        if (!activate(slot, 0)) {
+            slots.removeAt(slot)
+            metas.removeAt(slot)
+            publish()
+            return false
+        }
+        return true
+    }
+
+    /** Fork pessoal: embaralha a fila parada [slot]; ela recomeça do topo. */
+    fun shuffleStored(slot: Int) {
+        val stored = normalized(slot) ?: return
+        if (stored.heap.size < 2) return
+        val heap = stored.heap.shuffled()
+        slots[slot] = stored.copy(heap = heap, mapping = emptyList(), index = 0, songUid = heap[0], positionMs = 0)
+        bumpStored()
+        persist()
+        publish()
+    }
+
     // --- VER, TOCAR ---
 
     /** Mostra a fila [slot] na tela da fila, sem tocar nada. */

@@ -23,6 +23,11 @@
         android:id="@+id/action_playlist_add"
         android:icon="@drawable/ic_playlist_add_24"
         android:title="@string/lbl_playlist_add" />
+    <!-- Fork pessoal: pôr os álbuns das músicas selecionadas numa coleção. -->
+    <item
+        android:id="@+id/action_collection_add"
+        android:icon="@drawable/ic_collection_add_24"
+        android:title="@string/lbl_add_albums_to_collection" />
     <!-- Fork pessoal: editar as tags das músicas selecionadas, todas juntas. -->
     <item
         android:id="@+id/action_edit_tags"

@@ -145,6 +145,11 @@ class AlbumMenuDialogFragment : MenuDialogFragment<Menu.ForAlbum>() {
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.album)
             R.id.action_share -> requireContext().share(menu.album)
             R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.album)
+            R.id.action_collection_add ->
+                org.oxycblt.auxio.home.filter.CollectionDialogs.pick(
+                    requireActivity(),
+                    listOf(menu.album),
+                )
             else -> error("Unexpected menu item selected $item")
         }
     }
@@ -389,6 +394,11 @@ class SelectionMenuDialogFragment : MenuDialogFragment<Menu.ForSelection>() {
             R.id.action_playlist_add -> musicModel.addToPlaylist(menu.songs)
             R.id.action_share -> requireContext().share(menu.songs)
             R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.songs)
+            R.id.action_collection_add ->
+                org.oxycblt.auxio.home.filter.CollectionDialogs.pick(
+                    requireActivity(),
+                    menu.songs.map { it.album }.distinct(),
+                )
             else -> error("Unexpected menu item selected $item")
         }
     }

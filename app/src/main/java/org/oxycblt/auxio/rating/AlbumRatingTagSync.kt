@@ -60,14 +60,33 @@ constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val editor = TagEditor(context)
     private val albumJobs = ConcurrentHashMap<String, Job>()
-    /** Faixas ainda por gravar: song uid -> (música, valor). */
-    private val pending = ConcurrentHashMap<String, Pair<Song, String>>()
+    /** Gravações por fazer: "campo|song uid" -> (música, campo, valor). */
+    private val pending = ConcurrentHashMap<String, Triple<Song, TagField, String>>()
+    private val collectionJobs = ConcurrentHashMap<String, Job>()
+
+    private fun enqueue(song: Song, tagField: TagField, value: String) {
+        pending["${tagField.key}|${song.uid}"] = Triple(song, tagField, value)
+    }
     private var retryJob: Job? = null
     @Volatile private var resyncStarted = false
     private val importPrefs = context.getSharedPreferences("album_ratings_meta", Context.MODE_PRIVATE)
 
     fun attach() {
         AlbumRatings.onUserChange = { album, rating -> schedule(album, rating) }
+        AlbumCollections.onUserChange = { albums -> albums.forEach(::scheduleCollections) }
+    }
+
+    /** Fork pessoal: coleções do álbum no campo ALBUMCOLLECTION (mesma gravação cautelosa). */
+    private fun scheduleCollections(album: Album) {
+        val key = album.uid.toString()
+        collectionJobs.remove(key)?.cancel()
+        collectionJobs[key] =
+            scope.launch {
+                delay(DEBOUNCE_MS)
+                val value = AlbumCollections.tagValue(album)
+                for (song in album.songs) enqueue(song, TagField.ALBUM_COLLECTION, value)
+                flush()
+            }
     }
 
     private fun schedule(album: Album, rating: Int?) {
@@ -77,7 +96,7 @@ constructor(
             scope.launch {
                 delay(DEBOUNCE_MS)
                 val value = rating?.toString() ?: ""
-                for (song in album.songs) pending[song.uid.toString()] = song to value
+                for (song in album.songs) enqueue(song, TagField.ALBUM_RATING, value)
                 flush()
             }
     }
@@ -89,30 +108,51 @@ constructor(
 
     private suspend fun flushImpl() {
         val playingUid = withContext(Dispatchers.Main) { playbackManager.currentSong?.uid }
-        var written = 0
-        val errors = mutableListOf<String>()
+        val written = mutableMapOf<TagField, Int>()
+        val errors = mutableMapOf<TagField, MutableList<String>>()
         for ((key, entry) in pending.entries.toList()) {
-            val (song, value) = entry
+            val (song, tagField, value) = entry
             if (song.uid == playingUid) continue
-            val error = editor.write(song.uri, song.path.name ?: "", mapOf(TagField.ALBUM_RATING to value))
+            val error = editor.write(song.uri, song.path.name ?: "", mapOf(tagField to value))
             if (error != null) {
-                L.w("ALBUMRATING não gravado em ${song.path.name}: $error")
-                errors += error
+                L.w("${tagField.key} não gravado em ${song.path.name}: $error")
+                errors.getOrPut(tagField) { mutableListOf() } += error
             } else {
-                written++
+                written[tagField] = (written[tagField] ?: 0) + 1
             }
             pending.remove(key, entry)
         }
         // Fork pessoal: avisa na tela o resultado, para não falhar em silêncio.
-        if (written > 0 || errors.isNotEmpty()) {
-            val text =
-                if (errors.isEmpty()) {
-                    context.getString(R.string.lng_rating_tag_saved, written)
-                } else {
-                    context.getString(R.string.lng_rating_tag_failed, errors.size, errors.first())
-                }
+        val texts = mutableListOf<String>()
+        for (tagField in listOf(TagField.ALBUM_RATING, TagField.ALBUM_COLLECTION)) {
+            val ok = written[tagField] ?: 0
+            val failed = errors[tagField] ?: emptyList()
+            val rating = tagField == TagField.ALBUM_RATING
+            if (failed.isNotEmpty()) {
+                texts +=
+                    context.getString(
+                        if (rating) R.string.lng_rating_tag_failed
+                        else R.string.lng_collection_tag_failed,
+                        failed.size,
+                        failed.first(),
+                    )
+            } else if (ok > 0) {
+                texts +=
+                    context.getString(
+                        if (rating) R.string.lng_rating_tag_saved
+                        else R.string.lng_collection_tag_saved,
+                        ok,
+                    )
+            }
+        }
+        if (texts.isNotEmpty()) {
             withContext(Dispatchers.Main) {
-                android.widget.Toast.makeText(context, text, android.widget.Toast.LENGTH_LONG).show()
+                android.widget.Toast.makeText(
+                        context,
+                        texts.joinToString("\n"),
+                        android.widget.Toast.LENGTH_LONG,
+                    )
+                    .show()
             }
         }
         if (pending.isNotEmpty()) scheduleRetry()
@@ -133,7 +173,15 @@ constructor(
                 val song = album.songs.firstOrNull() ?: continue
                 val tag = editor.info(song.uri)["ALBUMRATING"]?.trim().orEmpty()
                 if (tag == rating.toString()) continue
-                for (s in album.songs) pending[s.uid.toString()] = s to rating.toString()
+                for (s in album.songs) enqueue(s, TagField.ALBUM_RATING, rating.toString())
+            }
+            // Fork pessoal: o mesmo para as coleções.
+            for (album in AlbumCollections.withCollections(albums)) {
+                val song = album.songs.firstOrNull() ?: continue
+                val expected = AlbumCollections.tagValue(album)
+                val tag = editor.info(song.uri)["ALBUMCOLLECTION"]?.trim().orEmpty()
+                if (tag == expected) continue
+                for (s in album.songs) enqueue(s, TagField.ALBUM_COLLECTION, expected)
             }
             if (pending.isNotEmpty()) flush()
         }
@@ -153,6 +201,7 @@ constructor(
      * apenas se não houver nenhuma nota salva no app.
      */
     fun importIfNeeded(albums: List<Album>) {
+        importCollectionsIfNeeded(albums)
         if (importPrefs.getBoolean(KEY_IMPORTED, false)) return
         if (AlbumRatings.hasAny()) {
             importPrefs.edit().putBoolean(KEY_IMPORTED, true).apply()
@@ -174,7 +223,29 @@ constructor(
         }
     }
 
+    /**
+     * Fork pessoal: numa instalação nova (sem coleções no app), recupera as coleções lendo o campo
+     * ALBUMCOLLECTION da primeira faixa de cada álbum. Roda uma vez só.
+     */
+    private fun importCollectionsIfNeeded(albums: List<Album>) {
+        if (importPrefs.getBoolean(KEY_COLLECTIONS_IMPORTED, false)) return
+        importPrefs.edit().putBoolean(KEY_COLLECTIONS_IMPORTED, true).apply()
+        if (AlbumCollections.hasAny()) return
+        scope.launch {
+            var found = 0
+            for (album in albums) {
+                val song = album.songs.firstOrNull() ?: continue
+                val tag = editor.info(song.uri)["ALBUMCOLLECTION"]?.trim().orEmpty()
+                if (tag.isEmpty()) continue
+                withContext(Dispatchers.Main) { AlbumCollections.restore(album, tag) }
+                found++
+            }
+            L.d("Coleções recuperadas das tags: $found álbuns")
+        }
+    }
+
     private companion object {
+        const val KEY_COLLECTIONS_IMPORTED = "collections_imported_from_tags"
         const val DEBOUNCE_MS = 4000L
         const val RETRY_MS = 15000L
         const val RESYNC_DELAY_MS = 8000L

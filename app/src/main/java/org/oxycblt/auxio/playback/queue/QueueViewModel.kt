@@ -170,6 +170,15 @@ constructor(
         else multiQueue.activate(shownSlot, adapterIndex)
     }
 
+    /**
+     * Fork pessoal: embaralha a fila mostrada. Na que está tocando, a música atual fica no topo e
+     * continua tocando; numa parada, tudo é embaralhado e ela recomeça do topo.
+     */
+    fun shuffleShown() {
+        if (queue.value.size < 2) return
+        if (isActiveView()) playbackManager.shuffled(true) else multiQueue.shuffleStored(shownSlot)
+    }
+
     /** Fork pessoal: toca a fila mostrada de onde ela parou (botão ▶). */
     fun playShown() {
         multiQueue.activate(shownSlot, null)

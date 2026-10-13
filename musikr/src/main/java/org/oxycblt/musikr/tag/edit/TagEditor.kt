@@ -39,7 +39,10 @@ enum class TagField(val key: String) {
     COMMENT("COMMENT"),
 
     /** Fork pessoal: nota do álbum (0 a 5), campo personalizado. Não aparece no editor. */
-    ALBUM_RATING("ALBUMRATING");
+    ALBUM_RATING("ALBUMRATING"),
+
+    /** Fork pessoal: coleções do álbum, separadas por "; ". Não aparece no editor. */
+    ALBUM_COLLECTION("ALBUMCOLLECTION");
 
     companion object {
         fun fromKey(key: String) = entries.find { it.key == key }

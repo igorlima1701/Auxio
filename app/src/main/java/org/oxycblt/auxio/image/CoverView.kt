@@ -384,6 +384,19 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
     }
 
     /**
+     * Fork pessoal: miniatura já pronta em disco (grade instantânea da abertura, antes de a
+     * biblioteca carregar).
+     */
+    fun bindFile(file: java.io.File?) {
+        bindImpl(
+            { file },
+            context.getString(R.string.lbl_albums),
+            R.drawable.ic_album_24,
+            squareishShapeAppearance,
+        )
+    }
+
+    /**
      * Bind an [Artist]'s image to this view.
      *
      * @param artist The [Artist] to bind to the view.

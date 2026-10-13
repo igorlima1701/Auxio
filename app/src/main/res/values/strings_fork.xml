@@ -148,4 +148,28 @@
     <string name="lng_info_rating_tag_none" translatable="false">sem a tag</string>
     <string name="lbl_last_crash" translatable="false">O app fechou com um erro da última vez</string>
     <string name="lbl_last_crash_copy" translatable="false">Copiar o erro</string>
+    <!-- Coleções, filtro negativo, tocar o filtro, embaralhar a fila -->
+    <string name="lbl_collections" translatable="false">Coleções</string>
+    <string name="lbl_new_collection" translatable="false">Nova coleção</string>
+    <string name="lbl_add_to_collection" translatable="false">Adicionar à coleção</string>
+    <string name="lbl_add_albums_to_collection" translatable="false">Adicionar álbuns à coleção</string>
+    <string name="fmt_add_albums_to_collection" translatable="false">Coleções de %d álbuns</string>
+    <string name="fmt_added_to_collection" translatable="false">%1$d álbum(ns) em \"%2$s\"</string>
+    <string name="lng_no_collections" translatable="false">Nenhuma coleção ainda. Toque em \"Nova coleção\".</string>
+    <string name="lng_collection_name_hint" translatable="false">Nome da coleção</string>
+    <string name="lng_collection_name_invalid" translatable="false">O nome não pode ficar vazio nem ter \";\".</string>
+    <string name="lng_collection_exists" translatable="false">Já existe uma coleção com esse nome.</string>
+    <string name="lbl_delete_collection" translatable="false">Excluir coleção</string>
+    <string name="fmt_delete_collection" translatable="false">Excluir a coleção \"%s\"? Os álbuns continuam na biblioteca.</string>
+    <string name="lbl_move_left" translatable="false">Mover para antes</string>
+    <string name="lbl_move_right" translatable="false">Mover para depois</string>
+    <string name="lng_collection_tag_saved" translatable="false">Coleção gravada em %d músicas</string>
+    <string name="lng_collection_tag_failed" translatable="false">Coleção não gravada em %1$d músicas: %2$s</string>
+    <string name="lng_filter_hint" translatable="false">Toque: incluir (✓) · de novo: excluir (✕) · de novo: desligar</string>
+    <string name="fmt_filter_not" translatable="false">sem %s</string>
+    <string name="lbl_play_filter" translatable="false">Tocar os álbuns do filtro</string>
+    <string name="lbl_play_in_order" translatable="false">Tocar em ordem</string>
+    <string name="lbl_play_shuffled" translatable="false">Tocar aleatório</string>
+    <string name="err_play_filter" translatable="false">Não deu para criar a fila (limite de 20 filas ou biblioteca carregando).</string>
+    <string name="lbl_queue_shuffle" translatable="false">Embaralhar a fila</string>
 </resources>

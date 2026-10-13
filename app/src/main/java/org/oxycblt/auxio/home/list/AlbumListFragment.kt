@@ -67,6 +67,11 @@ class AlbumListFragment :
     override val playbackModel: PlaybackViewModel by activityViewModels()
     private val albumAdapter = AlbumCoverAdapter(this)
     @Inject lateinit var gridThumbWarmer: GridThumbWarmer
+    @Inject lateinit var gridThumbStore: org.oxycblt.auxio.image.coil.GridThumbStore
+    /** Fork pessoal: foto da grade mostrada enquanto a biblioteca carrega. */
+    private var snapshotView: androidx.recyclerview.widget.RecyclerView? = null
+    /** Álbum tocado na foto, para abrir quando a biblioteca carregar. */
+    private var pendingSnapshotTap: String? = null
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
@@ -93,6 +98,16 @@ class AlbumListFragment :
             listener = this@AlbumListFragment
         }
 
+        // Fork pessoal: abertura do app -> mostra na hora a última grade, enquanto carrega.
+        if (
+            homeModel.albumList.value.isEmpty() &&
+                homeModel.albumFilter.value.isEmpty &&
+                musicModel.indexingState.value !is IndexingState.Completed
+        ) {
+            val entries = GridSnapshot.load(requireContext())
+            if (entries.isNotEmpty()) showSnapshot(binding, entries)
+        }
+
         binding.homeNoMusicPlaceholder.apply {
             setImageResource(R.drawable.ic_album_48)
             contentDescription = getString(R.string.lbl_albums)
@@ -109,8 +124,15 @@ class AlbumListFragment :
             }
             setOnCloseIconClickListener { homeModel.clearAlbumFilter() }
         }
+        binding.homeFilterPlay.setOnClickListener { showPlayFilterMenu(it) }
         collectImmediately(homeModel.albumFilter, ::updateFilter)
         collectImmediately(homeModel.empty, musicModel.indexingState, ::updateNoMusicIndicator)
+        collectImmediately(musicModel.indexingState) { state ->
+            // Biblioteca pronta mas sem álbuns (ou sem mudança na lista): tira a foto mesmo assim.
+            if (state is IndexingState.Completed && snapshotView != null) {
+                requireBinding().root.postDelayed({ hideSnapshot(homeModel.albumList.value) }, 1000)
+            }
+        }
         collectImmediately(listModel.selected, ::updateSelection)
         collectImmediately(
             playbackModel.song,
@@ -142,8 +164,83 @@ class AlbumListFragment :
         }
     }
 
+    private fun showSnapshot(binding: FragmentHomeListBinding, entries: List<GridSnapshot.Entry>) {
+        val real = binding.homeRecycler
+        val overlay = androidx.recyclerview.widget.RecyclerView(requireContext())
+        val lm =
+            AlbumGridLayoutManager(
+                requireContext(),
+                resources.getDimensionPixelSize(R.dimen.size_album_grid_min_cell),
+            )
+        overlay.layoutManager = lm
+        overlay.itemAnimator = null
+        overlay.clipToPadding = false
+        overlay.setBackgroundColor(
+            com.google.android.material.color.MaterialColors.getColor(
+                real,
+                android.R.attr.colorBackground,
+            )
+        )
+        overlay.setPadding(real.paddingLeft, real.paddingTop, real.paddingRight, real.paddingBottom)
+        // Acompanha as margens da grade de verdade (barras do sistema etc.).
+        real.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+            if (
+                overlay.paddingLeft != v.paddingLeft ||
+                    overlay.paddingTop != v.paddingTop ||
+                    overlay.paddingRight != v.paddingRight ||
+                    overlay.paddingBottom != v.paddingBottom
+            ) {
+                overlay.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, v.paddingBottom)
+            }
+        }
+        overlay.adapter =
+            GridSnapshotAdapter(entries, { lm.cellSize() }) { uid -> pendingSnapshotTap = uid }
+        (binding.root as android.view.ViewGroup).addView(
+            overlay,
+            1,
+            android.widget.FrameLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        snapshotView = overlay
+    }
+
+    /** Troca a foto pela grade de verdade, na mesma posição, e abre o álbum tocado na espera. */
+    private fun hideSnapshot(albums: List<Album>) {
+        val overlay = snapshotView ?: return
+        snapshotView = null
+        val binding = view?.let { requireBinding() }
+        if (binding != null && albums.isNotEmpty()) {
+            val lm = overlay.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
+            val first = lm.findFirstVisibleItemPosition()
+            if (first > 0) {
+                val offset = (lm.findViewByPosition(first)?.top ?: overlay.paddingTop) - overlay.paddingTop
+                val real = binding.homeRecycler
+                real.post {
+                    (real.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager)
+                        ?.scrollToPositionWithOffset(first.coerceAtMost(albums.lastIndex), offset)
+                }
+            }
+            pendingSnapshotTap?.let { uid ->
+                albums.find { it.uid.toString() == uid }?.let { detailModel.showAlbum(it) }
+            }
+        }
+        pendingSnapshotTap = null
+        // Um instante para as capas da grade de verdade aparecerem por baixo.
+        overlay.postDelayed(
+            {
+                (overlay.parent as? android.view.ViewGroup)?.removeView(overlay)
+                overlay.adapter = null
+            },
+            300,
+        )
+    }
+
     override fun onDestroyBinding(binding: FragmentHomeListBinding) {
         super.onDestroyBinding(binding)
+        snapshotView?.adapter = null
+        snapshotView = null
         binding.homeRecycler.apply {
             adapter = null
             popupProvider = null
@@ -213,12 +310,17 @@ class AlbumListFragment :
 
     private fun updateAlbums(albums: List<Album>) {
         albumAdapter.update(albums, homeModel.albumInstructions.consume())
+        if (albums.isNotEmpty()) hideSnapshot(albums)
         // Gera em segundo plano as miniaturas que faltam, no tamanho exato das células.
         val recycler = requireBinding().homeRecycler
         recycler.doOnLayout {
             val cell = (recycler.layoutManager as? AlbumGridLayoutManager)?.cellSize() ?: 0
             val halfGap = recycler.resources.getDimensionPixelSize(R.dimen.spacing_album_grid_half_gap)
             gridThumbWarmer.warm(albums, cell - 2 * halfGap)
+            // Fork pessoal: guarda a foto da grade completa para a próxima abertura.
+            if (homeModel.albumFilter.value.isEmpty && homeModel.query.value.isEmpty()) {
+                GridSnapshot.save(recycler.context, albums, cell - 2 * halfGap, gridThumbStore)
+            }
         }
     }
 
@@ -227,30 +329,40 @@ class AlbumListFragment :
         val binding = requireBinding()
         val chip = binding.homeFilterChip
         if (filter.isEmpty) {
-            chip.isVisible = false
+            binding.homeFilterBar.isVisible = false
             binding.homeRecycler.updatePadding(top = 0)
             return
         }
-        val parts = mutableListOf<String>()
-        if (filter.ratings.isNotEmpty()) {
-            parts +=
-                filter.ratings.sorted().joinToString(", ") {
-                    when (it) {
-                        AlbumFilter.NO_RATING -> getString(R.string.lbl_no_rating)
-                        0 -> getString(R.string.lbl_rating_zero)
-                        else -> getString(R.string.fmt_rating_stars, it)
-                    }
-                }
-        }
-        if (filter.years.isNotEmpty()) {
-            parts += filter.years.sortedDescending().joinToString(", ")
-        }
-        chip.text = parts.joinToString(" · ")
-        chip.isVisible = true
+        chip.text = filter.describe(requireContext())
+        binding.homeFilterBar.isVisible = true
         binding.homeRecycler.updatePadding(
             top = resources.getDimensionPixelSize(R.dimen.size_album_filter_space)
         )
         binding.homeRecycler.scrollToPosition(0)
+    }
+
+    /** Fork pessoal: ▶ do filtro -> toca os álbuns filtrados (em ordem ou embaralhados) numa fila nova. */
+    private fun showPlayFilterMenu(anchor: android.view.View) {
+        val popup = android.widget.PopupMenu(requireContext(), anchor)
+        popup.menu.add(0, 1, 0, R.string.lbl_play_in_order)
+        popup.menu.add(0, 2, 1, R.string.lbl_play_shuffled)
+        popup.setOnMenuItemClickListener { item ->
+            val songs = homeModel.shownAlbumSongs()
+            val name = homeModel.albumFilter.value.describe(requireContext())
+            if (songs.isNotEmpty()) {
+                val ok = playbackModel.playInNewQueue(songs, name, item.itemId == 2)
+                if (!ok) {
+                    android.widget.Toast.makeText(
+                            requireContext(),
+                            R.string.err_play_filter,
+                            android.widget.Toast.LENGTH_LONG,
+                        )
+                        .show()
+                }
+            }
+            true
+        }
+        popup.show()
     }
 
     private fun updateNoMusicIndicator(empty: Boolean, indexingState: IndexingState?) {

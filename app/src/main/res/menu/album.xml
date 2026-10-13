@@ -24,6 +24,11 @@
         android:id="@+id/action_playlist_add"
         android:icon="@drawable/ic_playlist_add_24"
         android:title="@string/lbl_playlist_add" />
+    <!-- Fork pessoal -->
+    <item
+        android:id="@+id/action_collection_add"
+        android:icon="@drawable/ic_collection_add_24"
+        android:title="@string/lbl_add_to_collection" />
     <item
         android:id="@+id/action_artist_details"
         android:icon="@drawable/ic_artist_24"

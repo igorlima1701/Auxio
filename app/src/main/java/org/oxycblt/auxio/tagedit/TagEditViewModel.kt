@@ -133,7 +133,10 @@ constructor(
         viewModelScope.launch {
             // Nome/artista do álbum mudam o identificador do álbum: guarda a nota para reaplicar.
             if (albumChanges) {
-                songs.map { it.album }.distinct().forEach { AlbumRatings.rememberForRetag(it) }
+                songs.map { it.album }.distinct().forEach {
+                    AlbumRatings.rememberForRetag(it)
+                    org.oxycblt.auxio.rating.AlbumCollections.rememberForRetag(it)
+                }
             }
             val failures = mutableListOf<String>()
             // Gravar o arquivo que o player está usando pode interromper a música; essa fica de fora.
