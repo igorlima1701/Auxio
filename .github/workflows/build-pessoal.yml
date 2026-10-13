@@ -29,8 +29,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: "21"
-          distribution: "jetbrains"
+          distribution: "temurin"
           cache: gradle
+          token: ${{ github.token }}
 
       - name: Instalar NDK (com novas tentativas se o download falhar)
         run: |
