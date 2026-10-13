@@ -110,4 +110,6 @@
     <string name="lng_queue_created_n" translatable="false">Criada a fila %d</string>
     <string name="err_queue_max" translatable="false">Já existem 20 filas</string>
     <string name="err_queue_library" translatable="false">A biblioteca ainda está carregando; tente de novo</string>
+    <string name="lbl_lyrics_grant" translatable="false">Liberar acesso à pasta</string>
+    <string name="lng_lyrics_grant_hint" translatable="false">Escolha a pasta principal das suas músicas (ex.: Music) e toque em \"Usar esta pasta\"</string>
 </resources>

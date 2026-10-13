@@ -120,9 +120,16 @@ class StepperOverlay(context: Context, attrs: AttributeSet?) :
                 context,
                 object : GestureDetector.SimpleOnGestureListener() {
                     override fun onDown(e: MotionEvent) = true
+
+                    // Fork pessoal: um toque troca capa/letra na hora. O toque duplo para
+                    // avançar/voltar 10 s foi tirado, porque obrigava a esperar o segundo toque.
+                    override fun onSingleTapUp(e: MotionEvent): Boolean {
+                        listener?.onCoverTap()
+                        return true
+                    }
                 },
             )
-        gestureDetector.setOnDoubleTapListener(this)
+        gestureDetector.setOnDoubleTapListener(null)
 
         addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
             leftTapView.updateArcSize(view)
@@ -139,10 +146,7 @@ class StepperOverlay(context: Context, attrs: AttributeSet?) :
     override fun onTouchEvent(event: MotionEvent): Boolean =
         gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
 
-    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-        listener?.onCoverTap()
-        return true
-    }
+    override fun onSingleTapConfirmed(e: MotionEvent) = false
 
     private fun enter(
         secondsView: SecondsView,

@@ -52,11 +52,15 @@ class LyricsPanel(
     private val onSeek: (Long) -> Unit,
     private val onClose: () -> Unit,
     private val onEdit: (Song) -> Unit,
+    private val onRequestAccess: (Song) -> Unit,
 ) {
     private val context = container.context
     private val adapter = LineAdapter()
     private val list: RecyclerView
-    private val empty: TextView
+    private val empty: LinearLayout
+    private val emptyText: TextView
+    private val emptyDetail: TextView
+    private val accessButton: com.google.android.material.button.MaterialButton
     private val sourceLabel: TextView
     private var song: Song? = null
     private var lyrics = Lyrics(emptyList(), false)
@@ -79,6 +83,8 @@ class LyricsPanel(
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                 alpha = 0.6f
                 gravity = Gravity.CENTER
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
             }
         bar.addView(sourceLabel, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         bar.addView(iconButton(R.drawable.ic_edit_24, R.string.lbl_lyrics_edit) { song?.let(onEdit) })
@@ -114,13 +120,43 @@ class LyricsPanel(
             }
         body.addView(list, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         empty =
+            LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                isVisible = false
+                val pad = (20 * resources.displayMetrics.density).toInt()
+                setPadding(pad, 0, pad, 0)
+                setOnClickListener { onClose() }
+            }
+        emptyText =
             TextView(context).apply {
                 gravity = Gravity.CENTER
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                alpha = 0.7f
-                isVisible = false
-                setOnClickListener { onClose() }
+                alpha = 0.8f
             }
+        emptyDetail =
+            TextView(context).apply {
+                gravity = Gravity.CENTER
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                alpha = 0.55f
+                setPadding(0, (8 * resources.displayMetrics.density).toInt(), 0, 0)
+            }
+        accessButton =
+            com.google.android.material.button.MaterialButton(context).apply {
+                setText(R.string.lbl_lyrics_grant)
+                isVisible = false
+                setOnClickListener { song?.let(onRequestAccess) }
+            }
+        empty.addView(emptyText)
+        empty.addView(emptyDetail)
+        empty.addView(
+            accessButton,
+            LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+                .apply { topMargin = (12 * context.resources.displayMetrics.density).toInt() },
+        )
         body.addView(empty, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         column.addView(body, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         container.addView(column, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -171,14 +207,18 @@ class LyricsPanel(
         sourceLabel.text =
             when (loaded.source) {
                 LyricsSource.FILE ->
-                    context.getString(if (lyrics.synced) R.string.lbl_lyrics_lrc_synced else R.string.lbl_lyrics_lrc)
+                    context.getString(if (lyrics.synced) R.string.lbl_lyrics_lrc_synced else R.string.lbl_lyrics_lrc) +
+                        (loaded.fileName?.let { " · $it" } ?: "")
                 LyricsSource.EMBEDDED -> context.getString(R.string.lbl_lyrics_embedded)
                 LyricsSource.NONE -> ""
             }
         val none = lyrics.lines.isEmpty()
         empty.isVisible = none
         list.isVisible = !none
-        empty.text = context.getString(R.string.lng_lyrics_none)
+        emptyText.text = context.getString(R.string.lng_lyrics_none)
+        emptyDetail.text = loaded.detail ?: ""
+        emptyDetail.isVisible = !loaded.detail.isNullOrEmpty()
+        accessButton.isVisible = loaded.needsAccess
         adapter.notifyDataSetChanged()
         list.scrollToPosition(0)
         lastUserScroll = 0

@@ -94,6 +94,7 @@ class PlaybackPanelFragment :
     private var equalizerLauncher: ActivityResultLauncher<Intent>? = null
     private var userAwarePagerCallback: UserAwarePagerCallback? = null
     private var lyricsPanel: LyricsPanel? = null
+    private var folderLauncher: ActivityResultLauncher<android.net.Uri?>? = null
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentPlaybackPanelBinding.inflate(inflater)
@@ -195,8 +196,29 @@ class PlaybackPanelFragment :
                     onSeek = { playbackModel.seekToMs(it) },
                     onClose = { setLyricsShown(false) },
                     onEdit = { LyricsEditDialog.show(requireActivity(), it) },
+                    onRequestAccess = { song ->
+                        requireContext().showToast(R.string.lng_lyrics_grant_hint)
+                        folderLauncher?.launch(LyricsFiles.folderHint(song))
+                    },
                 )
         }
+        folderLauncher =
+            registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+                if (uri != null) {
+                    try {
+                        requireContext()
+                            .contentResolver
+                            .takePersistableUriPermission(
+                                uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                            )
+                    } catch (e: Exception) {
+                        L.w(e, "Não consegui guardar a permissão da pasta")
+                    }
+                    LyricsFiles.bump()
+                }
+            }
 
         // --- VIEWMODEL SETUP --
         collectImmediately(playbackModel.song, ::updateSong)
@@ -206,9 +228,7 @@ class PlaybackPanelFragment :
         collectImmediately(playbackModel.isPlaying, ::updatePlaying)
         collectImmediately(playbackModel.isShuffled, ::updateShuffled)
         collectImmediately(playbackModel.pagerQueue, ::updatePager)
-        collectImmediately(LyricsFiles.version) {
-            if (lyricsShown) lyricsPanel?.bind(playbackModel.song.value)
-        }
+        collectImmediately(LyricsFiles.version) { lyricsPanel?.bind(playbackModel.song.value) }
         setLyricsShown(lyricsShown)
     }
 
@@ -268,6 +288,7 @@ class PlaybackPanelFragment :
     override fun onDestroyBinding(binding: FragmentPlaybackPanelBinding) {
         equalizerLauncher = null
         lyricsPanel = null
+        folderLauncher = null
         binding.playbackRepeat.clearPendingIcon()
         binding.playbackSong.isSelected = false
         binding.playbackArtist.isSelected = false
@@ -340,7 +361,8 @@ class PlaybackPanelFragment :
             }
         }
         binding.playbackSeekBar?.durationDs = song.durationMs.msToDs()
-        if (lyricsShown) lyricsPanel?.bind(song)
+        // Fork pessoal: a letra é lida já na troca de música, para abrir na hora.
+        lyricsPanel?.bind(song)
     }
 
     private fun updateParent(parent: MusicParent?) {
