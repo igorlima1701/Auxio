@@ -181,7 +181,7 @@ class SongInfoDialog : ViewBindingMaterialDialogFragment<DialogSongInfoBinding>(
         )
         if (history != null) {
             rows.addView(
-                MaterialButton(context, null, com.google.android.material.R.attr.borderlessButtonStyle)
+                MaterialButton(context, null, androidx.appcompat.R.attr.borderlessButtonStyle)
                     .apply {
                         setText(R.string.lbl_info_clear_history)
                         setOnClickListener {
