@@ -507,9 +507,23 @@ class MainFragment :
         binding.sheetScrim.isInvisible = !open
     }
 
+    /**
+     * Fork pessoal: as trocas de tela rodam na próxima mensagem da fila principal, e não dentro da
+     * entrega do evento. Senão, outras telas ainda recebendo o mesmo evento podiam rodar depois de
+     * terem sido desmontadas (era o que fechava o app).
+     */
+    private fun deferNav(block: () -> Unit) {
+        val root = binding?.root ?: return
+        root.post { if (binding != null) block() }
+    }
+
     private fun handleShow(show: Show?) {
         if (show == null) return
         detailModel.outsideShow.consume()
+        deferNav { handleShowNow(show) }
+    }
+
+    private fun handleShowNow(show: Show) {
         // Pedido antigo que ficou pendurado não deve ser tratado depois por outra tela.
         detailModel.toShow.consume()
         // Fork pessoal: vindo do player ou da fila, monta tudo escondido e só então mostra, para
@@ -595,7 +609,7 @@ class MainFragment :
         homeModel.showTabEvent.consume()
         val toGrid = homeModel.nextTabToGrid
         homeModel.nextTabToGrid = false
-        switchTab(type, reveal = true, toGrid = toGrid)
+        deferNav { switchTab(type, reveal = true, toGrid = toGrid) }
     }
 
     private fun switchTab(type: MusicType, reveal: Boolean, toGrid: Boolean) {
@@ -654,6 +668,10 @@ class MainFragment :
     private fun handleOpenSearch(open: Unit?) {
         if (open == null) return
         homeModel.openSearchEvent.consume()
+        deferNav { openSearchNow() }
+    }
+
+    private fun openSearchNow() {
         val binding = requireBinding()
         val onHome = currentPage == Page.HOME
         if (onHome) binding.mainExplore.isInvisible = true
