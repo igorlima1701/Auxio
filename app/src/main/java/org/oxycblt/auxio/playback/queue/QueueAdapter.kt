@@ -26,6 +26,7 @@ import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.R as MR
 import com.google.android.material.shape.MaterialShapeDrawable
+import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.ItemEditableSongBinding
 import org.oxycblt.auxio.list.EditClickListListener
 import org.oxycblt.auxio.list.adapter.FlexibleListAdapter
@@ -55,6 +56,8 @@ class QueueAdapter(private val listener: EditClickListListener<Song>) :
     private var isPlaying = false
     // Fork pessoal: posições marcadas na seleção de várias músicas.
     private var selectedPositions = emptySet<Int>()
+    // Fork pessoal: lista filtrada pela busca (sem arrastar nem deslizar).
+    var editable = true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         QueueSongViewHolder.from(parent)
@@ -74,6 +77,7 @@ class QueueAdapter(private val listener: EditClickListListener<Song>) :
         viewHolder.isFuture = position > currentIndex
         viewHolder.updatePlayingIndicator(position == currentIndex, isPlaying)
         viewHolder.setMultiSelected(position in selectedPositions)
+        viewHolder.setEditable(editable)
     }
 
     /** Fork pessoal: marca as posições selecionadas. */
@@ -126,7 +130,9 @@ class QueueAdapter(private val listener: EditClickListListener<Song>) :
  */
 class QueueSongViewHolder private constructor(private val binding: ItemEditableSongBinding) :
     PlayingIndicatorAdapter.ViewHolder(binding.root), MaterialDragCallback.ViewHolder {
-    override val enabled = true
+    // Fork pessoal: desligado durante a busca na fila (sem arrastar/deslizar na lista filtrada).
+    override var enabled = true
+    private var showingGroup = false
     override val root = binding.root
     override val body = binding.body
     override val delete = binding.background
@@ -182,6 +188,30 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
     }
 
     /** Fork pessoal: aparência de música marcada na seleção de várias. */
+    /**
+     * Fork pessoal: a linha vira a faixa "N músicas · Mover N músicas para esta posição" enquanto
+     * várias músicas marcadas são arrastadas juntas. null = volta ao normal.
+     */
+    fun setGroupLabel(count: Int?) {
+        val context = binding.context
+        if (count != null) {
+            showingGroup = true
+            binding.songName.text = context.getString(R.string.fmt_queue_group, count)
+            binding.songInfo.text = context.getString(R.string.fmt_queue_group_move, count)
+            binding.interactBody.setBackgroundColor(
+                context.getAttrColorCompat(MR.attr.colorTertiaryContainer).defaultColor
+            )
+        } else if (showingGroup) {
+            showingGroup = false
+            binding.interactBody.setBackgroundResource(R.drawable.ui_selection_bg)
+        }
+    }
+
+    fun setEditable(editable: Boolean) {
+        enabled = editable
+        binding.songDragHandle.isInvisible = !editable
+    }
+
     fun setMultiSelected(selected: Boolean) {
         binding.root.isActivated = selected
     }
@@ -206,6 +236,7 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
             true
         }
         binding.songAlbumCover.bind(song)
+        setGroupLabel(null)
         binding.songName.text = song.name.resolve(binding.context)
         binding.songInfo.text = song.artists.resolveNames(binding.context)
         // Not swiping this ViewHolder if it's being re-bound, ensure that the background is

@@ -139,4 +139,7 @@
     <string name="lng_queue_added_to" translatable="false">Adicionado a \"%s\"</string>
     <string name="lng_queue_created_named" translatable="false">Criada a fila \"%s\"</string>
     <string name="fmt_edit_tags_n" translatable="false">Editar tags de %d músicas</string>
+    <string name="fmt_queue_group" translatable="false">%d músicas</string>
+    <string name="fmt_queue_group_move" translatable="false">Mover %d músicas para esta posição</string>
+    <string name="lng_queue_search" translatable="false">Buscar nesta fila…</string>
 </resources>

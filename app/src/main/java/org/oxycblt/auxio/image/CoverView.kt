@@ -153,8 +153,11 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
                 it != -1
             }
 
-        val playbackIndicatorEnabled =
-            styledAttrs.getBoolean(R.styleable.CoverView_enablePlaybackIndicator, true)
+        // Fork pessoal: sem a animação de "tocando" sobre a capa/número da faixa nas listas; a música
+        // que toca fica marcada só pela cor da linha.
+        @Suppress("UNUSED_VARIABLE")
+        val ignored = styledAttrs.getBoolean(R.styleable.CoverView_enablePlaybackIndicator, true)
+        val playbackIndicatorEnabled = false
         val selectionBadgeEnabled =
             styledAttrs.getBoolean(R.styleable.CoverView_enableSelectionBadge, true)
         gridThumbnail = styledAttrs.getBoolean(R.styleable.CoverView_gridThumbnail, false)

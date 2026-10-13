@@ -39,6 +39,9 @@ import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.FragmentQueueBinding
 import org.oxycblt.auxio.list.EditClickListListener
 import org.oxycblt.auxio.music.MusicViewModel
+import org.oxycblt.auxio.music.resolve
+import org.oxycblt.auxio.music.resolveNames
+import org.oxycblt.auxio.playback.formatDurationMs
 import org.oxycblt.auxio.playback.PlaybackViewModel
 import org.oxycblt.auxio.ui.ViewBindingFragment
 import org.oxycblt.auxio.util.collectImmediately
@@ -56,13 +59,25 @@ import timber.log.Timber as L
  */
 @AndroidEntryPoint
 class QueueFragment :
-    ViewBindingFragment<FragmentQueueBinding>(), EditClickListListener<Song>, QueueMenuOpener {
+    ViewBindingFragment<FragmentQueueBinding>(),
+    EditClickListListener<Song>,
+    QueueMenuOpener,
+    QueueDragCallback.GroupDragHost {
     private val queueModel: QueueViewModel by viewModels()
     private val playbackModel: PlaybackViewModel by activityViewModels()
     private val musicModel: MusicViewModel by activityViewModels()
     @Inject lateinit var multiQueue: MultiQueue
     private val queueAdapter = QueueAdapter(this)
     private var touchHelper: ItemTouchHelper? = null
+
+    // Fork pessoal: arrasto de várias músicas juntas (as outras marcadas saem da lista até soltar).
+    private class GroupDrag(val original: List<Song>, val selected: List<Int>, val rep: Int, val ids: MutableList<Int>)
+
+    private var group: GroupDrag? = null
+
+    // Fork pessoal: busca dentro da fila. [filterMap] = posição na lista filtrada -> posição na fila.
+    private var filterQuery = ""
+    private var filterMap: List<Int> = emptyList()
     private val selectionBack =
         object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
@@ -79,7 +94,7 @@ class QueueFragment :
         binding.queueRecycler.apply {
             adapter = queueAdapter
             touchHelper =
-                ItemTouchHelper(QueueDragCallback(queueModel)).also {
+                ItemTouchHelper(QueueDragCallback(queueModel, this@QueueFragment)).also {
                     it.attachToRecyclerView(this)
                     org.oxycblt.auxio.list.recycler.PreviewSwipe.register(this, it)
                 }
@@ -106,6 +121,18 @@ class QueueFragment :
         binding.queueSelInvert.setOnClickListener { queueModel.invertSelection() }
         binding.queueSelRange.setOnClickListener { queueModel.selectRange() }
         binding.queueSelActions.setOnClickListener { showSelectionActions() }
+        binding.queueSearch.addTextChangedListener(
+            object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+
+                override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    setFilter(s?.toString().orEmpty())
+                }
+            }
+        )
+        binding.queueSearchClear.setOnClickListener { binding.queueSearch.setText("") }
 
         // --- VIEWMODEL SETUP ----
         collectImmediately(
@@ -114,7 +141,9 @@ class QueueFragment :
             playbackModel.isPlaying,
             ::updateQueue,
         )
-        collectImmediately(multiQueue.info, ::updateHeader)
+        collectImmediately(multiQueue.info, queueModel.queue, queueModel.index) { info, _, _ ->
+            updateHeader(info)
+        }
         collectImmediately(queueModel.selected, ::updateSelection)
     }
 
@@ -133,7 +162,7 @@ class QueueFragment :
     }
 
     override fun onClick(item: Song, viewHolder: RecyclerView.ViewHolder) {
-        val pos = viewHolder.bindingAdapterPosition
+        val pos = realPosition(viewHolder.bindingAdapterPosition)
         // Fork pessoal: com seleção aberta, tocar marca/desmarca.
         if (queueModel.selected.value.isNotEmpty()) {
             queueModel.toggleSelected(pos)
@@ -144,16 +173,76 @@ class QueueFragment :
 
     override fun openQueueMenu(song: Song, index: Int) {
         if (index == RecyclerView.NO_POSITION) return
-        QueueItemMenuDialog.show(childFragmentManager, song, index)
+        QueueItemMenuDialog.show(childFragmentManager, song, realPosition(index))
     }
 
     override fun onItemLongPress(index: Int) {
-        if (index == RecyclerView.NO_POSITION) return
+        if (index == RecyclerView.NO_POSITION || filterQuery.isNotEmpty()) return
         queueModel.toggleSelected(index)
     }
 
+    /** Posição na fila de uma linha da lista mostrada (que pode estar filtrada pela busca). */
+    private fun realPosition(shown: Int) =
+        if (filterQuery.isEmpty()) shown else filterMap.getOrElse(shown) { RecyclerView.NO_POSITION }
+
     override fun onPickUp(viewHolder: RecyclerView.ViewHolder) {
-        requireNotNull(touchHelper) { "ItemTouchHelper was not available" }.startDrag(viewHolder)
+        val helper = requireNotNull(touchHelper) { "ItemTouchHelper was not available" }
+        val pos = viewHolder.bindingAdapterPosition
+        val chosen = queueModel.selected.value
+        if (filterQuery.isNotEmpty() || pos == RecyclerView.NO_POSITION || pos !in chosen || chosen.size < 2) {
+            helper.startDrag(viewHolder)
+            return
+        }
+        // Fork pessoal: as outras marcadas saem da lista e a linha pega vira "N músicas".
+        val original = queueModel.queue.value
+        val selected = chosen.sorted()
+        val ids = original.indices.toMutableList()
+        for (p in selected.sortedDescending()) {
+            if (p == pos) continue
+            val idx = ids.indexOf(p)
+            ids.removeAt(idx)
+            queueAdapter.update(
+                ids.map { original[it] },
+                org.oxycblt.auxio.list.adapter.UpdateInstructions.Remove(idx, 1),
+            )
+        }
+        group = GroupDrag(original, selected, pos, ids)
+        queueAdapter.setSelectedPositions(setOf(ids.indexOf(pos)))
+        (viewHolder as? QueueSongViewHolder)?.setGroupLabel(selected.size)
+        helper.startDrag(viewHolder)
+    }
+
+    override fun groupMove(from: Int, to: Int): Boolean? {
+        val g = group ?: return null
+        if (from !in g.ids.indices || to !in g.ids.indices) return false
+        g.ids.add(to, g.ids.removeAt(from))
+        queueAdapter.update(
+            g.ids.map { g.original[it] },
+            org.oxycblt.auxio.list.adapter.UpdateInstructions.Move(from, to),
+        )
+        return true
+    }
+
+    override val groupActive: Boolean
+        get() = group != null
+
+    override fun groupDrop(end: Int): Boolean {
+        val g = group ?: return false
+        group = null
+        // A faixa do grupo vira todas as marcadas, na ordem em que estavam.
+        val at = g.ids.indexOf(g.rep).takeIf { it >= 0 } ?: end
+        val order = g.ids.toMutableList().apply {
+            removeAt(at)
+            addAll(at, g.selected)
+        }
+        val newSelection = g.selected.map { order.indexOf(it) }.toSet()
+        // Volta a lista da tela para a fila real (ainda na ordem antiga) e aplica a nova ordem.
+        queueAdapter.update(g.original, org.oxycblt.auxio.list.adapter.UpdateInstructions.Replace(0))
+        queueModel.reorder(order, newSelection)
+        if (order == order.indices.toList()) {
+            queueAdapter.setSelectedPositions(newSelection)
+        }
+        return true
     }
 
     private fun updateDivider() {
@@ -172,12 +261,17 @@ class QueueFragment :
         val binding = requireBinding()
         val viewing = info.viewing
         binding.queueName.text = info.names.getOrElse(viewing) { getString(R.string.lbl_queue) }
+        val queue = queueModel.queue.value
+        val position = queueModel.index.value
+        val totalMs = queue.sumOf { it.durationMs }
         val state =
             getString(
                 if (viewing == info.active) R.string.lng_queue_state_playing
                 else R.string.lng_queue_state_stopped
             )
-        binding.queueCount.text = songCount(info.sizes.getOrElse(viewing) { 0 }) + " · " + state
+        // Fork pessoal: posição da música atual / total e a duração da fila, como no Musicolet.
+        val where = if (position in queue.indices) "${position + 1} / ${queue.size}" else songCount(queue.size)
+        binding.queueCount.text = "$where · ⏱ ${totalMs.formatDurationMs(false)} · $state"
         binding.queuePlay.isVisible = viewing != info.active
     }
 
@@ -307,12 +401,60 @@ class QueueFragment :
         }
     }
 
+    /** Fork pessoal: filtra a fila mostrada pelo texto da busca (título, artista ou álbum). */
+    private fun setFilter(text: String) {
+        val query = normalize(text.trim())
+        val binding = binding ?: return
+        binding.queueSearchClear.isVisible = text.isNotEmpty()
+        if (query == filterQuery) return
+        filterQuery = query
+        if (query.isNotEmpty()) queueModel.clearSelection()
+        queueAdapter.editable = query.isEmpty()
+        applyQueue(queueModel.queue.value, queueModel.index.value, playbackModel.isPlaying.value, replace = true)
+    }
+
+    private fun normalize(s: String) =
+        java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}+"), "")
+            .lowercase()
+
+    private fun applyQueue(queue: List<Song>, index: Int, isPlaying: Boolean, replace: Boolean) {
+        val playingNow = isPlaying && queueModel.viewingActive.value
+        if (filterQuery.isEmpty()) {
+            filterMap = emptyList()
+            val instructions = queueModel.queueInstructions.consume()
+            queueAdapter.update(
+                queue,
+                if (replace) org.oxycblt.auxio.list.adapter.UpdateInstructions.Replace(0) else instructions,
+            )
+            queueAdapter.setPosition(index, playingNow)
+            return
+        }
+        queueModel.queueInstructions.consume()
+        val context = requireContext()
+        val matches =
+            queue.withIndex().filter { (_, song) ->
+                val text =
+                    song.name.resolve(context) + " " +
+                        song.artists.resolveNames(context) + " " +
+                        song.album.name.resolve(context)
+                normalize(text).contains(filterQuery)
+            }
+        filterMap = matches.map { it.index }
+        queueAdapter.update(matches.map { it.value }, org.oxycblt.auxio.list.adapter.UpdateInstructions.Replace(0))
+        queueAdapter.setPosition(filterMap.indexOf(index), playingNow)
+    }
+
     private fun updateQueue(queue: List<Song>, index: Int, isPlaying: Boolean) {
         val binding = requireBinding()
+        // Durante o arrasto de várias juntas, a lista da tela é cuidada pelo próprio arrasto.
+        if (group != null) return
 
-        queueAdapter.update(queue, queueModel.queueInstructions.consume())
-        // Fork pessoal: numa fila parada, a música em que ela parou aparece marcada, sem tocar.
-        queueAdapter.setPosition(index, isPlaying && queueModel.viewingActive.value)
+        applyQueue(queue, index, isPlaying, replace = false)
+        if (filterQuery.isNotEmpty()) {
+            queueModel.scrollTo.consume()
+            return
+        }
 
         // If requested, scroll to a new item (occurs when the index moves)
         val scrollTo = queueModel.scrollTo.consume()

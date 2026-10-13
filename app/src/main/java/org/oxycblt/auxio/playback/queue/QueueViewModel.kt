@@ -322,6 +322,12 @@ constructor(
         selected.value = (before + end + after).map { order.indexOf(it) }.toSet()
     }
 
+    /** Fork pessoal: aplica uma nova ordem (posições atuais na nova ordem) e a nova seleção. */
+    fun reorder(order: List<Int>, newSelection: Set<Int>) {
+        applyOrder(order)
+        selected.value = newSelection
+    }
+
     /** Põe a fila mostrada na ordem [order] (lista das posições atuais, na nova ordem). */
     private fun applyOrder(order: List<Int>) {
         val n = queue.value.size

@@ -28,7 +28,22 @@ import org.oxycblt.auxio.list.recycler.MaterialDragCallback
  *
  * @author Alexander Capehart (OxygenCobalt)
  */
-class QueueDragCallback(private val queueModel: QueueViewModel) : MaterialDragCallback() {
+class QueueDragCallback(
+    private val queueModel: QueueViewModel,
+    private val host: GroupDragHost? = null,
+) : MaterialDragCallback() {
+    /** Fork pessoal: quem cuida do arrasto de várias músicas juntas (a tela da fila). */
+    interface GroupDragHost {
+        /** Move a faixa do grupo; null = não há grupo sendo arrastado (move normal). */
+        fun groupMove(from: Int, to: Int): Boolean?
+
+        /** Há um grupo sendo arrastado agora. */
+        val groupActive: Boolean
+
+        /** Fim do arrasto de um grupo. */
+        fun groupDrop(end: Int): Boolean
+    }
+
     // Fork pessoal: lembra de onde a música saiu, para levar as selecionadas juntas no fim.
     private var dragging: RecyclerView.ViewHolder? = null
     private var dragStart = RecyclerView.NO_POSITION
@@ -44,6 +59,13 @@ class QueueDragCallback(private val queueModel: QueueViewModel) : MaterialDragCa
             dragging = null
             dragStart = RecyclerView.NO_POSITION
             val end = holder?.bindingAdapterPosition ?: RecyclerView.NO_POSITION
+            val h = host
+            if (h != null && h.groupActive) {
+                // Depois do quadro atual, para o ItemTouchHelper terminar de soltar a linha.
+                val view = holder?.itemView
+                if (view != null) view.post { h.groupDrop(end) } else h.groupDrop(end)
+                return
+            }
             if (start != RecyclerView.NO_POSITION && end != RecyclerView.NO_POSITION) {
                 // Depois do quadro atual, para o ItemTouchHelper terminar de soltar a linha.
                 holder?.itemView?.post { queueModel.onDragEnd(start, end) }
@@ -55,11 +77,12 @@ class QueueDragCallback(private val queueModel: QueueViewModel) : MaterialDragCa
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder,
-    ) =
-        queueModel.moveQueueDataItems(
-            viewHolder.bindingAdapterPosition,
-            target.bindingAdapterPosition,
-        )
+    ): Boolean {
+        val from = viewHolder.bindingAdapterPosition
+        val to = target.bindingAdapterPosition
+        host?.groupMove(from, to)?.let { return it }
+        return queueModel.moveQueueDataItems(from, to)
+    }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (isPreviewSwipe(direction)) {

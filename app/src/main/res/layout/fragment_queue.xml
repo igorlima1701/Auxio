@@ -175,4 +175,50 @@
 
     </FrameLayout>
 
+    <!-- Fork pessoal: busca dentro da fila, como no Musicolet. -->
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_touchable_medium"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/spacing_medium">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_search_24"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+        <EditText
+            android:id="@+id/queue_search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="@string/lng_queue_search"
+            android:imeOptions="actionSearch"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="@dimen/spacing_medium"
+            android:paddingEnd="@dimen/spacing_small"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/queue_search_clear"
+            android:layout_width="@dimen/size_touchable_medium"
+            android:layout_height="@dimen/size_touchable_medium"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_cancel"
+            android:src="@drawable/ic_close_24"
+            android:visibility="gone"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+    </LinearLayout>
+
 </LinearLayout>
