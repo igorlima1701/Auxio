@@ -9,6 +9,13 @@ plugins {
 }
 
 android {
+    // Fork pessoal: sem o lint na compilação de release (ele baixa ferramentas extras e já derrubou
+    // uma build por falha de download; o APK pessoal não precisa dele).
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     // Auxio implicitly depends on the native modules, explicitly specify it
     // here so the libraries are still stripped.
     ndkVersion ndk_version
