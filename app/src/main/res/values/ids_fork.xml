@@ -2,4 +2,5 @@
 <!-- Fork pessoal: ids usados como chave de tag nas linhas das listas. -->
 <resources>
     <item name="tag_preview_song" type="id" />
+    <item name="tag_touch_helpers" type="id" />
 </resources>

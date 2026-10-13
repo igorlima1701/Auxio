@@ -105,6 +105,7 @@ class PlaylistDetailFragment :
         touchHelper =
             ItemTouchHelper(PlaylistDragCallback(detailModel)).also {
                 it.attachToRecyclerView(binding.detailRecycler)
+                org.oxycblt.auxio.list.recycler.PreviewSwipe.register(binding.detailRecycler, it)
             }
 
         // --- VIEWMODEL SETUP ---

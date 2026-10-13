@@ -81,6 +81,7 @@ class QueueFragment :
             touchHelper =
                 ItemTouchHelper(QueueDragCallback(queueModel)).also {
                     it.attachToRecyclerView(this)
+                    org.oxycblt.auxio.list.recycler.PreviewSwipe.register(this, it)
                 }
         }
 

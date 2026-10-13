@@ -31,7 +31,17 @@ import org.oxycblt.musikr.Song
  */
 object PreviewSwipe {
     fun attach(recycler: RecyclerView) {
-        ItemTouchHelper(Callback()).attachToRecyclerView(recycler)
+        val helper = ItemTouchHelper(Callback())
+        helper.attachToRecyclerView(recycler)
+        register(recycler, helper)
+    }
+
+    /** Guarda os ItemTouchHelper da lista, para soltar a linha arrastada depois da prévia. */
+    fun register(recycler: RecyclerView, helper: ItemTouchHelper) {
+        @Suppress("UNCHECKED_CAST")
+        val list = (recycler.getTag(R.id.tag_touch_helpers) as? MutableList<ItemTouchHelper>)
+            ?: mutableListOf<ItemTouchHelper>().also { recycler.setTag(R.id.tag_touch_helpers, it) }
+        if (helper !in list) list.add(helper)
     }
 
     fun songOf(holder: RecyclerView.ViewHolder) =
@@ -40,16 +50,27 @@ object PreviewSwipe {
     /** Toca a prévia da música da linha e devolve a linha ao lugar. */
     fun preview(holder: RecyclerView.ViewHolder) {
         songOf(holder)?.let(PreviewPlayer::start)
-        // A linha ficou arrastada para fora da tela; sem animação de lista, ela não volta sozinha.
-        if (holder is MaterialDragCallback.ViewHolder) {
-            holder.body.translationX = 0f
-            holder.root.translationY = 0f
-            holder.delete.visibility = android.view.View.INVISIBLE
-        } else {
-            ItemTouchHelper.Callback.getDefaultUIUtil().clearView(holder.itemView)
-        }
+        val recycler = holder.itemView.parent as? RecyclerView
         val pos = holder.bindingAdapterPosition
-        if (pos != RecyclerView.NO_POSITION) holder.bindingAdapter?.notifyItemChanged(pos)
+        val adapter = holder.bindingAdapter
+        // O ItemTouchHelper guarda a linha "arrastada para fora" até ela sair da tela. Religá-lo à
+        // lista descarta esse estado e devolve a linha ao lugar na hora.
+        recycler?.post {
+            @Suppress("UNCHECKED_CAST")
+            val helpers = recycler.getTag(R.id.tag_touch_helpers) as? List<ItemTouchHelper>
+            helpers?.forEach {
+                it.attachToRecyclerView(null)
+                it.attachToRecyclerView(recycler)
+            }
+            if (holder is MaterialDragCallback.ViewHolder) {
+                holder.body.translationX = 0f
+                holder.root.translationY = 0f
+                holder.delete.visibility = android.view.View.INVISIBLE
+            } else {
+                ItemTouchHelper.Callback.getDefaultUIUtil().clearView(holder.itemView)
+            }
+            if (pos != RecyclerView.NO_POSITION) adapter?.notifyItemChanged(pos)
+        }
     }
 
     private class Callback : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
