@@ -112,4 +112,7 @@
     <string name="err_queue_library" translatable="false">A biblioteca ainda está carregando; tente de novo</string>
     <string name="lbl_lyrics_grant" translatable="false">Liberar acesso à pasta</string>
     <string name="lng_lyrics_grant_hint" translatable="false">Escolha a pasta principal das suas músicas (ex.: Music) e toque em \"Usar esta pasta\"</string>
+    <string name="lbl_lyrics_search" translatable="false">Buscar letra</string>
+    <string name="lbl_lyrics_search_go" translatable="false">Buscar</string>
+    <string name="lng_lyrics_search_word" translatable="false">Busca no Google por \"%s\" mais a palavra abaixo:</string>
 </resources>

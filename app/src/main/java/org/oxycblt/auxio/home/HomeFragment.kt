@@ -159,21 +159,19 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
             offscreenPageLimit = Tab.MAX_SEQUENCE_IDX + 1
 
             dampen()
+            // Fork pessoal: as abas trocam só pela barra de baixo (sem deslizar).
+            isUserInputEnabled = false
         }
 
         // Further initialization must be done in the function that also handles
         // re-creating the ViewPager.
         setupPager(binding)
 
-        // Fork pessoal: abre na aba Álbuns e liga a busca do topo.
-        if (savedInstanceState == null) {
-            selectTab(MusicType.ALBUMS)
-        }
+        // Fork pessoal: liga a busca do topo. A aba mostrada é escolhida em onViewStateRestored.
         binding.homeQuery.doAfterTextChanged { homeModel.setQuery(it?.toString() ?: "") }
 
         // --- VIEWMODEL SETUP ---
         collect(homeModel.recreateTabs.flow, ::handleRecreate)
-        collect(homeModel.showTabEvent.flow, ::handleShowTab)
         collect(homeModel.scrollTopEvent.flow, ::handleScrollTop)
         collect(homeModel.chooseMusicLocations.flow, ::handleChooseFolders)
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
@@ -271,6 +269,12 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
 
     private fun updateCurrentTab(tabType: MusicType) {
         val binding = requireBinding()
+        // Fork pessoal: a barra de baixo troca a aba pelo estado; a página acompanha na hora.
+        val idx = homeModel.currentTabTypes.indexOf(tabType)
+        if (idx >= 0 && binding.homePager.currentItem != idx) {
+            binding.homePager.setCurrentItem(idx, false)
+            binding.homeAppbar.setExpanded(true, false)
+        }
         // Fork pessoal: cada aba tem sua busca; trocar de aba limpa o texto.
         binding.homeQuery.apply {
             setHint(
@@ -306,10 +310,10 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
     }
 
     /** Fork pessoal: troca a aba pedida pela barra de abas (ou pelo ano no player). */
-    private fun handleShowTab(type: MusicType?) {
-        if (type == null) return
-        homeModel.showTabEvent.consume()
-        selectTab(type)
+    /** Fork pessoal: a aba a mostrar é a que o app escolheu (a barra de baixo manda nela). */
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        selectTab(homeModel.forcedTab ?: homeModel.currentTabType.value)
     }
 
     /** Fork pessoal: tocar de novo no ícone da aba atual leva a lista ao topo. */

@@ -61,7 +61,6 @@ class LyricsPanel(
     private val emptyText: TextView
     private val emptyDetail: TextView
     private val accessButton: com.google.android.material.button.MaterialButton
-    private val sourceLabel: TextView
     private var song: Song? = null
     private var lyrics = Lyrics(emptyList(), false)
     private var current = -1
@@ -71,25 +70,6 @@ class LyricsPanel(
 
     init {
         container.removeAllViews()
-        val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        val bar =
-            LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-            }
-        bar.addView(iconButton(R.drawable.ic_album_24, R.string.lbl_lyrics_cover) { onClose() })
-        sourceLabel =
-            TextView(context).apply {
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-                alpha = 0.6f
-                gravity = Gravity.CENTER
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
-            }
-        bar.addView(sourceLabel, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        bar.addView(iconButton(R.drawable.ic_edit_24, R.string.lbl_lyrics_edit) { song?.let(onEdit) })
-        column.addView(bar)
-
         val body = FrameLayout(context)
         list =
             RecyclerView(context).apply {
@@ -99,6 +79,24 @@ class LyricsPanel(
                 overScrollMode = View.OVER_SCROLL_NEVER
                 clipToPadding = false
                 isVerticalScrollBarEnabled = true
+                // Toque fora das linhas (nos espaços de cima e de baixo) também volta para a capa.
+                val detector =
+                    android.view.GestureDetector(
+                        context,
+                        object : android.view.GestureDetector.SimpleOnGestureListener() {
+                            override fun onSingleTapUp(e: android.view.MotionEvent) = true
+                        },
+                    )
+                addOnItemTouchListener(
+                    object : RecyclerView.SimpleOnItemTouchListener() {
+                        override fun onInterceptTouchEvent(rv: RecyclerView, e: android.view.MotionEvent): Boolean {
+                            if (detector.onTouchEvent(e) && rv.findChildViewUnder(e.x, e.y) == null) {
+                                onClose()
+                            }
+                            return false
+                        }
+                    }
+                )
                 addOnScrollListener(
                     object : RecyclerView.OnScrollListener() {
                         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -158,8 +156,12 @@ class LyricsPanel(
                 .apply { topMargin = (12 * context.resources.displayMetrics.density).toInt() },
         )
         body.addView(empty, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        column.addView(body, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
-        container.addView(column, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        container.addView(body, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        // Fork pessoal: só o lápis, pequeno, flutuando no canto (sem a linha de botões).
+        val pencil = iconButton(R.drawable.ic_edit_24, R.string.lbl_lyrics_edit) { song?.let(onEdit) }
+        pencil.alpha = 0.7f
+        val size = (40 * context.resources.displayMetrics.density).toInt()
+        container.addView(pencil, FrameLayout.LayoutParams(size, size, Gravity.TOP or Gravity.END))
     }
 
     private fun iconButton(icon: Int, desc: Int, onClick: () -> Unit) =
@@ -169,8 +171,6 @@ class LyricsPanel(
             val ripple = TypedValue()
             context.theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, ripple, true)
             setBackgroundResource(ripple.resourceId)
-            val size = (44 * resources.displayMetrics.density).toInt()
-            layoutParams = LinearLayout.LayoutParams(size, size)
             setOnClickListener { onClick() }
         }
 
@@ -185,7 +185,6 @@ class LyricsPanel(
         current = -1
         adapter.notifyDataSetChanged()
         empty.isVisible = false
-        sourceLabel.text = ""
         loadJob =
             scope.launch {
                 val loaded = withContext(Dispatchers.IO) { LyricsFiles.load(context, song) }
@@ -204,14 +203,6 @@ class LyricsPanel(
     private fun show(loaded: LoadedLyrics) {
         lyrics = Lyrics.parse(loaded.text)
         current = -1
-        sourceLabel.text =
-            when (loaded.source) {
-                LyricsSource.FILE ->
-                    context.getString(if (lyrics.synced) R.string.lbl_lyrics_lrc_synced else R.string.lbl_lyrics_lrc) +
-                        (loaded.fileName?.let { " · $it" } ?: "")
-                LyricsSource.EMBEDDED -> context.getString(R.string.lbl_lyrics_embedded)
-                LyricsSource.NONE -> ""
-            }
         val none = lyrics.lines.isEmpty()
         empty.isVisible = none
         list.isVisible = !none
@@ -278,9 +269,17 @@ class LyricsPanel(
                     position == current -> 1f
                     else -> 0.4f
                 }
-            view.setOnClickListener {
+            // Fork pessoal: um toque volta para a capa; segurar uma linha (letra sincronizada) pula
+            // a música para ela.
+            view.setOnClickListener { onClose() }
+            view.setOnLongClickListener {
                 val time = line.timeMs
-                if (lyrics.synced && time != null) onSeek(time) else onClose()
+                if (lyrics.synced && time != null) {
+                    onSeek(time)
+                    true
+                } else {
+                    false
+                }
             }
         }
     }

@@ -33,6 +33,7 @@ import kotlinx.coroutines.withContext
 import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.DialogLyricsEditBinding
 import org.oxycblt.auxio.music.MusicRepository
+import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.playback.PlaybackViewModel
 import org.oxycblt.auxio.ui.ViewBindingMaterialDialogFragment
 import org.oxycblt.auxio.util.showToast
@@ -76,6 +77,7 @@ class LyricsEditDialog : ViewBindingMaterialDialogFragment<DialogLyricsEditBindi
             dismiss()
             return
         }
+        binding.lyricsSearch.setOnClickListener { askSearch(song) }
         binding.lyricsEditNote.text = getString(R.string.lng_lyrics_loading)
         loaded = savedInstanceState != null
         if (loaded) {
@@ -91,6 +93,48 @@ class LyricsEditDialog : ViewBindingMaterialDialogFragment<DialogLyricsEditBindi
             loaded = true
             updateButtons()
         }
+    }
+
+    /** Pergunta a palavra extra (padrão "Genius", a última usada fica lembrada) e abre a busca. */
+    private fun askSearch(song: Song) {
+        val context = requireContext()
+        val prefs = context.getSharedPreferences("lyrics_search", android.content.Context.MODE_PRIVATE)
+        val input =
+            android.widget.EditText(context).apply {
+                setText(prefs.getString(KEY_WORD, "Genius"))
+                setSingleLine()
+                selectAll()
+            }
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val frame =
+            android.widget.FrameLayout(context).apply {
+                setPadding(pad, pad / 2, pad, 0)
+                addView(input)
+            }
+        val title = song.name.resolve(context)
+        val artist = song.artists.firstOrNull()?.name?.resolve(context) ?: ""
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.lbl_lyrics_search)
+            .setMessage(getString(R.string.lng_lyrics_search_word, "$title $artist".trim()))
+            .setView(frame)
+            .setPositiveButton(R.string.lbl_lyrics_search_go) { _, _ ->
+                val word = input.text?.toString()?.trim() ?: ""
+                prefs.edit().putString(KEY_WORD, word).apply()
+                val query = listOf(title, artist, word).filter { it.isNotBlank() }.joinToString(" ")
+                val uri =
+                    android.net.Uri.parse(
+                        "https://www.google.com/search?q=" + android.net.Uri.encode(query)
+                    )
+                try {
+                    startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+                } catch (e: Exception) {
+                    context.showToast(R.string.err_no_app)
+                }
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .show()
+            .window
+            ?.setWindowAnimations(0)
     }
 
     private fun noteFor(source: LyricsSource?, song: Song): String {
@@ -165,6 +209,7 @@ class LyricsEditDialog : ViewBindingMaterialDialogFragment<DialogLyricsEditBindi
     companion object {
         private const val TAG = "auxio.fork.LYRICS_EDIT"
         private const val ARG_UID = "uid"
+        private const val KEY_WORD = "word"
 
         fun show(activity: FragmentActivity, song: Song) {
             LyricsEditDialog()

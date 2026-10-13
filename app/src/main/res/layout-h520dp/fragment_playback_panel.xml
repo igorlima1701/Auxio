@@ -7,6 +7,7 @@
 
     <org.oxycblt.auxio.ui.AuxioToolbar
         android:id="@+id/playback_toolbar"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,16 +35,17 @@
         app:layout_constraintTop_toBottomOf="@+id/playback_toolbar"
         app:layout_constraintVertical_chainStyle="packed" />
 
-    <!-- Fork pessoal: letra no lugar da capa (tocar na capa alterna). Montada no código. -->
+    <!-- Fork pessoal: letra no lugar da capa (tocar na capa alterna), do topo até o nome da música e na largura toda. Montada no código. -->
     <FrameLayout
         android:id="@+id/playback_lyrics"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/playback_pager"
-        app:layout_constraintEnd_toEndOf="@+id/playback_pager"
-        app:layout_constraintStart_toStartOf="@+id/playback_pager"
-        app:layout_constraintTop_toTopOf="@+id/playback_pager" />
+        android:layout_marginBottom="@dimen/spacing_small"
+        app:layout_constraintBottom_toTopOf="@+id/playback_info_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/playback_info_container"

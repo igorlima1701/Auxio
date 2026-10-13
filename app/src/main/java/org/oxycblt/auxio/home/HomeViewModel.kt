@@ -283,6 +283,8 @@ constructor(
     /** Fork pessoal: mostra na aba Álbuns só os álbuns de [year] (mantendo o filtro de nota). */
     fun showAlbumsOfYear(year: Int) {
         setAlbumFilter(albumFilter.value.copy(years = setOf(year)))
+        // Mostra a lista de álbuns (fecha o álbum que estiver aberto na aba).
+        nextTabToGrid = true
         showTab(MusicType.ALBUMS)
     }
 
@@ -315,6 +317,18 @@ constructor(
     /** Fork pessoal: se a tela inicial está visível (não há álbum/artista aberto por cima). */
     var homeVisible = false
 
+    /** Fork pessoal: a próxima troca de aba deve ir para a lista, não para a tela salva da aba. */
+    var nextTabToGrid = false
+
+    /** Fork pessoal: aba que a tela inicial deve mostrar quando for recriada. */
+    var forcedTab: MusicType? = null
+
+    /** Fork pessoal: troca a aba atual na hora (a tela inicial acompanha). */
+    fun forceTab(type: MusicType) {
+        forcedTab = type
+        _currentTabType.value = type
+    }
+
     /** Fork pessoal: pedido para rolar a lista de uma aba até o topo. */
     val scrollTopEvent: Event<MusicType>
         field = MutableEvent<MusicType>()
@@ -324,6 +338,7 @@ constructor(
      */
     fun showTab(type: MusicType) {
         if (homeVisible && mainPage.value == MainPage.HOME && currentTabType.value == type) {
+            nextTabToGrid = false
             scrollTopEvent.put(type)
         } else {
             showTabEvent.put(type)

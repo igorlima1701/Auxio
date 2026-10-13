@@ -20,6 +20,8 @@ package org.oxycblt.auxio
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Parcelable
+import android.view.View
 import android.view.LayoutInflater
 import android.view.ViewTreeObserver
 import android.view.WindowInsets
@@ -30,7 +32,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.core.os.bundleOf
+import androidx.navigation.FloatingWindow
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.RecyclerView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.R as MR
 import com.google.android.material.bottomsheet.BackportBottomSheetBehavior
@@ -108,6 +115,16 @@ class MainFragment :
     @Inject lateinit var multiQueue: org.oxycblt.auxio.playback.queue.MultiQueue
     private var queuePicker: androidx.appcompat.app.AlertDialog? = null
 
+    // Fork pessoal: telas abertas em cada aba.
+    private data class SavedDest(val entryId: String, val destId: Int, val args: Bundle?)
+
+    private class SavedScroll(val state: Parcelable, val collapsed: Boolean)
+
+    private val openStack = mutableListOf<SavedDest>()
+    private val tabStacks = mutableMapOf<MusicType, List<SavedDest>>()
+    private val tabScroll = mutableMapOf<MusicType, SavedScroll?>()
+    private var searchOpen = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Fork pessoal: sem animação ao abrir configurações/sobre.
@@ -156,30 +173,7 @@ class MainFragment :
             @Suppress("DEPRECATION") insets.consumeSystemWindowInsets()
         }
 
-        // Fork pessoal: deslizar para os lados troca de página:
-        // Fila <-> Player <-> Álbuns <-> Artistas <-> Playlists.
-        binding.mainExplore.apply {
-            shouldTrack = {
-                currentPage == Page.HOME &&
-                    playbackModel.song.value != null &&
-                    binding.exploreNavHost.findNavController().currentDestination?.id ==
-                        R.id.home_fragment &&
-                    homeModel.currentTabType.value == homeModel.currentTabTypes.firstOrNull()
-            }
-            onSwipe = { direction -> if (direction < 0) showPage(Page.PLAYBACK) }
-        }
-        binding.playbackPage.apply {
-            excludedIds = listOf(R.id.playback_pager, R.id.playback_seek_bar, R.id.playback_lyrics)
-            onSwipe = { direction ->
-                if (direction > 0) {
-                    showPage(Page.HOME)
-                    homeModel.showTab(MusicType.ALBUMS)
-                } else {
-                    showPage(Page.QUEUE)
-                }
-            }
-        }
-        binding.queuePage.onSwipe = { direction -> if (direction > 0) showPage(Page.PLAYBACK) }
+        // Fork pessoal: o deslizar para os lados para trocar de página foi desligado.
 
         binding.mainScrim.setOnClickListener { binding.homeNewPlaylistFab.close() }
         binding.sheetScrim.setOnClickListener { binding.homeNewPlaylistFab.close() }
@@ -239,6 +233,7 @@ class MainFragment :
         // so handle that by resetting the flag.
         requireNotNull(navigationListener) { "NavigationListener was not available" }
             .attach(binding.exploreNavHost.findNavController())
+        binding.exploreNavHost.findNavController().addOnDestinationChangedListener(stackListener)
         // Listener could still reasonably fire even if we clear the binding, attach/detach
         // our pre-draw listener our listener in onStart/onStop respectively.
         binding.root.viewTreeObserver.addOnPreDrawListener(this@MainFragment)
@@ -262,6 +257,7 @@ class MainFragment :
         val binding = requireBinding()
         requireNotNull(navigationListener) { "NavigationListener was not available" }
             .release(binding.exploreNavHost.findNavController())
+        binding.exploreNavHost.findNavController().removeOnDestinationChangedListener(stackListener)
         binding.root.viewTreeObserver.removeOnPreDrawListener(this)
     }
 
@@ -455,36 +451,146 @@ class MainFragment :
     }
 
     private fun handleShow(show: Show?) {
+        if (show == null) return
+        // Na tela inicial, a navegação é feita pela própria tela (sem troca de página).
+        if (currentPage == Page.HOME) return
+        // Fork pessoal: vindo do player ou da fila, monta tudo escondido e só então mostra, para
+        // não aparecer por um instante a tela que estava aberta antes.
         when (show) {
-            is Show.SongAlbumDetails,
-            is Show.ArtistDetails,
-            is Show.AlbumDetails -> playbackModel.openMain()
-            is Show.SongDetails,
+            is Show.SongAlbumDetails ->
+                showDetailFromOutside(
+                    MusicType.ALBUMS,
+                    R.id.album_detail_fragment,
+                    "albumUid",
+                    show.song.album.uid,
+                )
+            is Show.AlbumDetails ->
+                showDetailFromOutside(
+                    MusicType.ALBUMS,
+                    R.id.album_detail_fragment,
+                    "albumUid",
+                    show.album.uid,
+                )
+            is Show.ArtistDetails ->
+                showDetailFromOutside(
+                    MusicType.ARTISTS,
+                    R.id.artist_detail_fragment,
+                    "artistUid",
+                    show.artist.uid,
+                )
+            is Show.GenreDetails ->
+                showDetailFromOutside(
+                    MusicType.GENRES,
+                    R.id.genre_detail_fragment,
+                    "genreUid",
+                    show.genre.uid,
+                )
+            is Show.PlaylistDetails ->
+                showDetailFromOutside(
+                    MusicType.PLAYLISTS,
+                    R.id.playlist_detail_fragment,
+                    "playlistUid",
+                    show.playlist.uid,
+                )
+            // Escolha entre artistas: abre a tela inicial e a própria tela mostra a escolha.
             is Show.SongArtistDecision,
-            is Show.AlbumArtistDecision,
-            is Show.GenreDetails,
-            is Show.PlaylistDetails,
-            null -> {}
+            is Show.AlbumArtistDecision -> showPage(Page.HOME)
+            is Show.SongDetails -> {}
         }
     }
 
+    private fun showDetailFromOutside(tab: MusicType, destId: Int, argName: String, uid: Music.UID) {
+        switchTab(tab, reveal = false, toGrid = false)
+        val nav = requireBinding().exploreNavHost.findNavController()
+        val top = nav.currentBackStackEntry
+        val topUid =
+            top?.arguments?.let {
+                androidx.core.os.BundleCompat.getParcelable(it, argName, Music.UID::class.java)
+            }
+        if (top?.destination?.id != destId || topUid != uid) {
+            nav.navigate(destId, bundleOf(argName to uid))
+            flushExploreNav()
+        }
+        showPage(Page.HOME)
+    }
+
     /**
-     * Fork pessoal: ao trocar de aba pela barra de baixo, volta para a tela inicial (saindo de telas
-     * de detalhe) e fecha o player. Quem troca a aba é o HomeFragment.
+     * Fork pessoal: troca de aba pela barra de baixo. Cada aba lembra as telas que estavam abertas
+     * nela (um álbum, um artista…) e as reabre ao voltar. Tocar no ícone da aba atual com uma tela
+     * aberta volta para a lista da aba.
      */
     private fun handleShowTab(type: MusicType?) {
         if (type == null) return
-        showPage(Page.HOME)
+        homeModel.showTabEvent.consume()
+        val toGrid = homeModel.nextTabToGrid
+        homeModel.nextTabToGrid = false
+        switchTab(type, reveal = true, toGrid = toGrid)
+    }
+
+    private fun switchTab(type: MusicType, reveal: Boolean, toGrid: Boolean) {
+        val binding = requireBinding()
+        val nav = binding.exploreNavHost.findNavController()
+        val current = homeModel.currentTabType.value
+        val onHome = currentPage == Page.HOME
+        if (!searchOpen && type == current) {
+            if (onHome || toGrid) {
+                tabStacks.remove(type)
+                tabScroll.remove(type)
+                if (openStack.isNotEmpty()) {
+                    if (onHome) binding.mainExplore.isInvisible = true
+                    popToHome()
+                    flushExploreNav()
+                }
+            }
+            if (reveal) showPage(Page.HOME)
+            return
+        }
+        // Esconde a área durante a troca para não aparecer nenhuma tela intermediária.
+        if (onHome) binding.mainExplore.isInvisible = true
+        if (!searchOpen && openStack.isNotEmpty()) {
+            tabStacks[current] = openStack.toList()
+            tabScroll[current] = captureTopScroll()
+        }
+        homeModel.forceTab(type)
         popToHome()
+        val restore = tabStacks.remove(type)
+        val scroll = tabScroll.remove(type)
+        if (restore != null && !toGrid) {
+            for (dest in restore) {
+                try {
+                    nav.navigate(dest.destId, dest.args)
+                } catch (e: Exception) {
+                    L.w(e, "Não consegui reabrir a tela salva da aba")
+                    break
+                }
+            }
+        }
+        flushExploreNav()
+        if (restore != null && !toGrid) scroll?.let(::restoreTopScroll)
+        if (reveal) {
+            showPage(Page.HOME)
+        } else if (onHome) {
+            binding.mainExplore.isInvisible = false
+        }
     }
 
     /** Fork pessoal: busca geral pela barra de baixo. */
     private fun handleOpenSearch(open: Unit?) {
         if (open == null) return
         homeModel.openSearchEvent.consume()
-        showPage(Page.HOME)
+        val binding = requireBinding()
+        val onHome = currentPage == Page.HOME
+        if (onHome) binding.mainExplore.isInvisible = true
+        if (!searchOpen && openStack.isNotEmpty()) {
+            val current = homeModel.currentTabType.value
+            tabStacks[current] = openStack.toList()
+            tabScroll[current] = captureTopScroll()
+        }
         popToHome()
-        requireBinding().exploreNavHost.findNavController().navigateSafe(HomeFragmentDirections.search())
+        binding.exploreNavHost.findNavController().navigateSafe(HomeFragmentDirections.search())
+        searchOpen = true
+        flushExploreNav()
+        showPage(Page.HOME)
     }
 
     private fun popToHome() {
@@ -493,6 +599,56 @@ class MainFragment :
             navController.popBackStack(R.id.home_fragment, false)
         }
     }
+
+    /** Executa já as trocas de tela pendentes, para tudo estar pronto antes de aparecer. */
+    private fun flushExploreNav() {
+        try {
+            (childFragmentManager.findFragmentById(R.id.explore_nav_host) as? NavHostFragment)
+                ?.childFragmentManager
+                ?.executePendingTransactions()
+        } catch (e: Exception) {
+            L.w(e, "Não consegui executar as trocas de tela pendentes")
+        }
+    }
+
+    private fun topDetailViews(): Pair<RecyclerView?, View?> {
+        val host = childFragmentManager.findFragmentById(R.id.explore_nav_host) as? NavHostFragment
+        val view = host?.childFragmentManager?.primaryNavigationFragment?.view
+        return view?.findViewById<RecyclerView>(R.id.detail_recycler) to
+            view?.findViewById<View>(R.id.detail_appbar)
+    }
+
+    private fun captureTopScroll(): SavedScroll? {
+        val (recycler, appbar) = topDetailViews()
+        val state = recycler?.layoutManager?.onSaveInstanceState() ?: return null
+        return SavedScroll(state, (appbar?.top ?: 0) < 0)
+    }
+
+    private fun restoreTopScroll(saved: SavedScroll) {
+        val (recycler, appbar) = topDetailViews()
+        recycler?.layoutManager?.onRestoreInstanceState(saved.state)
+        if (saved.collapsed) {
+            (appbar as? com.google.android.material.appbar.AppBarLayout)?.setExpanded(false, false)
+        }
+    }
+
+    /** Acompanha as telas abertas na aba atual (álbuns, artistas…), sem contar diálogos. */
+    private val stackListener =
+        NavController.OnDestinationChangedListener { controller, destination, arguments ->
+            if (destination is FloatingWindow) return@OnDestinationChangedListener
+            if (destination.id == R.id.home_fragment) {
+                openStack.clear()
+                searchOpen = false
+                return@OnDestinationChangedListener
+            }
+            val entry = controller.currentBackStackEntry ?: return@OnDestinationChangedListener
+            val idx = openStack.indexOfFirst { it.entryId == entry.id }
+            if (idx >= 0) {
+                while (openStack.size > idx + 1) openStack.removeAt(openStack.lastIndex)
+            } else {
+                openStack.add(SavedDest(entry.id, destination.id, arguments))
+            }
+        }
 
     private fun handleShowOuter(outer: Outer?) {
         val directions =
