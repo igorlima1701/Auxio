@@ -191,4 +191,11 @@
     <string name="fmt_fork_backup_exported" translatable="false">Cópia salva: %1$d execuções e %2$d itens de configuração.</string>
     <string name="fmt_fork_backup_imported" translatable="false">Importado: %1$d execuções novas e %2$d itens de configuração. O app vai fechar para aplicar; é só abrir de novo.</string>
     <string name="fmt_fork_backup_failed" translatable="false">Não deu certo: %s</string>
+    <!-- Aba Playlists (topo como no Music OLED) -->
+    <string name="lbl_auto_all" translatable="false">Todas as músicas</string>
+    <string name="lbl_auto_added" translatable="false">Adicionadas recentemente</string>
+    <string name="lbl_auto_added_all" translatable="false">Todas</string>
+    <string name="fmt_auto_added_days" translatable="false">Últimos %d dias</string>
+    <string name="fmt_auto_tracks_played" translatable="false">%1$d de %2$d faixas</string>
+    <string name="lbl_your_playlists" translatable="false">Suas playlists</string>
 </resources>

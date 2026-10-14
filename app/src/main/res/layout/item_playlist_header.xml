@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fork pessoal: topo da aba Playlists, como no Music OLED. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/header_all"
+        style="@style/Widget.Auxio.TextView.ForkAutoRow"
+        android:drawableStart="@drawable/ic_song_24"
+        android:text="@string/lbl_auto_all" />
+
+    <TextView
+        android:id="@+id/header_added"
+        style="@style/Widget.Auxio.TextView.ForkAutoRow"
+        android:drawableStart="@drawable/ic_auto_added_24"
+        android:text="@string/lbl_auto_added" />
+
+    <TextView
+        android:id="@+id/header_recent"
+        style="@style/Widget.Auxio.TextView.ForkAutoRow"
+        android:drawableStart="@drawable/ic_auto_history_24"
+        android:text="@string/lbl_auto_recent" />
+
+    <TextView
+        android:id="@+id/header_most"
+        style="@style/Widget.Auxio.TextView.ForkAutoRow"
+        android:drawableStart="@drawable/ic_auto_fire_24"
+        android:text="@string/lbl_auto_most" />
+
+    <TextView
+        android:id="@+id/header_not_played"
+        style="@style/Widget.Auxio.TextView.ForkAutoRow"
+        android:drawableStart="@drawable/ic_auto_block_24"
+        android:text="@string/lbl_auto_not_played" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/spacing_medium"
+        android:paddingTop="@dimen/spacing_large"
+        android:paddingBottom="@dimen/spacing_small"
+        android:text="@string/lbl_your_playlists"
+        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:textColor="?attr/colorPrimary" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/header_new_playlist"
+        style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginBottom="@dimen/spacing_small"
+        android:text="@string/lbl_new_playlist"
+        app:icon="@drawable/ic_add_24" />
+
+</LinearLayout>

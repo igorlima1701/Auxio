@@ -118,12 +118,26 @@ private class MusikrImpl(
         var loaded = 0
         val exploredChannel = Channel<Explored>(Channel.UNLIMITED)
         val exploredTask = exploreStep.explore(this, exploredChannel)
+        // Fork pessoal: a contagem roda fora da linha principal e o progresso só é avisado no
+        // máximo 10 vezes por segundo (antes era a cada música, o que travava a rolagem).
+        var lastProgress = 0L
+        val progressLock = Any()
+        suspend fun report(force: Boolean = false) {
+            val now = android.os.SystemClock.uptimeMillis()
+            val snapshot: IndexingProgress
+            synchronized(progressLock) {
+                if (!force && now - lastProgress < 100) return
+                lastProgress = now
+                snapshot = IndexingProgress.Songs(loaded, explored)
+            }
+            kotlinx.coroutines.withContext(Dispatchers.Main) { onProgress(snapshot) }
+        }
         val trackedExploredChannel = Channel<Explored>(Channel.UNLIMITED)
         val trackedExploredTask =
-            tryAsyncWith(trackedExploredChannel, Dispatchers.Main) {
+            tryAsyncWith(trackedExploredChannel, Dispatchers.Default) {
                 for (item in exploredChannel) {
-                    explored++
-                    onProgress(IndexingProgress.Songs(loaded, explored))
+                    synchronized(progressLock) { explored++ }
+                    report()
                     trackedExploredChannel.send(item)
                 }
             }
@@ -131,13 +145,16 @@ private class MusikrImpl(
         val extractedTask = extractStep.extract(this, trackedExploredChannel, extractedChannel)
         val trackedExtractedChannel = Channel<Extracted>(Channel.UNLIMITED)
         val trackedExtractedTask =
-            tryAsyncWith(trackedExtractedChannel, Dispatchers.Main) {
+            tryAsyncWith(trackedExtractedChannel, Dispatchers.Default) {
                 for (item in extractedChannel) {
-                    loaded++
-                    onProgress(IndexingProgress.Songs(loaded, explored))
+                    synchronized(progressLock) { loaded++ }
+                    report()
                     trackedExtractedChannel.send(item)
                 }
-                onProgress(IndexingProgress.Indeterminate)
+                report(force = true)
+                kotlinx.coroutines.withContext(Dispatchers.Main) {
+                    onProgress(IndexingProgress.Indeterminate)
+                }
             }
         val library = evaluateStep.evaluate(trackedExtractedChannel)
         merge(exploredTask, extractedTask, trackedExploredTask, trackedExtractedTask).await()

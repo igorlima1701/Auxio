@@ -110,7 +110,7 @@ private class ExploreStepImpl(private val fs: FS, private val storage: Storage) 
             }
 
         val mergeTask =
-            scope.tryAsyncWith(explored, Dispatchers.Main) {
+            scope.tryAsyncWith(explored, Dispatchers.Default) {
                 for (item in finalized) {
                     it.send(item.explored)
                 }

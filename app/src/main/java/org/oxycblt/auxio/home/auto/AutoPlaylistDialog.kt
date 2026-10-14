@@ -98,8 +98,9 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
             reload()
         }
 
-        // Período (só em "Não tocadas")
-        binding.autoPeriodsScroll.isVisible = kind == AutoPlaylists.Kind.NOT_PLAYED
+        // Período ("Não tocadas" e "Adicionadas recentemente")
+        val added = kind == AutoPlaylists.Kind.ADDED
+        binding.autoPeriodsScroll.isVisible = added || kind == AutoPlaylists.Kind.NOT_PLAYED
         if (kind == AutoPlaylists.Kind.NOT_PLAYED) {
             for (days in AutoPlaylists.PERIODS) {
                 val label =
@@ -107,6 +108,16 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                     else getString(R.string.fmt_auto_days, days)
                 addChoice(binding.autoPeriods, label, days == period) {
                     period = days
+                    reload()
+                }
+            }
+        } else if (added) {
+            for (days in AutoPlaylists.ADDED_PERIODS) {
+                val label =
+                    if (days == null) getString(R.string.lbl_auto_added_all)
+                    else getString(R.string.fmt_auto_added_days, days)
+                addChoice(binding.autoPeriods, label, days == addedPeriod) {
+                    addedPeriod = days
                     reload()
                 }
             }
@@ -135,14 +146,15 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         val context = requireContext()
         val albums = showAlbums
         val currentKind = kind
-        val days = period
+        val days = if (currentKind == AutoPlaylists.Kind.ADDED) addedPeriod else period
+        val settings = listSettings
         viewLifecycleOwner.lifecycleScope.launch {
             val result =
                 if (library == null) emptyList()
                 else
                     withContext(Dispatchers.Default) {
-                        if (albums) AutoPlaylists.albums(context, library, currentKind, days)
-                        else AutoPlaylists.songs(context, library, currentKind, days)
+                        if (albums) AutoPlaylists.albums(context, library, settings, currentKind, days)
+                        else AutoPlaylists.songs(context, library, settings, currentKind, days)
                     }
             val binding = this@AutoPlaylistDialog.binding ?: return@launch
             rows = result
@@ -215,6 +227,10 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                         DateUtils.MINUTE_IN_MILLIS,
                     ),
                 )
+        // Fork pessoal: álbum em "Não tocadas" mostra quanto já foi ouvido no período.
+        if (row.music is Album && kind == AutoPlaylists.Kind.NOT_PLAYED) {
+            return "$artist · " + getString(R.string.fmt_auto_tracks_played, row.played, row.total)
+        }
         return "$artist · $plays"
     }
 
@@ -255,9 +271,12 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         // Últimas escolhas (valem enquanto o app está aberto).
         private var showAlbums = false
         private var period: Int? = null
+        private var addedPeriod: Int? = 30
 
         fun titleOf(kind: AutoPlaylists.Kind) =
             when (kind) {
+                AutoPlaylists.Kind.ALL -> R.string.lbl_auto_all
+                AutoPlaylists.Kind.ADDED -> R.string.lbl_auto_added
                 AutoPlaylists.Kind.RECENT -> R.string.lbl_auto_recent
                 AutoPlaylists.Kind.MOST -> R.string.lbl_auto_most
                 AutoPlaylists.Kind.NOT_PLAYED -> R.string.lbl_auto_not_played

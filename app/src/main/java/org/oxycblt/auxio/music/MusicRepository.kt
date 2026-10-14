@@ -426,6 +426,9 @@ constructor(
                     val quick = Musikr.new(context, Config(snapshotFs, storage, interpretation)).run()
                     L.d("Quick index finished in ${System.currentTimeMillis() - quickStart}ms")
                     emitLibrary(quick.library)
+                    // Fork pessoal: a conferência completa (pastas e tags) espera um pouco, para
+                    // não disputar o processador com a rolagem logo depois de abrir o app.
+                    kotlinx.coroutines.delay(FULL_SCAN_DELAY_MS)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -519,3 +522,6 @@ constructor(
         }
     }
 }
+
+/** Fork pessoal: espera entre a biblioteca rápida da abertura e a conferência completa. */
+private const val FULL_SCAN_DELAY_MS = 10_000L

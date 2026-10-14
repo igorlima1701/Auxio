@@ -60,6 +60,45 @@ class PlaylistListFragment :
     override val musicModel: MusicViewModel by activityViewModels()
     override val playbackModel: PlaybackViewModel by activityViewModels()
     private val playlistAdapter = PlaylistAdapter(this)
+    private val headerAdapter = HeaderAdapter()
+
+    /** Fork pessoal: o topo da aba (uma linha só, antes das playlists). */
+    private inner class HeaderAdapter :
+        androidx.recyclerview.widget.RecyclerView.Adapter<HeaderHolder>() {
+        override fun getItemCount() = 1
+
+        override fun getItemViewType(position: Int) = R.layout.item_playlist_header
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
+            val binding =
+                org.oxycblt.auxio.databinding.ItemPlaylistHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            val kinds =
+                mapOf(
+                    binding.headerAll to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.ALL,
+                    binding.headerAdded to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.ADDED,
+                    binding.headerRecent to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.RECENT,
+                    binding.headerMost to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.MOST,
+                    binding.headerNotPlayed to
+                        org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.NOT_PLAYED,
+                )
+            for ((row, kind) in kinds) {
+                row.setOnClickListener {
+                    org.oxycblt.auxio.home.auto.AutoPlaylistDialog.show(childFragmentManager, kind)
+                }
+            }
+            binding.headerNewPlaylist.setOnClickListener { musicModel.createPlaylist() }
+            return HeaderHolder(binding.root)
+        }
+
+        override fun onBindViewHolder(holder: HeaderHolder, position: Int) {}
+    }
+
+    private class HeaderHolder(view: android.view.View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view)
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
@@ -69,7 +108,8 @@ class PlaylistListFragment :
 
         binding.homeRecycler.apply {
             id = R.id.home_playlist_recycler
-            adapter = playlistAdapter
+            // Fork pessoal: listas automáticas e "+ Nova playlist" no topo, como no Music OLED.
+            adapter = androidx.recyclerview.widget.ConcatAdapter(headerAdapter, playlistAdapter)
             popupProvider = this@PlaylistListFragment
             listener = this@PlaylistListFragment
         }
@@ -79,28 +119,6 @@ class PlaylistListFragment :
             contentDescription = getString(R.string.lbl_playlists)
         }
         binding.homeNoMusicMsg.text = getString(R.string.lng_empty_playlists)
-
-        // Fork pessoal: playlists automáticas (pelo histórico de execuções) no topo.
-        binding.homeAutoBar.visibility = android.view.View.VISIBLE
-        binding.homeRecycler.setPadding(
-            binding.homeRecycler.paddingLeft,
-            resources.getDimensionPixelSize(R.dimen.size_album_filter_space),
-            binding.homeRecycler.paddingRight,
-            binding.homeRecycler.paddingBottom,
-        )
-        binding.homeRecycler.clipToPadding = false
-        val kinds =
-            mapOf(
-                binding.homeAutoRecent to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.RECENT,
-                binding.homeAutoMost to org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.MOST,
-                binding.homeAutoNotPlayed to
-                    org.oxycblt.auxio.home.auto.AutoPlaylists.Kind.NOT_PLAYED,
-            )
-        for ((chip, kind) in kinds) {
-            chip.setOnClickListener {
-                org.oxycblt.auxio.home.auto.AutoPlaylistDialog.show(childFragmentManager, kind)
-            }
-        }
 
         collectImmediately(homeModel.playlistList, ::updatePlaylists)
         collectImmediately(
@@ -128,7 +146,7 @@ class PlaylistListFragment :
     }
 
     override fun getPopupData(pos: Int): FastScrollRecyclerView.PopupProvider.PopupData? {
-        val playlist = homeModel.playlistList.value.getOrNull(pos) ?: return null
+        val playlist = homeModel.playlistList.value.getOrNull(pos - 1) ?: return null
         // Change how we display the popup depending on the current sort mode.
         return when (homeModel.playlistSort.mode) {
             // By Name -> Use Name
@@ -173,12 +191,9 @@ class PlaylistListFragment :
     ) {
         val binding = requireBinding()
         binding.homeRecycler.isInvisible = empty
-        binding.homeNoMusic.isInvisible = !empty && playlists.isNotEmpty()
-        if (!empty && playlists.isEmpty()) {
-            binding.homeNoMusicAction.isVisible = true
-            binding.homeNoMusicAction.text = getString(R.string.lbl_new_playlist)
-            binding.homeNoMusicAction.setOnClickListener { musicModel.createPlaylist() }
-        } else {
+        // Fork pessoal: sem playlists, o topo (com "+ Nova playlist") já basta.
+        binding.homeNoMusic.isInvisible = !empty
+        run {
             binding.homeNoMusicAction.isVisible =
                 indexingState == null || (empty && indexingState is IndexingState.Completed)
             binding.homeNoMusicAction.text = getString(R.string.set_locations)
