@@ -131,7 +131,7 @@ class AuxioService :
         val mediaNotification = playbackFragment.notification
         if (mediaNotification != null) {
             if (change == ForegroundListener.Change.MEDIA_SESSION) {
-                startForeground(mediaNotification.code, mediaNotification.build())
+                safeStartForeground(mediaNotification.code, mediaNotification.build())
             }
             // Nothing changed, but don't show anything music related since we can always
             // index during playback.
@@ -139,8 +139,7 @@ class AuxioService :
         } else {
             musicFragment.createNotification {
                 if (it != null) {
-                    startForeground(it.code, it.build())
-                    isForeground = true
+                    isForeground = safeStartForeground(it.code, it.build())
                 } else {
                     ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
                     isForeground = false
@@ -148,6 +147,20 @@ class AuxioService :
             }
         }
     }
+
+    /**
+     * Fork pessoal: com o app em segundo plano, o Android 12+ proíbe entrar em primeiro plano (ex.:
+     * a conferência da biblioteca que começa alguns segundos depois de abrir). Antes isso fechava o
+     * app; agora o trabalho só segue sem a notificação.
+     */
+    private fun safeStartForeground(code: Int, notification: android.app.Notification): Boolean =
+        try {
+            startForeground(code, notification)
+            true
+        } catch (e: IllegalStateException) {
+            timber.log.Timber.w("Não deu para entrar em primeiro plano: $e")
+            false
+        }
 
     override fun invalidateMusic(mediaId: String) {
         notifyChildrenChanged(mediaId)
