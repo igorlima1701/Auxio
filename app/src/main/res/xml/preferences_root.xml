@@ -54,6 +54,10 @@
             app:title="@string/set_fork_backup_export" />
 
         <Preference
+            app:key="fork_startup_timings"
+            app:title="@string/set_fork_startup_timings" />
+
+        <Preference
             app:key="fork_backup_import"
             app:summary="@string/set_fork_backup_import_desc"
             app:title="@string/set_fork_backup_import" />

@@ -73,6 +73,7 @@ class Auxio : Application() {
         // Fork pessoal: carrega as notas dos álbuns.
         org.oxycblt.auxio.rating.AlbumRatings.init(this)
         org.oxycblt.auxio.rating.AlbumCollections.init(this)
+        org.oxycblt.auxio.music.StartupTimings.init(this)
         org.oxycblt.auxio.playback.PlayHistory.init(this)
         org.oxycblt.auxio.playback.PreviewPlayer.attach(this, playbackStateManager)
         albumRatingTagSync.attach()

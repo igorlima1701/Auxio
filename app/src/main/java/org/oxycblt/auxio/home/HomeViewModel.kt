@@ -246,19 +246,53 @@ constructor(
         empty.value = homeGenerator.empty()
     }
 
+    /** Fork pessoal: um cálculo de lista por aba; um pedido novo cancela o anterior. */
+    private val invalidateJobs = HashMap<MusicType, kotlinx.coroutines.Job>()
+
+    /**
+     * Fork pessoal: ordenar e filtrar as listas (milhares de músicas) roda fora da linha principal;
+     * só a troca da lista na tela acontece nela. Assim a tela não congela quando a biblioteca chega.
+     */
     override fun invalidateMusic(type: MusicType, instructions: UpdateInstructions) {
+        invalidateJobs[type]?.cancel()
+        invalidateJobs[type] =
+            viewModelScope.launch {
+                val computed: List<Any> =
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                        when (type) {
+                            MusicType.SONGS ->
+                                matchQuery(homeGenerator.songs()) {
+                                    listOf(it.name.resolve(context), it.album.name.resolve(context)) +
+                                        it.artists.map { a -> a.name.resolve(context) }
+                                }
+                            MusicType.ALBUMS -> homeGenerator.albums()
+                            MusicType.ARTISTS ->
+                                matchQuery(homeGenerator.artists()) { listOf(it.name.resolve(context)) }
+                            MusicType.GENRES ->
+                                matchQuery(homeGenerator.genres()) { listOf(it.name.resolve(context)) }
+                            MusicType.PLAYLISTS ->
+                                matchQuery(homeGenerator.playlists()) { listOf(it.name.resolve(context)) }
+                        }
+                    }
+                applyMusic(type, computed, instructions)
+            }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun applyMusic(type: MusicType, computed: List<Any>, instructions: UpdateInstructions) {
         when (type) {
             MusicType.SONGS -> {
                 songInstructions.put(instructions)
-                songList.value = matchQuery(homeGenerator.songs()) { listOf(it.name.resolve(context), it.album.name.resolve(context)) + it.artists.map { a -> a.name.resolve(context) } }
+                songList.value = computed as List<Song>
             }
             MusicType.ALBUMS -> {
-                allAlbums = homeGenerator.albums()
+                allAlbums = computed as List<Album>
                 AlbumRatings.resolvePending(allAlbums)
                 AlbumCollections.resolvePending(allAlbums)
                 if (allAlbums.isNotEmpty()) {
                     albumRatingTagSync.importIfNeeded(allAlbums)
                     albumRatingTagSync.resyncIfNeeded(allAlbums)
+                    org.oxycblt.auxio.music.StartupTimings.markAlbumsShown()
                 }
                 albumInstructions.put(
                     if (albumFilter.value.isEmpty) instructions else UpdateInstructions.Replace(0)
@@ -267,15 +301,15 @@ constructor(
             }
             MusicType.ARTISTS -> {
                 artistInstructions.put(instructions)
-                _artistList.value = matchQuery(homeGenerator.artists()) { listOf(it.name.resolve(context)) }
+                _artistList.value = computed as List<Artist>
             }
             MusicType.GENRES -> {
                 genreInstructions.put(instructions)
-                genreList.value = matchQuery(homeGenerator.genres()) { listOf(it.name.resolve(context)) }
+                genreList.value = computed as List<Genre>
             }
             MusicType.PLAYLISTS -> {
                 playlistInstructions.put(instructions)
-                playlistList.value = matchQuery(homeGenerator.playlists()) { listOf(it.name.resolve(context)) }
+                playlistList.value = computed as List<Playlist>
             }
         }
     }

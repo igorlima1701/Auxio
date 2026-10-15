@@ -22,6 +22,7 @@ import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.oxycblt.musikr.pipeline.EvaluateStep
 import org.oxycblt.musikr.pipeline.ExploreStep
 import org.oxycblt.musikr.pipeline.Explored
@@ -156,7 +157,19 @@ private class MusikrImpl(
                     onProgress(IndexingProgress.Indeterminate)
                 }
             }
+        val runStart = android.os.SystemClock.elapsedRealtime()
+        // Fork pessoal: tempo de cada etapa (só medição).
+        launch {
+            trackedExploredTask.await()
+            MusikrTimings.exploreMs = android.os.SystemClock.elapsedRealtime() - runStart
+        }
+        launch {
+            trackedExtractedTask.await()
+            MusikrTimings.extractMs = android.os.SystemClock.elapsedRealtime() - runStart
+        }
         val library = evaluateStep.evaluate(trackedExtractedChannel)
+        MusikrTimings.totalMs = android.os.SystemClock.elapsedRealtime() - runStart
+        MusikrTimings.songs = loaded
         merge(exploredTask, extractedTask, trackedExploredTask, trackedExtractedTask).await()
         LibraryResultImpl(config, library)
     }

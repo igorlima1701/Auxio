@@ -97,14 +97,37 @@ private class FSCoverStorage(private val dir: File) : CoverStorage {
         return mapMutex.withLock { fileMutexes.getOrPut(file) { Mutex() } }
     }
 
-    override suspend fun find(name: String): FDCover? =
-        withContext(Dispatchers.IO) {
+    /**
+     * Fork pessoal: nomes das capas já gravadas, lidos de uma vez só. Assim, montar a biblioteca não
+     * precisa conferir arquivo por arquivo se a capa existe (milhares de consultas ao disco).
+     */
+    @Volatile private var known: MutableSet<String>? = null
+
+    private fun knownNames(): MutableSet<String> {
+        known?.let { return it }
+        synchronized(this) {
+            known?.let { return it }
+            val set = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+            dir.list()?.let { set.addAll(it) }
+            known = set
+            return set
+        }
+    }
+
+    override suspend fun find(name: String): FDCover? {
+        val names = knownNames()
+        if (name in names) return FSStoredCover(File(dir, name))
+        return withContext(Dispatchers.IO) {
             try {
-                File(dir, name).takeIf { it.exists() }?.let { FSStoredCover(it) }
+                File(dir, name).takeIf { it.exists() }?.let {
+                    names.add(name)
+                    FSStoredCover(it)
+                }
             } catch (e: IOException) {
                 null
             }
         }
+    }
 
     override suspend fun write(name: String, block: suspend (OutputStream) -> Unit): FDCover {
         val fileMutex = getMutexForFile(name)
@@ -117,6 +140,7 @@ private class FSCoverStorage(private val dir: File) : CoverStorage {
                     try {
                         tempFile.outputStream().use { block(it) }
                         tempFile.renameTo(targetFile)
+                        known?.add(name)
                         FSStoredCover(targetFile)
                     } catch (e: IOException) {
                         tempFile.delete()
@@ -135,6 +159,7 @@ private class FSCoverStorage(private val dir: File) : CoverStorage {
         }
 
     override suspend fun rm(name: String) {
+        known?.remove(name)
         withContext(Dispatchers.IO) { File(dir, name).deleteRecursively() }
     }
 }

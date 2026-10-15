@@ -423,8 +423,17 @@ constructor(
             if (snapshotFs != null) {
                 try {
                     val quickStart = System.currentTimeMillis()
-                    val quick = Musikr.new(context, Config(snapshotFs, storage, interpretation)).run()
+                    StartupTimings.markQuickStart()
+                    val quickStorage =
+                        Storage(
+                            org.oxycblt.auxio.music.shim.QuickReadCache(cache),
+                            covers,
+                            storedPlaylists,
+                        )
+                    val quick =
+                        Musikr.new(context, Config(snapshotFs, quickStorage, interpretation)).run()
                     L.d("Quick index finished in ${System.currentTimeMillis() - quickStart}ms")
+                    StartupTimings.markQuickDone()
                     emitLibrary(quick.library)
                     // Fork pessoal: a conferência completa (pastas e tags) espera um pouco, para
                     // não disputar o processador com a rolagem logo depois de abrir o app.
@@ -497,7 +506,9 @@ constructor(
         // Consumers expect their updates to be on the main thread (notably PlaybackService),
         // so switch to it.
         withContext(Dispatchers.Main) {
+            val dispatchStart = android.os.SystemClock.elapsedRealtime()
             dispatchLibraryChange(deviceLibraryChanged, userLibraryChanged)
+            StartupTimings.markEmit(android.os.SystemClock.elapsedRealtime() - dispatchStart)
         }
     }
 

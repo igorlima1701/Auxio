@@ -121,6 +121,14 @@ class RootPreferenceFragment : BasePreferenceFragment(R.xml.preferences_root) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Fork pessoal: tempos da última abertura (para achar o que ainda é lento).
+        findPreference<Preference>("fork_startup_timings")?.summary =
+            org.oxycblt.auxio.music.StartupTimings.last(requireContext())
+                ?: getString(R.string.lng_fork_startup_timings_none)
+    }
+
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         // Hook generic preferences to their specified preferences
         // TODO: These seem like good things to put into a side navigation view, if I choose to

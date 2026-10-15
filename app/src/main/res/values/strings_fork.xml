@@ -198,4 +198,6 @@
     <string name="fmt_auto_added_days" translatable="false">Últimos %d dias</string>
     <string name="fmt_auto_tracks_played" translatable="false">%1$d de %2$d faixas</string>
     <string name="lbl_your_playlists" translatable="false">Suas playlists</string>
+    <string name="set_fork_startup_timings" translatable="false">Tempo da última abertura</string>
+    <string name="lng_fork_startup_timings_none" translatable="false">Ainda não medido. Feche o app de vez e abra de novo.</string>
 </resources>
