@@ -73,6 +73,7 @@ class AlbumDetailFragment : DetailFragment<Album, Song>() {
         // -- VIEWMODEL SETUP ---
         // DetailViewModel handles most initialization from the navigation argument.
         detailModel.setAlbum(args.albumUid)
+        addRymButton(binding)
         collectImmediately(detailModel.currentAlbum, ::updateAlbum)
         collectImmediately(detailModel.albumSongList, ::updateList)
         collect(detailModel.toShow.flow, ::handleShow)
@@ -329,4 +330,78 @@ class AlbumDetailFragment : DetailFragment<Album, Song>() {
     }
 
     private fun RecyclerView.canScroll() = computeVerticalScrollRange() > height
+
+    /**
+     * Fork pessoal: botão "RYM" à direita do nome do álbum. Abre no navegador a página do álbum no
+     * RateYourMusic, por uma busca que vai direto ao primeiro resultado do site (os endereços do
+     * RYM não dá para montar com segurança a partir das tags).
+     */
+    private fun addRymButton(binding: FragmentDetailBinding) {
+        val header = binding.detailName.parent as? androidx.constraintlayout.widget.ConstraintLayout ?: return
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        val size = (48 * density).toInt()
+        val button =
+            android.widget.TextView(context).apply {
+                id = android.view.View.generateViewId()
+                text = "RYM"
+                gravity = android.view.Gravity.CENTER
+                textSize = 12f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setTextColor(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        header,
+                        com.google.android.material.R.attr.colorOnSecondaryContainer,
+                    )
+                )
+                background =
+                    android.graphics.drawable.GradientDrawable().apply {
+                        shape = android.graphics.drawable.GradientDrawable.OVAL
+                        setColor(
+                            com.google.android.material.color.MaterialColors.getColor(
+                                header,
+                                com.google.android.material.R.attr.colorSecondaryContainer,
+                            )
+                        )
+                    }
+                val ripple = android.util.TypedValue()
+                context.theme.resolveAttribute(
+                    android.R.attr.selectableItemBackgroundBorderless,
+                    ripple,
+                    true,
+                )
+                foreground = androidx.core.content.ContextCompat.getDrawable(context, ripple.resourceId)
+                contentDescription = getString(R.string.desc_open_rym)
+                setOnClickListener { openRym() }
+            }
+        header.addView(button, androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(size, size))
+        val set = androidx.constraintlayout.widget.ConstraintSet()
+        set.clone(header)
+        set.connect(button.id, androidx.constraintlayout.widget.ConstraintSet.END, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.END)
+        set.connect(button.id, androidx.constraintlayout.widget.ConstraintSet.TOP, binding.detailName.id, androidx.constraintlayout.widget.ConstraintSet.TOP)
+        set.connect(button.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM, binding.detailInfo.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM)
+        val gap = (8 * density).toInt()
+        for (text in listOf(binding.detailName, binding.detailSubhead, binding.detailInfo)) {
+            set.connect(text.id, androidx.constraintlayout.widget.ConstraintSet.END, button.id, androidx.constraintlayout.widget.ConstraintSet.START, gap)
+        }
+        set.applyTo(header)
+    }
+
+    private fun openRym() {
+        val album = detailModel.currentAlbum.value ?: return
+        val context = requireContext()
+        val artist = album.artists.firstOrNull()?.name?.resolve(context).orEmpty()
+        val title = album.name.resolve(context)
+        // "\" no DuckDuckGo = ir direto ao primeiro resultado.
+        val query = "\\site:rateyourmusic.com/release $artist $title"
+        val uri =
+            android.net.Uri.parse(
+                "https://duckduckgo.com/?q=" + java.net.URLEncoder.encode(query, "UTF-8")
+            )
+        try {
+            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+        } catch (e: android.content.ActivityNotFoundException) {
+            requireContext().showToast(R.string.err_no_browser)
+        }
+    }
 }

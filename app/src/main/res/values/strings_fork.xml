@@ -200,4 +200,6 @@
     <string name="lbl_your_playlists" translatable="false">Suas playlists</string>
     <string name="set_fork_startup_timings" translatable="false">Tempo da última abertura</string>
     <string name="lng_fork_startup_timings_none" translatable="false">Ainda não medido. Feche o app de vez e abra de novo.</string>
+    <string name="desc_open_rym" translatable="false">Abrir o álbum no RateYourMusic</string>
+    <string name="err_no_browser" translatable="false">Nenhum navegador encontrado</string>
 </resources>
