@@ -73,7 +73,11 @@ class AlbumDetailFragment : DetailFragment<Album, Song>() {
         // -- VIEWMODEL SETUP ---
         // DetailViewModel handles most initialization from the navigation argument.
         detailModel.setAlbum(args.albumUid)
-        addRymButton(binding)
+        try {
+            addRymButton(binding)
+        } catch (e: Exception) {
+            L.w("Botão RYM não coube no cabeçalho: $e")
+        }
         collectImmediately(detailModel.currentAlbum, ::updateAlbum)
         collectImmediately(detailModel.albumSongList, ::updateList)
         collect(detailModel.toShow.flow, ::handleShow)
@@ -374,17 +378,25 @@ class AlbumDetailFragment : DetailFragment<Album, Song>() {
                 contentDescription = getString(R.string.desc_open_rym)
                 setOnClickListener { openRym() }
             }
-        header.addView(button, androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(size, size))
-        val set = androidx.constraintlayout.widget.ConstraintSet()
-        set.clone(header)
-        set.connect(button.id, androidx.constraintlayout.widget.ConstraintSet.END, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.END)
-        set.connect(button.id, androidx.constraintlayout.widget.ConstraintSet.TOP, binding.detailName.id, androidx.constraintlayout.widget.ConstraintSet.TOP)
-        set.connect(button.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM, binding.detailInfo.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM)
+        // Restrições direto nos parâmetros de layout (o cabeçalho tem filhos sem id, então nada de
+        // ConstraintSet).
+        val lp =
+            androidx.constraintlayout.widget.ConstraintLayout.LayoutParams(size, size).apply {
+                endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
+                topToTop = binding.detailName.id
+                bottomToBottom = binding.detailInfo.id
+            }
+        header.addView(button, lp)
         val gap = (8 * density).toInt()
         for (text in listOf(binding.detailName, binding.detailSubhead, binding.detailInfo)) {
-            set.connect(text.id, androidx.constraintlayout.widget.ConstraintSet.END, button.id, androidx.constraintlayout.widget.ConstraintSet.START, gap)
+            val params =
+                text.layoutParams as? androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                    ?: continue
+            params.endToEnd = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+            params.endToStart = button.id
+            params.marginEnd = gap
+            text.layoutParams = params
         }
-        set.applyTo(header)
     }
 
     private fun openRym() {
