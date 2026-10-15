@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 Auxio Project
- * AutoPlaylistDialog.kt is part of Auxio.
+ * AutoPlaylistFragment.kt is part of Auxio.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +25,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
+import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BackportBottomSheetBehavior
-import com.google.android.material.bottomsheet.BackportBottomSheetDialog
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.oxycblt.auxio.R
-import org.oxycblt.auxio.databinding.DialogAutoPlaylistBinding
+import org.oxycblt.auxio.databinding.FragmentAutoPlaylistBinding
 import org.oxycblt.auxio.databinding.ItemAutoRowBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.list.ListSettings
@@ -48,7 +46,7 @@ import org.oxycblt.auxio.music.MusicRepository
 import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.music.resolveNames
 import org.oxycblt.auxio.playback.PlaybackViewModel
-import org.oxycblt.auxio.ui.ViewBindingBottomSheetDialogFragment
+import org.oxycblt.auxio.ui.ViewBindingFragment
 import org.oxycblt.auxio.util.inflater
 import org.oxycblt.musikr.Album
 import org.oxycblt.musikr.Song
@@ -58,7 +56,7 @@ import org.oxycblt.musikr.Song
  * escolha entre músicas e álbuns e, em "Não tocadas", o período.
  */
 @AndroidEntryPoint
-class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlaylistBinding>() {
+class AutoPlaylistFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
     private val playbackModel: PlaybackViewModel by activityViewModels()
     private val detailModel: DetailViewModel by activityViewModels()
     @Inject lateinit var musicRepository: MusicRepository
@@ -67,42 +65,34 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
     private val kind: AutoPlaylists.Kind
         get() = AutoPlaylists.Kind.entries[requireArguments().getInt(ARG_KIND)]
 
+    /**
+     * As linhas ficam na tela (fragmento) enquanto ela estiver na pilha: voltando de um álbum, a
+     * lista aparece na hora, no mesmo ponto da rolagem.
+     */
     private var rows: List<AutoPlaylists.Row> = emptyList()
-    /** Posição a restaurar na primeira carga (quando a lista reabre na volta de um álbum). */
-    private var pendingScroll: Pair<Int, Int>? = null
     private val adapter = RowAdapter()
 
     override fun onCreateBinding(inflater: LayoutInflater) =
-        DialogAutoPlaylistBinding.inflate(inflater)
+        FragmentAutoPlaylistBinding.inflate(inflater)
 
-    override fun onStart() {
-        super.onStart()
-        (dialog as? BackportBottomSheetDialog)?.behavior?.apply {
-            skipCollapsed = true
-            state = BackportBottomSheetBehavior.STATE_EXPANDED
-        }
-    }
-
-    override fun onBindingCreated(binding: DialogAutoPlaylistBinding, savedInstanceState: Bundle?) {
+    override fun onBindingCreated(binding: FragmentAutoPlaylistBinding, savedInstanceState: Bundle?) {
         super.onBindingCreated(binding, savedInstanceState)
-        binding.root.minimumHeight = (resources.displayMetrics.heightPixels * 0.85).toInt()
-        binding.autoName.text = getString(titleOf(kind))
-        if (savedInstanceState == null) {
-            requireArguments().takeIf { it.containsKey(ARG_POS) }?.let {
-                pendingScroll = it.getInt(ARG_POS) to it.getInt(ARG_OFFSET)
-            }
-        }
+        binding.autoToolbar.title = getString(titleOf(kind))
+        binding.autoToolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        binding.autoName.isVisible = false
         binding.autoRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.autoRecycler.adapter = adapter
+        val restoring = rows.isNotEmpty()
+        if (restoring) showRows(binding, rows)
 
         // Músicas / Álbuns
         addChoice(binding.autoMode, getString(R.string.lbl_songs), !showAlbums) {
             showAlbums = false
-            reload()
+            reload(toTop = true)
         }
         addChoice(binding.autoMode, getString(R.string.lbl_albums), showAlbums) {
             showAlbums = true
-            reload()
+            reload(toTop = true)
         }
 
         // Período ("Não tocadas" e "Adicionadas recentemente")
@@ -115,7 +105,7 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                     else getString(R.string.fmt_auto_days, days)
                 addChoice(binding.autoPeriods, label, days == period) {
                     period = days
-                    reload()
+                    reload(toTop = true)
                 }
             }
         } else if (added) {
@@ -125,14 +115,20 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                     else getString(R.string.fmt_auto_added_days, days)
                 addChoice(binding.autoPeriods, label, days == addedPeriod) {
                     addedPeriod = days
-                    reload()
+                    reload(toTop = true)
                 }
             }
         }
 
         binding.autoPlay.setOnClickListener { play(false, 0) }
         binding.autoShuffle.setOnClickListener { play(true, 0) }
-        reload()
+        // Voltando de um álbum: só atualiza (sem mexer na rolagem). Abrindo: carrega do zero.
+        reload(toTop = !restoring)
+    }
+
+    override fun onDestroyBinding(binding: FragmentAutoPlaylistBinding) {
+        super.onDestroyBinding(binding)
+        binding.autoRecycler.adapter = null
     }
 
     private fun addChoice(group: ChipGroup, label: String, checked: Boolean, onPick: () -> Unit) {
@@ -148,7 +144,7 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         group.addView(chip)
     }
 
-    private fun reload() {
+    private fun reload(toTop: Boolean) {
         val library = musicRepository.library
         val context = requireContext()
         val albums = showAlbums
@@ -163,28 +159,29 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                         if (albums) AutoPlaylists.albums(context, library, settings, currentKind, days)
                         else AutoPlaylists.songs(context, library, settings, currentKind, days)
                     }
-            val binding = this@AutoPlaylistDialog.binding ?: return@launch
-            rows = result
-            adapter.notifyDataSetChanged()
-            val restore = pendingScroll
-            pendingScroll = null
-            val lm = binding.autoRecycler.layoutManager as LinearLayoutManager
-            if (restore != null && restore.first < result.size) {
-                lm.scrollToPositionWithOffset(restore.first, restore.second)
-            } else {
-                binding.autoRecycler.scrollToPosition(0)
-            }
-            binding.autoCount.text =
-                if (albums) resources.getQuantityString(R.plurals.fmt_album_count, result.size, result.size)
-                else resources.getQuantityString(R.plurals.fmt_song_count, result.size, result.size)
-            binding.autoEmpty.isVisible = result.isEmpty()
-            binding.autoRecycler.isVisible = result.isNotEmpty()
+            val binding = this@AutoPlaylistFragment.binding ?: return@launch
+            if (!toTop && result == rows) return@launch
+            showRows(binding, result)
+            if (toTop) binding.autoRecycler.scrollToPosition(0)
             binding.autoEmpty.text =
                 getString(
                     if (library == null) R.string.lng_auto_loading
                     else if (!org.oxycblt.auxio.playback.PlayHistory.isLoaded) R.string.lng_auto_loading
                     else R.string.lng_auto_empty
                 )
+        }
+    }
+
+    private fun showRows(binding: FragmentAutoPlaylistBinding, result: List<AutoPlaylists.Row>) {
+        val albums = showAlbums
+        rows = result
+        adapter.notifyDataSetChanged()
+        run {
+            binding.autoCount.text =
+                if (albums) resources.getQuantityString(R.plurals.fmt_album_count, result.size, result.size)
+                else resources.getQuantityString(R.plurals.fmt_song_count, result.size, result.size)
+            binding.autoEmpty.isVisible = result.isEmpty()
+            binding.autoRecycler.isVisible = result.isNotEmpty()
         }
     }
 
@@ -202,9 +199,7 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         val songs = songsOfRows()
         if (songs.isEmpty()) return
         val name = getString(titleOf(kind))
-        if (playbackModel.playInNewQueue(songs, name, shuffle, start)) {
-            dismiss()
-        } else {
+        if (!playbackModel.playInNewQueue(songs, name, shuffle, start)) {
             Toast.makeText(requireContext(), R.string.err_play_filter, Toast.LENGTH_LONG).show()
         }
     }
@@ -213,15 +208,10 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         val row = rows.getOrNull(position) ?: return
         when (val music = row.music) {
             is Song -> play(false, position)
-            is Album -> {
-                // Fork pessoal: ao voltar do álbum, a lista reabre no mesmo ponto.
-                val lm = binding?.autoRecycler?.layoutManager as? LinearLayoutManager
-                val first = lm?.findFirstVisibleItemPosition()?.coerceAtLeast(0) ?: 0
-                val offset = lm?.findViewByPosition(first)?.top ?: 0
-                reopen = Reopen(kind, first, offset, System.currentTimeMillis())
-                dismiss()
-                detailModel.showAlbum(music)
-            }
+            is Album ->
+                // A tela do álbum entra por cima desta; voltar traz a lista de novo.
+                findNavController()
+                    .navigate(R.id.album_detail_fragment, bundleOf("albumUid" to music.uid))
             else -> {}
         }
     }
@@ -283,37 +273,8 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
 
     private class RowHolder(val binding: ItemAutoRowBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private data class Reopen(val kind: AutoPlaylists.Kind, val pos: Int, val offset: Int, val at: Long)
-
     companion object {
-        private const val ARG_POS = "pos"
-        private const val ARG_OFFSET = "offset"
-        private const val REOPEN_MAX_MS = 30 * 60 * 1000L
-
-        /** Lista a reabrir quando a aba Playlists voltar a aparecer (depois de abrir um álbum). */
-        private var reopen: Reopen? = null
-
-        /** Fork pessoal: reabre a lista que levou a um álbum, se for o caso. */
-        fun reopenIfPending(manager: FragmentManager) {
-            val r = reopen ?: return
-            reopen = null
-            if (System.currentTimeMillis() - r.at > REOPEN_MAX_MS) return
-            if (manager.findFragmentByTag(TAG) != null || manager.isStateSaved) return
-            AutoPlaylistDialog()
-                .apply {
-                    arguments =
-                        bundleOf(ARG_KIND to r.kind.ordinal, ARG_POS to r.pos, ARG_OFFSET to r.offset)
-                }
-                .show(manager, TAG)
-        }
-
-        /** Esquece a lista a reabrir (o usuário foi para outro lugar). */
-        fun forgetReopen() {
-            reopen = null
-        }
-
-        private const val TAG = "auxio.fork.AUTO_PLAYLIST"
-        private const val ARG_KIND = "kind"
+        const val ARG_KIND = "kind"
 
         // Últimas escolhas (valem enquanto o app está aberto).
         private var showAlbums = false
@@ -329,11 +290,6 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
                 AutoPlaylists.Kind.NOT_PLAYED -> R.string.lbl_auto_not_played
             }
 
-        fun show(manager: FragmentManager, kind: AutoPlaylists.Kind) {
-            if (manager.findFragmentByTag(TAG) != null) return
-            AutoPlaylistDialog()
-                .apply { arguments = bundleOf(ARG_KIND to kind.ordinal) }
-                .show(manager, TAG)
-        }
+        fun args(kind: AutoPlaylists.Kind) = bundleOf(ARG_KIND to kind.ordinal)
     }
 }

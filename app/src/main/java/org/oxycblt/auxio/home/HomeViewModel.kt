@@ -224,14 +224,6 @@ constructor(
                 albumList.value = filterAlbums(allAlbums)
             }
         }
-        // Fork pessoal: saiu da aba Playlists -> a lista automática não reabre mais sozinha.
-        viewModelScope.launch {
-            currentTabType.collect {
-                if (it != MusicType.PLAYLISTS) {
-                    org.oxycblt.auxio.home.auto.AutoPlaylistDialog.forgetReopen()
-                }
-            }
-        }
         // Fork pessoal: coleções mudaram -> refiltra (se o filtro usa coleções).
         viewModelScope.launch {
             AlbumCollections.version.drop(1).collect {

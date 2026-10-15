@@ -130,7 +130,12 @@ class AlbumListFragment :
         collectImmediately(musicModel.indexingState) { state ->
             // Biblioteca pronta mas sem álbuns (ou sem mudança na lista): tira a foto mesmo assim.
             if (state is IndexingState.Completed && snapshotView != null) {
-                requireBinding().root.postDelayed({ hideSnapshot(homeModel.albumList.value) }, 1000)
+                requireBinding().root.postDelayed(
+                    {
+                        if (!albumsWaitingIdle) hideSnapshot(homeModel.albumList.value)
+                    },
+                    1000,
+                )
             }
         }
         collectImmediately(listModel.selected, ::updateSelection)
@@ -174,6 +179,10 @@ class AlbumListFragment :
             )
         overlay.layoutManager = lm
         overlay.itemAnimator = null
+        // Como na grade de verdade: células prontas para reciclar, sem inflar no meio da rolagem.
+        overlay.setHasFixedSize(true)
+        overlay.recycledViewPool.setMaxRecycledViews(0, 48)
+        overlay.setItemViewCacheSize(12)
         overlay.clipToPadding = false
         overlay.setBackgroundColor(
             com.google.android.material.color.MaterialColors.getColor(
@@ -195,6 +204,22 @@ class AlbumListFragment :
         }
         overlay.adapter =
             GridSnapshotAdapter(entries, { lm.cellSize() }) { uid -> pendingSnapshotTap = uid }
+        overlay.addOnScrollListener(
+            object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(
+                    recyclerView: androidx.recyclerview.widget.RecyclerView,
+                    newState: Int,
+                ) {
+                    if (
+                        newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE &&
+                            albumsWaitingIdle &&
+                            view != null
+                    ) {
+                        updateAlbums(homeModel.albumList.value)
+                    }
+                }
+            }
+        )
         (binding.root as android.view.ViewGroup).addView(
             overlay,
             1,
@@ -311,7 +336,21 @@ class AlbumListFragment :
         listModel.openMenu(R.menu.album, item)
     }
 
+    /** Fork pessoal: a grade de verdade chegou enquanto a foto rolava; entra quando parar. */
+    private var albumsWaitingIdle = false
+
     private fun updateAlbums(albums: List<Album>) {
+        val overlay = snapshotView
+        if (
+            overlay != null &&
+                albums.isNotEmpty() &&
+                overlay.scrollState != androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
+        ) {
+            // Trocar a foto pela grade no meio de uma rolagem rápida dá um tranco: espera parar.
+            albumsWaitingIdle = true
+            return
+        }
+        albumsWaitingIdle = false
         albumAdapter.update(albums, homeModel.albumInstructions.consume())
         if (albums.isNotEmpty()) hideSnapshot(albums)
         // Gera em segundo plano as miniaturas que faltam, no tamanho exato das células.

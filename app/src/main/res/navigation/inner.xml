@@ -203,6 +203,16 @@
             app:destination="@id/play_from_genre_dialog" />
     </fragment>
 
+    <!-- Fork pessoal: listas automáticas da aba Playlists (tocadas recentemente etc.). -->
+    <fragment
+        android:id="@+id/auto_playlist_fragment"
+        android:name="org.oxycblt.auxio.home.auto.AutoPlaylistFragment"
+        android:label="auto_playlist_fragment">
+        <argument
+            android:name="kind"
+            app:argType="integer" />
+    </fragment>
+
     <fragment
         android:id="@+id/album_detail_fragment"
         android:name="org.oxycblt.auxio.detail.AlbumDetailFragment"

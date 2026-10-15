@@ -87,7 +87,14 @@ class PlaylistListFragment :
                 )
             for ((row, kind) in kinds) {
                 row.setOnClickListener {
-                    org.oxycblt.auxio.home.auto.AutoPlaylistDialog.show(childFragmentManager, kind)
+                    // Fork pessoal: a lista abre como uma tela (como um álbum ou uma playlist).
+                    androidx.navigation.fragment.NavHostFragment.findNavController(
+                            this@PlaylistListFragment
+                        )
+                        .navigate(
+                            R.id.auto_playlist_fragment,
+                            org.oxycblt.auxio.home.auto.AutoPlaylistFragment.args(kind),
+                        )
                 }
             }
             binding.headerNewPlaylist.setOnClickListener { musicModel.createPlaylist() }
@@ -102,16 +109,6 @@ class PlaylistListFragment :
 
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
-
-    override fun onResume() {
-        super.onResume()
-        // Fork pessoal: voltando de um álbum aberto por uma lista automática, ela reabre.
-        view?.post {
-            if (isResumed) {
-                org.oxycblt.auxio.home.auto.AutoPlaylistDialog.reopenIfPending(childFragmentManager)
-            }
-        }
-    }
 
     override fun onBindingCreated(binding: FragmentHomeListBinding, savedInstanceState: Bundle?) {
         super.onBindingCreated(binding, savedInstanceState)
