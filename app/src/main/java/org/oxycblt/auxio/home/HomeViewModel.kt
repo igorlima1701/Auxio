@@ -177,6 +177,12 @@ constructor(
     val playlistSort: Sort
         get() = listSettings.playlistSort
 
+    /**
+     * Fork pessoal: um cálculo de lista por aba; um pedido novo cancela o anterior. Fica antes do
+     * [homeGenerator]: ao ser criado, ele já pode pedir as listas (biblioteca já carregada).
+     */
+    private val invalidateJobs = HashMap<MusicType, kotlinx.coroutines.Job>()
+
     private val homeGenerator = homeGeneratorFactory.create(this)
 
     /**
@@ -245,9 +251,6 @@ constructor(
     override fun invalidateEmpty() {
         empty.value = homeGenerator.empty()
     }
-
-    /** Fork pessoal: um cálculo de lista por aba; um pedido novo cancela o anterior. */
-    private val invalidateJobs = HashMap<MusicType, kotlinx.coroutines.Job>()
 
     /**
      * Fork pessoal: ordenar e filtrar as listas (milhares de músicas) roda fora da linha principal;
