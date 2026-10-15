@@ -68,6 +68,8 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         get() = AutoPlaylists.Kind.entries[requireArguments().getInt(ARG_KIND)]
 
     private var rows: List<AutoPlaylists.Row> = emptyList()
+    /** Posição a restaurar na primeira carga (quando a lista reabre na volta de um álbum). */
+    private var pendingScroll: Pair<Int, Int>? = null
     private val adapter = RowAdapter()
 
     override fun onCreateBinding(inflater: LayoutInflater) =
@@ -85,6 +87,11 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         super.onBindingCreated(binding, savedInstanceState)
         binding.root.minimumHeight = (resources.displayMetrics.heightPixels * 0.85).toInt()
         binding.autoName.text = getString(titleOf(kind))
+        if (savedInstanceState == null) {
+            requireArguments().takeIf { it.containsKey(ARG_POS) }?.let {
+                pendingScroll = it.getInt(ARG_POS) to it.getInt(ARG_OFFSET)
+            }
+        }
         binding.autoRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.autoRecycler.adapter = adapter
 
@@ -159,7 +166,14 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
             val binding = this@AutoPlaylistDialog.binding ?: return@launch
             rows = result
             adapter.notifyDataSetChanged()
-            binding.autoRecycler.scrollToPosition(0)
+            val restore = pendingScroll
+            pendingScroll = null
+            val lm = binding.autoRecycler.layoutManager as LinearLayoutManager
+            if (restore != null && restore.first < result.size) {
+                lm.scrollToPositionWithOffset(restore.first, restore.second)
+            } else {
+                binding.autoRecycler.scrollToPosition(0)
+            }
             binding.autoCount.text =
                 if (albums) resources.getQuantityString(R.plurals.fmt_album_count, result.size, result.size)
                 else resources.getQuantityString(R.plurals.fmt_song_count, result.size, result.size)
@@ -200,6 +214,11 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
         when (val music = row.music) {
             is Song -> play(false, position)
             is Album -> {
+                // Fork pessoal: ao voltar do álbum, a lista reabre no mesmo ponto.
+                val lm = binding?.autoRecycler?.layoutManager as? LinearLayoutManager
+                val first = lm?.findFirstVisibleItemPosition()?.coerceAtLeast(0) ?: 0
+                val offset = lm?.findViewByPosition(first)?.top ?: 0
+                reopen = Reopen(kind, first, offset, System.currentTimeMillis())
                 dismiss()
                 detailModel.showAlbum(music)
             }
@@ -264,7 +283,35 @@ class AutoPlaylistDialog : ViewBindingBottomSheetDialogFragment<DialogAutoPlayli
 
     private class RowHolder(val binding: ItemAutoRowBinding) : RecyclerView.ViewHolder(binding.root)
 
+    private data class Reopen(val kind: AutoPlaylists.Kind, val pos: Int, val offset: Int, val at: Long)
+
     companion object {
+        private const val ARG_POS = "pos"
+        private const val ARG_OFFSET = "offset"
+        private const val REOPEN_MAX_MS = 30 * 60 * 1000L
+
+        /** Lista a reabrir quando a aba Playlists voltar a aparecer (depois de abrir um álbum). */
+        private var reopen: Reopen? = null
+
+        /** Fork pessoal: reabre a lista que levou a um álbum, se for o caso. */
+        fun reopenIfPending(manager: FragmentManager) {
+            val r = reopen ?: return
+            reopen = null
+            if (System.currentTimeMillis() - r.at > REOPEN_MAX_MS) return
+            if (manager.findFragmentByTag(TAG) != null || manager.isStateSaved) return
+            AutoPlaylistDialog()
+                .apply {
+                    arguments =
+                        bundleOf(ARG_KIND to r.kind.ordinal, ARG_POS to r.pos, ARG_OFFSET to r.offset)
+                }
+                .show(manager, TAG)
+        }
+
+        /** Esquece a lista a reabrir (o usuário foi para outro lugar). */
+        fun forgetReopen() {
+            reopen = null
+        }
+
         private const val TAG = "auxio.fork.AUTO_PLAYLIST"
         private const val ARG_KIND = "kind"
 

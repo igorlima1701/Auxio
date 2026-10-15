@@ -103,6 +103,16 @@ class PlaylistListFragment :
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
 
+    override fun onResume() {
+        super.onResume()
+        // Fork pessoal: voltando de um álbum aberto por uma lista automática, ela reabre.
+        view?.post {
+            if (isResumed) {
+                org.oxycblt.auxio.home.auto.AutoPlaylistDialog.reopenIfPending(childFragmentManager)
+            }
+        }
+    }
+
     override fun onBindingCreated(binding: FragmentHomeListBinding, savedInstanceState: Bundle?) {
         super.onBindingCreated(binding, savedInstanceState)
 
