@@ -161,6 +161,7 @@ abstract class MaterialDragCallback : ItemTouchHelper.Callback() {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             // Fork pessoal: o fundo de "apagar" só aparece ao arrastar para a direita (remover).
             holder.delete.isInvisible = dX <= 0f
+            holder.deleteIcon?.isInvisible = dX <= 0f
         }
 
         // Update other translations. We do not call the default implementation, so we must do
@@ -216,6 +217,9 @@ abstract class MaterialDragCallback : ItemTouchHelper.Callback() {
         val body: View
         /** The scrim view showing the delete icon. Should be behind [body]. */
         val delete: View
+        /** Fork pessoal: o ícone da lixeira, que aparece junto com [delete]. */
+        val deleteIcon: View?
+            get() = null
         /** The drawable of the [body] background that can be elevated. */
         val liftableBackground: Drawable
         /** The drawable of the [body] background that can be rounded when dragging. */

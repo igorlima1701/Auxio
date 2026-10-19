@@ -136,6 +136,7 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
     override val root = binding.root
     override val body = binding.body
     override val delete = binding.background
+    override val deleteIcon = binding.deleteIcon
     override val liftableBackground =
         MaterialShapeDrawable.createWithElevationOverlay(binding.root.context).apply {
             fillColor = binding.context.getAttrColorCompat(MR.attr.colorSurfaceContainerHighest)
@@ -242,6 +243,7 @@ class QueueSongViewHolder private constructor(private val binding: ItemEditableS
         // Not swiping this ViewHolder if it's being re-bound, ensure that the background is
         // not visible. See QueueDragCallback for why this is done.
         binding.background.isInvisible = true
+        binding.deleteIcon.isInvisible = true
     }
 
     override fun updatePlayingIndicator(isActive: Boolean, isPlaying: Boolean) {

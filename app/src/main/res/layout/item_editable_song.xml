@@ -13,11 +13,15 @@
         android:background="?attr/colorError"
         android:visibility="invisible" />
 
+    <!-- Fork pessoal: remover agora é arrastar para a DIREITA (para a esquerda é a prévia), então a
+         lixeira fica do lado esquerdo e só aparece junto com o fundo vermelho. -->
     <ImageView
+        android:id="@+id/delete_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|center_vertical"
-        android:layout_marginEnd="@dimen/spacing_small"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:visibility="invisible"
         android:contentDescription="@string/desc_remove_song"
         android:padding="@dimen/spacing_medium"
         android:src="@drawable/ic_delete_24"

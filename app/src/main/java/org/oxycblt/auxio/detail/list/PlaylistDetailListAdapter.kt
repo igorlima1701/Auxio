@@ -235,6 +235,7 @@ private constructor(private val binding: ItemEditableSongBinding) :
     override val root = binding.root
     override val body = binding.body
     override val delete = binding.background
+    override val deleteIcon = binding.deleteIcon
     override val liftableBackground =
         MaterialShapeDrawable.createWithElevationOverlay(binding.root.context).apply {
             fillColor = binding.context.getAttrColorCompat(MR.attr.colorSurfaceContainerHigh)
@@ -269,6 +270,7 @@ private constructor(private val binding: ItemEditableSongBinding) :
         // Not swiping this ViewHolder if it's being re-bound, ensure that the background is
         // not visible. See MaterialDragCallback for why this is done.
         binding.background.isInvisible = true
+        binding.deleteIcon.isInvisible = true
     }
 
     override fun updateSelectionIndicator(isSelected: Boolean) {
