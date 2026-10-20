@@ -84,7 +84,9 @@ private data class SimpleKnownName(override val raw: String, override val sort: 
  */
 private data class IntelligentKnownName(override val raw: String, override val sort: String?) :
     Name.Known() {
-    override val tokens = parseTokens(sort ?: raw)
+    // Fork pessoal: os mesmos nomes (álbum, artista, gênero) se repetem em milhares de músicas;
+    // calcula uma vez só por nome.
+    override val tokens = tokenCache.getOrPut(sort ?: raw) { parseTokens(sort ?: raw) }
 
     private fun parseTokens(name: String): List<Token> {
         // TODO: This routine is consuming much of the song building runtime, find a way to
@@ -107,11 +109,11 @@ private data class IntelligentKnownName(override val raw: String, override val s
                 }
 
         // Transliterate to latin if available
-        if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                Transliterator.getAvailableIDs().toList().contains("Any-Latin")
-        ) {
-            stripped = Transliterator.getInstance("Any-Latin;").transliterate(stripped)
+        // Fork pessoal: antes isto listava todos os transliteradores e criava um novo para cada
+        // nome (milhares de vezes na abertura). Agora a consulta é feita uma vez e o transliterador
+        // é reaproveitado (um por thread), e só é usado quando há letras fora do alfabeto latino.
+        if (stripped.any { it.code > 0x24F }) {
+            latin()?.let { stripped = it.transliterate(stripped) }
         }
 
         // To properly compare numeric components in names, we have to split them up into
@@ -140,5 +142,24 @@ private data class IntelligentKnownName(override val raw: String, override val s
 
     companion object {
         private val TOKEN_REGEX by lazy { Regex("(\\d+)|(\\D+)") }
+
+        private val tokenCache = java.util.concurrent.ConcurrentHashMap<String, List<Token>>()
+
+        private val latinAvailable: Boolean by lazy {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                Transliterator.getAvailableIDs().toList().contains("Any-Latin")
+        }
+
+        private val latinTransliterator =
+            object : ThreadLocal<Transliterator?>() {
+                override fun initialValue(): Transliterator? =
+                    if (latinAvailable && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        Transliterator.getInstance("Any-Latin;")
+                    } else {
+                        null
+                    }
+            }
+
+        private fun latin(): Transliterator? = if (latinAvailable) latinTransliterator.get() else null
     }
 }
