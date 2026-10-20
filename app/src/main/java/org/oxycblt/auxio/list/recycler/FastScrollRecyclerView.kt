@@ -562,10 +562,12 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
 
         showingPopup = true
         resetPopupTextAutoScaleConfig()
+        // Fork pessoal: aparece na hora, sem crescer nem esmaecer.
         popupShapeScaleAnimation?.cancel()
         popupShapeAlphaAnimation?.cancel()
-        popupShapeScaleAnimation = popupScaleSpring.scale(popupView, 1f)
-        popupShapeAlphaAnimation = popupAlphaSpring.alpha(popupView, 1f)
+        popupView.scaleX = 1f
+        popupView.scaleY = 1f
+        popupView.alpha = 1f
     }
 
     private fun hidePopup() {
@@ -576,8 +578,7 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         showingPopup = false
         popupShapeScaleAnimation?.cancel()
         popupShapeAlphaAnimation?.cancel()
-        popupShapeScaleAnimation = popupScaleSpring.scale(popupView, 0.5f)
-        popupShapeAlphaAnimation = popupAlphaSpring.alpha(popupView, 0f)
+        popupView.alpha = 0f
     }
 
     private fun createPopupTextView(context: Context): MaterialTextView =
@@ -783,8 +784,10 @@ private class SoftBurstPopupDrawable(context: Context) : Drawable() {
         val top = drawableBounds.exactCenterY() - size / 2f
         pathBounds.set(left, top, left + size, top + size)
 
-        fittedPath = ExpressiveShapes.getSoftBurst(pathBounds)
-        val maxRadius = computeMaxRadius(fittedPath, pathBounds.centerX(), pathBounds.centerY())
+        // Fork pessoal: quadrado de cantos arredondados, fixo (antes uma "estrela" que girava).
+        val corner = size * 0.28f
+        fittedPath = Path().apply { addRoundRect(pathBounds, corner, corner, Path.Direction.CW) }
+        val maxRadius = 0f
         if (maxRadius > 0f) {
             val targetRadius = size / 2f
             val uniformScale = targetRadius / maxRadius
@@ -804,14 +807,7 @@ private class SoftBurstPopupDrawable(context: Context) : Drawable() {
             return
         }
 
-        canvas.withScale(revealScale, revealScale, pathBounds.centerX(), pathBounds.centerY()) {
-            canvas.rotate(
-                baseRotationDegrees + scrollRotationDegrees,
-                pathBounds.centerX(),
-                pathBounds.centerY(),
-            )
-            canvas.drawPath(fittedPath, paint)
-        }
+        canvas.drawPath(fittedPath, paint)
     }
 
     override fun setAlpha(alpha: Int) {
