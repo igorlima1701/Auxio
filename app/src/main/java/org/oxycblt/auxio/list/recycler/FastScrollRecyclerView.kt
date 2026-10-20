@@ -434,6 +434,14 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
         thumbOffset = (thumbOffsetRange * fraction).toInt()
     }
 
+    /** Fork pessoal: o toque está na barrinha (faixa de ~24 dp na borda, na altura dela)? */
+    private fun onThumb(x: Float, y: Float): Boolean {
+        val edge = 24 * resources.displayMetrics.density
+        val slackY = 12 * resources.displayMetrics.density
+        val inEdge = if (isRtl) x <= edge else x >= width - edge
+        return inEdge && y >= thumbView.top - slackY && y <= thumbView.bottom + slackY
+    }
+
     private fun onItemTouch(event: MotionEvent): Boolean {
         if (!fastScrollingEnabled || !fastScrollingPossible) {
             dragging = false
@@ -447,40 +455,15 @@ constructor(context: Context, attrs: AttributeSet? = null, @AttrRes defStyleAttr
                 downX = eventX
                 downY = eventY
 
-                if (eventX >= thumbView.left && eventX < thumbView.right) {
+                // Fork pessoal: só pega a barrinha (faixa estreita na borda, na altura dela). Antes,
+                // qualquer arrasto numa faixa de 48 dp na borda inteira pulava a lista.
+                if (onThumb(eventX, eventY)) {
                     dragStartY = eventY
-
-                    if (thumbView.isUnder(eventX, eventY, minTouchTargetSize)) {
-                        dragStartThumbOffset = thumbOffset
-                    } else if (eventX > thumbView.right - thumbWidth / 4) {
-                        dragStartThumbOffset =
-                            (eventY - thumbPadding.top - thumbHeight / 2f).toInt()
-                        scrollToThumbOffset(dragStartThumbOffset)
-                    } else {
-                        return false
-                    }
-
+                    dragStartThumbOffset = thumbOffset
                     dragging = true
                 }
             }
             MotionEvent.ACTION_MOVE -> {
-                if (
-                    !dragging &&
-                        thumbView.isUnder(downX, thumbView.top.toFloat(), minTouchTargetSize) &&
-                        abs(eventY - downY) > touchSlop
-                ) {
-                    if (thumbView.isUnder(downX, downY, minTouchTargetSize)) {
-                        dragStartY = lastY
-                        dragStartThumbOffset = thumbOffset
-                    } else {
-                        dragStartY = eventY
-                        dragStartThumbOffset =
-                            (eventY - thumbPadding.top - thumbHeight / 2f).toInt()
-                        scrollToThumbOffset(dragStartThumbOffset)
-                    }
-
-                    dragging = true
-                }
 
                 if (dragging) {
                     val thumbOffset = dragStartThumbOffset + (eventY - dragStartY).toInt()
