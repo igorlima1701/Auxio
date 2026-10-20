@@ -100,6 +100,8 @@ class ExoPlaybackStateHolder(
         player.addListener(this)
         // Fork pessoal: histórico de execuções pelo tempo ouvido.
         playTracker = PlayTracker(player).also { player.addListener(it) }
+        // Fork pessoal: volume sobe aos poucos ao voltar da pausa.
+        resumeFade = ResumeFade(player).also { player.addListener(it) }
         StopAfterSong.listener = { updatePauseOnRepeat() }
         replayGainProcessor.attach()
         playbackSettings.registerListener(this)
@@ -107,10 +109,13 @@ class ExoPlaybackStateHolder(
     }
 
     private var playTracker: PlayTracker? = null
+    private var resumeFade: ResumeFade? = null
 
     fun release() {
         playTracker?.release()
         playTracker = null
+        resumeFade?.release()
+        resumeFade = null
         saveJob.cancel()
         playbackManager.unregisterStateHolder(this)
         musicRepository.removeUpdateListener(this)
