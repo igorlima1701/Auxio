@@ -288,6 +288,7 @@ constructor(
                     albumRatingTagSync.importIfNeeded(allAlbums)
                     albumRatingTagSync.resyncIfNeeded(allAlbums)
                     org.oxycblt.auxio.music.StartupTimings.markAlbumsShown()
+                    StartupGate.markLibraryReady()
                 }
                 albumInstructions.put(
                     if (albumFilter.value.isEmpty) instructions else UpdateInstructions.Replace(0)

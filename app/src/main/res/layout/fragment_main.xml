@@ -156,4 +156,32 @@ Deslizar para os lados troca de página: Fila ↔ Player ↔ Álbuns ↔ Artista
 
     </LinearLayout>
 
+    <!-- Fork pessoal: tela de carregamento da abertura (ícone + barra), por cima de tudo. -->
+    <LinearLayout
+        android:id="@+id/startup_cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorSurface"
+        android:clickable="true"
+        android:elevation="16dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:importantForAccessibility="no"
+            android:src="@mipmap/ic_launcher" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/startup_progress"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:max="1000" />
+
+    </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

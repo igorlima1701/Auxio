@@ -114,6 +114,7 @@ class MainFragment :
     private var sheetRising: Boolean? = null
     @Inject lateinit var uiSettings: UISettings
     @Inject lateinit var multiQueue: org.oxycblt.auxio.playback.queue.MultiQueue
+    @Inject lateinit var musicRepository: org.oxycblt.auxio.music.MusicRepository
     private var queuePicker: androidx.appcompat.app.AlertDialog? = null
 
     // Fork pessoal: telas abertas em cada aba.
@@ -225,6 +226,7 @@ class MainFragment :
         collectImmediately(homeModel.currentTabType, ::updateCurrentTab)
         collectImmediately(homeModel.songList, homeModel.isFastScrolling, ::updateFab)
         collectImmediately(musicModel.indexingState, ::updateIndexerState)
+        setupStartupCover(binding)
         collectImmediately(listModel.selected, selectionBackCallback::invalidateEnabled)
         collectImmediately(playbackModel.song, ::updateSong)
         collectImmediately(playbackModel.openPanel.flow, ::handlePanel)
@@ -868,5 +870,33 @@ class MainFragment :
                 FloatingActionButton.OnVisibilityChangedListener::class,
                 Boolean::class,
             )
+    }
+
+    /**
+     * Fork pessoal: tela de carregamento da abertura (ícone + barra). Some quando a biblioteca e as
+     * primeiras capas do grid estão prontas, para o grid já aparecer liso.
+     */
+    private fun setupStartupCover(binding: FragmentMainBinding) {
+        val gate = org.oxycblt.auxio.home.StartupGate
+        // App já aberto (biblioteca na memória): nada de tela de carregamento.
+        if (!gate.ready.value && musicRepository.library != null && !homeModel.albumList.value.isEmpty()) {
+            gate.markReady()
+        }
+        if (gate.ready.value) return
+        binding.startupCover.isVisible = true
+        collectImmediately(gate.progress) { p ->
+            requireBinding().startupProgress.setProgressCompat((p * 1000).toInt(), true)
+        }
+        collectImmediately(gate.ready) { ready ->
+            if (ready) requireBinding().startupCover.isVisible = false
+        }
+        // Reservas: biblioteca pronta mas sem a aba de álbuns na frente, ou algo que demore demais.
+        collectImmediately(gate.libraryReady) { ready ->
+            if (ready) requireBinding().root.postDelayed({ gate.markReady() }, 1500)
+        }
+        collectImmediately(musicModel.indexingState) { state ->
+            if (state is IndexingState.Completed) requireBinding().root.postDelayed({ gate.markReady() }, 500)
+        }
+        binding.root.postDelayed({ gate.markReady() }, 12_000)
     }
 }

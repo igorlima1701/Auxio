@@ -431,7 +431,15 @@ constructor(
                             storedPlaylists,
                         )
                     val quick =
-                        Musikr.new(context, Config(snapshotFs, quickStorage, interpretation)).run()
+                        Musikr.new(context, Config(snapshotFs, quickStorage, interpretation)).run {
+                            progress ->
+                            // Fork pessoal: barra da tela de carregamento.
+                            if (progress is IndexingProgress.Songs && progress.explored > 0) {
+                                org.oxycblt.auxio.home.StartupGate.libraryProgress(
+                                    progress.loaded.toFloat() / progress.explored
+                                )
+                            }
+                        }
                     L.d("Quick index finished in ${System.currentTimeMillis() - quickStart}ms")
                     StartupTimings.markQuickDone()
                     emitLibrary(quick.library)

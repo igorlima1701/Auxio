@@ -104,8 +104,12 @@ class AlbumListFragment :
                 homeModel.albumFilter.value.isEmpty &&
                 musicModel.indexingState.value !is IndexingState.Completed
         ) {
-            val entries = GridSnapshot.load(requireContext())
-            if (entries.isNotEmpty()) showSnapshot(binding, entries)
+            // Fork pessoal: a foto da grade deu lugar à tela de carregamento (StartupGate); fica
+            // desligada.
+            if (USE_SNAPSHOT) {
+                val entries = GridSnapshot.load(requireContext())
+                if (entries.isNotEmpty()) showSnapshot(binding, entries)
+            }
         }
 
         binding.homeNoMusicPlaceholder.apply {
@@ -360,8 +364,15 @@ class AlbumListFragment :
             val halfGap = recycler.resources.getDimensionPixelSize(R.dimen.spacing_album_grid_half_gap)
             gridThumbWarmer.warm(albums, cell - 2 * halfGap)
             // Fork pessoal: guarda a foto da grade completa para a próxima abertura.
-            if (homeModel.albumFilter.value.isEmpty && homeModel.query.value.isEmpty()) {
+            if (USE_SNAPSHOT && homeModel.albumFilter.value.isEmpty && homeModel.query.value.isEmpty()) {
                 GridSnapshot.save(recycler.context, albums, cell - 2 * halfGap, gridThumbStore)
+            }
+            // Fork pessoal: abertura -> o grid já está montado; um instante para as capas da tela
+            // (e da tela seguinte) carregarem, e a tela de carregamento sai.
+            if (albums.isNotEmpty() && !org.oxycblt.auxio.home.StartupGate.ready.value) {
+                org.oxycblt.auxio.home.StartupGate.coversProgress(0.3f)
+                recycler.postDelayed({ org.oxycblt.auxio.home.StartupGate.coversProgress(0.7f) }, 150)
+                recycler.postDelayed({ org.oxycblt.auxio.home.StartupGate.markReady() }, COVERS_WAIT_MS)
             }
         }
     }
@@ -430,5 +441,10 @@ class AlbumListFragment :
         // playing song is also contained within.
         val album = (parent as? Album)?.takeIf { song?.album == it }
         albumAdapter.setPlaying(album, isPlaying)
+    }
+
+    private companion object {
+        const val USE_SNAPSHOT = false
+        const val COVERS_WAIT_MS = 350L
     }
 }
