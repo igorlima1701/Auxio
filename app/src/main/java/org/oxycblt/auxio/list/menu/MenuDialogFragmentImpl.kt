@@ -90,7 +90,19 @@ class SongMenuDialogFragment : MenuDialogFragment<Menu.ForSong>() {
             // Fork pessoal: "Informações da música" no estilo do Music OLED.
             R.id.action_detail -> SongInfoDialog.show(requireActivity(), menu.song)
             R.id.action_edit_tags -> TagEditDialog.show(requireActivity(), menu.song)
+            // Fork pessoal: "Parar depois desta" também no menu da música do player.
+            R.id.action_stop_after ->
+                org.oxycblt.auxio.playback.StopAfterSong.toggle(menu.song.uid)
             else -> error("Unexpected menu item selected $item")
+        }
+    }
+
+    override fun adjustItem(item: MenuItem, menu: Menu.ForSong) {
+        if (
+            item.itemId == R.id.action_stop_after &&
+                org.oxycblt.auxio.playback.StopAfterSong.target.value == menu.song.uid
+        ) {
+            item.title = getString(R.string.lbl_stop_after_cancel)
         }
     }
 }

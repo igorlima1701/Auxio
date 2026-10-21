@@ -66,6 +66,9 @@ abstract class MenuDialogFragment<M : Menu> :
      */
     abstract fun updateMenu(binding: DialogMenuBinding, menu: M)
 
+    /** Fork pessoal: ajuste de um item antes de mostrar (ex.: título que depende do estado). */
+    protected open fun adjustItem(item: MenuItem, menu: M) {}
+
     /**
      * Forward the clicked [MenuItem] to it's corresponding handler in another module.
      *
@@ -123,6 +126,7 @@ abstract class MenuDialogFragment<M : Menu> :
         val visible =
             builder.children.mapTo(mutableListOf()) {
                 it.isEnabled = !disabledIds.contains(it.itemId)
+                adjustItem(it, casted)
                 it
             }
         menuAdapter.update(visible, UpdateInstructions.Diff)
