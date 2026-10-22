@@ -223,45 +223,49 @@
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
                 android:id="@+id/fork_volume"
-                style="@style/Widget.Auxio.Button.Playback.Toggle"
+                style="@style/Widget.Auxio.Button.Playback.Plain.Side"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_volume"
                 app:icon="@drawable/ic_volume_24"
+                app:iconSize="28dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
                 android:id="@+id/playback_skip_prev"
-                style="@style/Widget.Auxio.Button.Playback.Skip"
+                style="@style/Widget.Auxio.Button.Playback.Plain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_skip_prev"
                 app:icon="@drawable/ic_skip_prev_24"
+                app:iconSize="40dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large.Narrow" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
                 android:id="@+id/playback_play_pause"
-                style="@style/Widget.Auxio.Button.Playback.PlayPause"
+                style="@style/Widget.Auxio.Button.Playback.Plain.PlayPause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_play_pause"
                 app:icon="@drawable/sel_playing_state_24"
+                app:iconSize="56dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large"
                 tools:icon="@drawable/ic_play_24" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
                 android:id="@+id/playback_skip_next"
-                style="@style/Widget.Auxio.Button.Playback.Skip"
+                style="@style/Widget.Auxio.Button.Playback.Plain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_skip_next"
                 app:icon="@drawable/ic_skip_next_24"
+                app:iconSize="40dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large.Narrow" />
 
             <!-- Espaço vazio do lado direito, para o play ficar no meio (o equalizador saiu). -->
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
                 android:id="@+id/fork_spacer"
-                style="@style/Widget.Auxio.Button.Playback.Toggle"
+                style="@style/Widget.Auxio.Button.Playback.Plain.Side"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
@@ -269,6 +273,7 @@
                 android:importantForAccessibility="no"
                 android:visibility="invisible"
                 app:icon="@drawable/ic_volume_24"
+                app:iconSize="28dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
         </org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButtonGroup>

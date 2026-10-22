@@ -13,4 +13,20 @@
         <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
+
+    <!-- Fork pessoal: botões do player só com o ícone, sem fundo (como no Music OLED). -->
+    <style name="Widget.Auxio.Button.Playback.Plain" parent="Widget.Material3Expressive.Button.IconButton.Tonal">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="iconTint">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Widget.Auxio.Button.Playback.Plain.Side">
+        <item name="iconTint">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Widget.Auxio.Button.Playback.Plain.PlayPause">
+        <item name="android:checkable">true</item>
+        <item name="toggleCheckedStateOnClick">false</item>
+    </style>
 </resources>
