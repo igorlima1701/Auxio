@@ -19,9 +19,26 @@
 package org.oxycblt.auxio.playback.ui
 
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewConfiguration
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.slider.LabelFormatter
 import com.google.android.material.slider.Slider
+import kotlin.math.abs
 import kotlin.math.max
+import org.oxycblt.auxio.R
 import org.oxycblt.auxio.databinding.ViewSeekBarBinding
 import org.oxycblt.auxio.playback.formatDurationDs
 import org.oxycblt.auxio.util.inflater
@@ -44,6 +61,138 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     init {
         binding.seekBarSlider.addOnSliderTouchListener(this)
         binding.seekBarSlider.addOnChangeListener(this)
+        binding.seekBarSlider.setLabelFormatter { it.toLong().formatDurationDs(false) }
+    }
+
+    // --- Fork pessoal: segurar a bolinha = escolher o ponto e confirmar ("Ir para"/"Cancelar") ---
+
+    private val longHandler = Handler(Looper.getMainLooper())
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    private var downX = 0f
+    private var downY = 0f
+    private var longMode = false
+    private var confirming = false
+    private var confirmPopup: PopupWindow? = null
+    /** Última posição mandada pelo player (para o "Cancelar" voltar a ela). */
+    private var playerPositionDs = 0L
+    private val enterLongMode = Runnable {
+        longMode = true
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        binding.seekBarSlider.labelBehavior = LabelFormatter.LABEL_FLOATING
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                dismissConfirm(apply = false)
+                downX = ev.x
+                downY = ev.y
+                longMode = false
+                longHandler.postDelayed(enterLongMode, LONG_PRESS_MS)
+            }
+            MotionEvent.ACTION_MOVE ->
+                if (!longMode && (abs(ev.x - downX) > touchSlop || abs(ev.y - downY) > touchSlop)) {
+                    longHandler.removeCallbacks(enterLongMode)
+                }
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> longHandler.removeCallbacks(enterLongMode)
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    /** Põe os tempos nas pontas da barra, na mesma linha (como no Music OLED). */
+    fun useInlineTimes() {
+        val density = resources.displayMetrics.density
+        val side = (60 * density).toInt()
+        (binding.seekBarSlider.layoutParams as FrameLayout.LayoutParams).apply {
+            marginStart = side
+            marginEnd = side
+            bottomMargin = 0
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        for (view in listOf(binding.seekBarPosition, binding.seekBarDuration)) {
+            (view.layoutParams as FrameLayout.LayoutParams).apply {
+                gravity =
+                    Gravity.CENTER_VERTICAL or
+                        if (view === binding.seekBarPosition) Gravity.START else Gravity.END
+                bottomMargin = 0
+                marginStart = (12 * density).toInt()
+                marginEnd = (12 * density).toInt()
+            }
+            view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        }
+        requestLayout()
+    }
+
+    private fun showConfirm() {
+        confirming = true
+        val density = resources.displayMetrics.density
+        val content =
+            LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding((8 * density).toInt(), 0, (8 * density).toInt(), 0)
+            }
+        fun button(label: Int, apply: Boolean) =
+            MaterialButton(context).apply {
+                setText(label)
+                setOnClickListener { dismissConfirm(apply) }
+                content.addView(
+                    this,
+                    LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                        )
+                        .apply {
+                            marginStart = (6 * density).toInt()
+                            marginEnd = (6 * density).toInt()
+                        },
+                )
+            }
+        button(R.string.lbl_seek_to, true)
+        button(R.string.lbl_seek_cancel, false)
+        content.measure(
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        )
+        val popup =
+            PopupWindow(
+                content,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                false,
+            )
+        popup.setBackgroundDrawable(ColorDrawable(0))
+        popup.isOutsideTouchable = false
+        popup.elevation = 8 * density
+        val loc = IntArray(2)
+        getLocationInWindow(loc)
+        val x = loc[0] + (width - content.measuredWidth) / 2
+        val y = loc[1] - content.measuredHeight - (56 * density).toInt()
+        popup.showAtLocation(this, Gravity.NO_GRAVITY, x, y.coerceAtLeast(0))
+        confirmPopup = popup
+    }
+
+    private fun dismissConfirm(apply: Boolean) {
+        val popup = confirmPopup ?: return
+        confirmPopup = null
+        popup.dismiss()
+        confirming = false
+        isActivated = false
+        if (apply) {
+            listener?.onSeekConfirmed(binding.seekBarSlider.value.toLong())
+        } else {
+            val back = playerPositionDs.coerceIn(0, durationDs)
+            binding.seekBarSlider.value = back.toFloat()
+            binding.seekBarPosition.text = back.formatDurationDs(true)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        longHandler.removeCallbacks(enterLongMode)
+        confirmPopup?.dismiss()
+        confirmPopup = null
+        confirming = false
+        super.onDetachedFromWindow()
     }
 
     /** Enables/disables wavy active-track rendering to match playback state. */
@@ -64,6 +213,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             // Sanity check 1: Ensure that no negative values are sneaking their way into
             // this component.
             val from = max(value, 0)
+            playerPositionDs = from
             // Sanity check 2: Ensure that this value is within the duration and will not crash
             // the app, and that the user is not currently seeking (which would cause the SeekBar
             // to jump around).
@@ -105,6 +255,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     override fun onStopTrackingTouch(slider: Slider) {
+        longHandler.removeCallbacks(enterLongMode)
+        if (longMode) {
+            // Fork pessoal: segurou a bolinha; só vai para o ponto se confirmar.
+            longMode = false
+            slider.labelBehavior = LabelFormatter.LABEL_GONE
+            showConfirm()
+            return
+        }
         L.d("Confirming seek")
         // End of seek event, send off new value to listener.
         isActivated = false
@@ -113,6 +271,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
         binding.seekBarPosition.text = value.toLong().formatDurationDs(true)
+    }
+
+    private companion object {
+        const val LONG_PRESS_MS = 450L
     }
 
     /** A listener for SeekBar interactions. */

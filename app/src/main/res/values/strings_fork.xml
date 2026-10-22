@@ -203,4 +203,65 @@
     <string name="lng_fork_startup_timings_none" translatable="false">Ainda não medido. Feche o app de vez e abra de novo.</string>
     <string name="desc_open_rym" translatable="false">Abrir o álbum no RateYourMusic</string>
     <string name="err_no_browser" translatable="false">Nenhum navegador encontrado</string>
+
+    <!-- Player no estilo Music OLED -->
+    <string name="desc_volume" translatable="false">Volume</string>
+    <string name="desc_bookmarks" translatable="false">Marcadores e notas</string>
+    <string name="desc_sleep_timer" translatable="false">Timer para parar</string>
+    <string name="desc_end_mode" translatable="false">O que fazer quando acaba</string>
+    <string name="lbl_seek_to" translatable="false">Ir para</string>
+    <string name="lbl_seek_cancel" translatable="false">Cancelar</string>
+
+    <string name="lbl_end_song_title" translatable="false">Quando a música acaba…</string>
+    <string name="lbl_end_queue_title" translatable="false">Quando a fila acaba…</string>
+    <string name="lbl_end_stop" translatable="false">Parar ali</string>
+    <string name="lbl_end_load_next" translatable="false">Carregar a próxima e pausar</string>
+    <string name="lbl_end_play_next" translatable="false">Tocar a próxima</string>
+    <string name="lbl_end_repeat_song" translatable="false">Repetir a mesma música</string>
+    <string name="lbl_end_to_first" translatable="false">Voltar para a primeira música</string>
+    <string name="lbl_end_reshuffle" translatable="false">Reembaralhar a fila (se o aleatório estiver ligado)</string>
+    <string name="lbl_end_and_then" translatable="false">E então…</string>
+    <string name="lbl_end_next_queue" translatable="false">Pular para a próxima fila</string>
+    <string name="lbl_end_repeat_queue" translatable="false">Repetir a mesma fila</string>
+    <string name="lbl_end_simple" translatable="false">Simples</string>
+    <string name="lbl_end_advanced" translatable="false">Avançado</string>
+    <string name="lbl_end_reset" translatable="false">Padrão</string>
+
+    <string name="lbl_timer_time" translatable="false">Parar depois de um tempo</string>
+    <string name="lbl_timer_songs" translatable="false">Parar depois de N músicas</string>
+    <string name="lbl_timer_specific" translatable="false">Depois de uma música específica</string>
+    <string name="lbl_timer_cancel" translatable="false">Desligar o timer</string>
+    <string name="lng_timer_cancelled" translatable="false">Timer desligado</string>
+    <string name="lng_timer_invalid_time" translatable="false">Tempo inválido. Use h:mm (ex.: 1:30) ou só os minutos.</string>
+    <string name="lng_timer_invalid_songs" translatable="false">Número inválido.</string>
+    <string name="fmt_timer_time_set" translatable="false">Vai parar às %s</string>
+    <string name="fmt_timer_status_time" translatable="false">Vai parar às %1$s (faltam %2$d min)</string>
+    <string name="fmt_timer_after_song" translatable="false">Vai parar depois de "%s"</string>
+    <plurals name="fmt_timer_songs_set" translatable="false">
+        <item quantity="one">Vai parar no fim desta música</item>
+        <item quantity="other">Vai parar depois de %d músicas</item>
+    </plurals>
+    <plurals name="fmt_timer_status_songs" translatable="false">
+        <item quantity="one">Vai parar no fim desta música</item>
+        <item quantity="other">Vai parar depois de %d músicas (contando esta)</item>
+    </plurals>
+
+    <string name="lbl_bookmarks" translatable="false">Marcadores/Notas</string>
+    <string name="lbl_bookmark_add" translatable="false">Adicionar</string>
+    <string name="lbl_bookmark_save" translatable="false">Salvar</string>
+    <string name="lbl_bookmark_note" translatable="false">Marcador ou nota</string>
+    <string name="lbl_bookmark_edit" translatable="false">Editar</string>
+    <string name="lbl_bookmark_remove" translatable="false">Remover este marcador</string>
+    <string name="lbl_bookmark_info" translatable="false">Informações</string>
+    <string name="lbl_bookmark_share" translatable="false">Compartilhar</string>
+    <string name="lbl_bookmark_save_as" translatable="false">Salvar como novo arquivo</string>
+    <string name="lbl_bookmark_delete" translatable="false">Apagar</string>
+    <string name="lbl_bookmark_yes" translatable="false">sim</string>
+    <string name="lbl_bookmark_no" translatable="false">ainda não</string>
+    <string name="lng_bookmark_empty" translatable="false">Nenhum marcador nesta música.</string>
+    <string name="lng_bookmark_need_access" translatable="false">O app ainda não tem acesso à pasta desta música. Toque em Adicionar para liberar a pasta.</string>
+    <string name="lng_bookmark_saved" translatable="false">Cópia salva</string>
+    <string name="lng_bookmark_delete_confirm" translatable="false">Apagar o arquivo de marcadores desta música?</string>
+    <string name="fmt_bookmark_error" translatable="false">Não consegui gravar: %s</string>
+    <string name="fmt_bookmark_info" translatable="false">Arquivo: %1$s\nPasta: %2$s\nMarcadores: %3$d\nArquivo criado: %4$s</string>
 </resources>

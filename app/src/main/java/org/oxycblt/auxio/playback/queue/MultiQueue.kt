@@ -112,7 +112,25 @@ constructor(
         load()
         playbackManager.addListener(this)
         playbackManager.beforeNewPlayback = ::beforeNewPlayback
+        org.oxycblt.auxio.playback.EndMode.nextQueue = ::playNextQueue
         publish()
+    }
+
+    /**
+     * Fork pessoal: fim da fila com "pular para a próxima fila". Passa para a fila seguinte da lista
+     * (depois da última, volta à primeira), de onde ela parou. [play] = já começa tocando.
+     */
+    private fun playNextQueue(play: Boolean): Boolean {
+        if (slots.size <= 1) return false
+        val target = (active + 1) % slots.size
+        if (!load(target, keepPlaying = false, index = null)) return false
+        metas[active] = metas[active].copy(used = System.currentTimeMillis())
+        playbackManager.playing(play)
+        viewingSlot = target
+        saveEngineNow()
+        persist()
+        publish()
+        return true
     }
 
     /**

@@ -75,6 +75,7 @@ class Auxio : Application() {
         org.oxycblt.auxio.rating.AlbumCollections.init(this)
         org.oxycblt.auxio.music.StartupTimings.init(this)
         org.oxycblt.auxio.playback.PlayHistory.init(this)
+        org.oxycblt.auxio.playback.EndMode.init(this)
         org.oxycblt.auxio.playback.PreviewPlayer.attach(this, playbackStateManager)
         albumRatingTagSync.attach()
 

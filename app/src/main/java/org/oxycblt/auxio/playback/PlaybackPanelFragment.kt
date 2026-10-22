@@ -39,7 +39,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.abs
+import kotlinx.coroutines.launch
 import org.oxycblt.auxio.R
+import org.oxycblt.auxio.bookmarks.Bookmarks
+import org.oxycblt.auxio.bookmarks.BookmarksDialog
+import org.oxycblt.auxio.playback.ui.EndGlyph
+import org.oxycblt.auxio.playback.ui.EndGlyphDrawable
 import org.oxycblt.auxio.databinding.FragmentPlaybackPanelBinding
 import org.oxycblt.auxio.detail.DetailViewModel
 import org.oxycblt.auxio.list.ListViewModel
@@ -167,7 +172,7 @@ class PlaybackPanelFragment :
 
         // Set up actions
         // TODO: Add better playback button accessibility
-        binding.playbackRepeat.setOnClickListener { playbackModel.toggleRepeatMode() }
+        binding.playbackRepeat?.setOnClickListener { playbackModel.toggleRepeatMode() }
         binding.playbackSkipPrev.setOnClickListener { playbackModel.prev() }
         binding.playbackPlayPause.apply {
             @SuppressLint("RestrictedApi")
@@ -180,12 +185,13 @@ class PlaybackPanelFragment :
             setOnClickListener { playbackModel.togglePlaying() }
         }
         binding.playbackSkipNext.setOnClickListener { playbackModel.next() }
-        binding.playbackShuffle.setOnClickListener { playbackModel.toggleShuffled() }
+        binding.playbackShuffle?.setOnClickListener { playbackModel.toggleShuffled() }
         binding.playbackMore?.setOnClickListener {
             playbackModel.song.value?.let {
                 listModel.openMenu(R.menu.playback_song, it, PlaySong.ByItself)
             }
         }
+        setupOledControls(binding)
 
         // Fork pessoal: letra no lugar da capa.
         binding.playbackLyrics?.let { container ->
@@ -289,7 +295,7 @@ class PlaybackPanelFragment :
         equalizerLauncher = null
         lyricsPanel = null
         folderLauncher = null
-        binding.playbackRepeat.clearPendingIcon()
+        binding.playbackRepeat?.clearPendingIcon()
         binding.playbackSong.isSelected = false
         binding.playbackArtist.isSelected = false
         binding.playbackAlbum?.isSelected = false
@@ -378,7 +384,7 @@ class PlaybackPanelFragment :
     }
 
     private fun updateRepeat(repeatMode: RepeatMode) {
-        val repeatButton = requireBinding().playbackRepeat
+        val repeatButton = requireBinding().playbackRepeat ?: return
         repeatButton.isChecked = repeatMode != RepeatMode.NONE
         repeatButton.setIconResource(repeatMode.icon)
     }
@@ -390,7 +396,98 @@ class PlaybackPanelFragment :
     }
 
     private fun updateShuffled(isShuffled: Boolean) {
-        requireBinding().playbackShuffle.isChecked = isShuffled
+        val binding = requireBinding()
+        binding.playbackShuffle?.isChecked = isShuffled
+        binding.forkShuffle?.apply {
+            setImageResource(if (isShuffled) R.drawable.ic_shuffle_on_24 else R.drawable.ic_shuffle_off_24)
+            isActivated = isShuffled
+        }
+    }
+
+    // --- Fork pessoal: controles no estilo do Music OLED ---
+
+    private fun setupOledControls(binding: FragmentPlaybackPanelBinding) {
+        if (binding.forkActions == null) return
+        binding.playbackSeekBar?.useInlineTimes()
+        binding.forkMore?.setOnClickListener {
+            playbackModel.song.value?.let {
+                listModel.openMenu(R.menu.playback_song, it, PlaySong.ByItself)
+            }
+        }
+        binding.forkShuffle?.setOnClickListener { playbackModel.toggleShuffled() }
+        binding.forkEndMode?.setOnClickListener { EndModeDialog.show(requireContext()) }
+        binding.forkTimer?.setOnClickListener {
+            val queue = playbackModel.pagerQueue.value
+            SleepTimerDialog.show(requireContext(), queue.queue, queue.index)
+        }
+        binding.forkBookmarks?.setOnClickListener {
+            val song = playbackModel.song.value ?: return@setOnClickListener
+            BookmarksDialog.show(
+                requireContext(),
+                viewLifecycleOwner.lifecycleScope,
+                song,
+                object : BookmarksDialog.Player {
+                    override fun positionMs() = playbackModel.positionMs()
+
+                    override fun seekTo(ms: Long) = playbackModel.seekToMs(ms)
+
+                    override fun togglePlaying() = playbackModel.togglePlaying()
+
+                    override fun isPlaying() = playbackModel.isPlaying.value
+
+                    override fun requestAccess(song: Song) {
+                        requireContext().showToast(R.string.lng_lyrics_grant_hint)
+                        folderLauncher?.launch(LyricsFiles.folderHint(song))
+                    }
+                },
+            )
+        }
+        binding.forkVolume?.setOnClickListener {
+            // Mostra o controle de volume do Android.
+            val audio = requireContext().getSystemService(android.media.AudioManager::class.java)
+            audio?.adjustStreamVolume(
+                android.media.AudioManager.STREAM_MUSIC,
+                android.media.AudioManager.ADJUST_SAME,
+                android.media.AudioManager.FLAG_SHOW_UI,
+            )
+        }
+        collectImmediately(EndMode.state) { state ->
+            val view = requireBinding().forkEndMode ?: return@collectImmediately
+            val color =
+                com.google.android.material.color.MaterialColors.getColor(
+                    view,
+                    com.google.android.material.R.attr.colorOnSurfaceVariant,
+                )
+            val size = (26 * resources.displayMetrics.density).toInt()
+            view.setImageDrawable(EndGlyphDrawable(requireContext(), EndGlyph.forState(state), size, color))
+        }
+        collectImmediately(SleepTimer.mode, StopAfterSong.target) { mode, target ->
+            requireBinding().forkTimer?.isActivated = mode != null || target != null
+        }
+        collectImmediately(playbackModel.song, Bookmarks.version, LyricsFiles.version) { song, _, _ ->
+            refreshBookmarkIndicator(song)
+        }
+    }
+
+    private var bookmarkJob: kotlinx.coroutines.Job? = null
+
+    private fun refreshBookmarkIndicator(song: Song?) {
+        bookmarkJob?.cancel()
+        requireBinding().forkBookmarks?.isActivated = false
+        if (song == null) return
+        val context = requireContext().applicationContext
+        bookmarkJob =
+            viewLifecycleOwner.lifecycleScope.launch {
+                val has =
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        try {
+                            Bookmarks.load(context, song).let { it.marks.isNotEmpty() || it.header.isNotBlank() }
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }
+                binding?.forkBookmarks?.isActivated = has
+            }
     }
 
     private fun updatePager(queue: PagerQueue) {

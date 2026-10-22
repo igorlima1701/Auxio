@@ -47,6 +47,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Fork pessoal: player no estilo do Music OLED. Título, artista e álbum centralizados. -->
     <LinearLayout
         android:id="@+id/playback_info_container"
         android:layout_width="0dp"
@@ -54,9 +55,8 @@
         android:layout_marginStart="@dimen/spacing_medium"
         android:layout_marginEnd="@dimen/spacing_medium"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/playback_seek_bar"
-        app:layout_constraintEnd_toStartOf="@+id/playback_more"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintBottom_toTopOf="@+id/fork_actions"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playback_toolbar"
         app:layout_constraintVertical_bias="1.0"
@@ -68,6 +68,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fallbackLineSpacing="false"
+            android:gravity="center"
+            android:textAlignment="center"
             tools:text="Song Name" />
 
         <TextView
@@ -75,13 +77,17 @@
             style="@style/Widget.Auxio.TextView.Secondary.Marquee"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_tiny"
             android:fallbackLineSpacing="false"
+            android:gravity="center"
+            android:textAlignment="center"
             tools:text="Artist Name" />
 
-        <!-- Fork pessoal: "Álbum · Ano". Tocar no ano abre os álbuns daquele ano. -->
+        <!-- "Álbum · Ano". Tocar no ano abre os álbuns daquele ano. -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_tiny">
 
             <TextView
                 android:id="@+id/playback_album"
@@ -91,7 +97,7 @@
                 android:fallbackLineSpacing="false"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@+id/playback_year"
-                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -115,39 +121,99 @@
 
     </LinearLayout>
 
-    <org.oxycblt.auxio.ui.RippleFixMaterialButton
-        android:id="@+id/playback_more"
-        style="@style/Widget.Auxio.Button.Playback.More"
-        app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Small"
-        android:layout_width="wrap_content"
+    <!-- Marcadores, timer, menu, o que fazer quando acaba, aleatório. -->
+    <LinearLayout
+        android:id="@+id/fork_actions"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/spacing_medium"
-        app:icon="@drawable/ic_more_24"
-        app:layout_constraintBottom_toBottomOf="@+id/playback_info_container"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:layout_marginEnd="@dimen/spacing_small"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/playback_seek_bar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/playback_info_container" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playback_info_container">
+
+        <ImageView
+            android:id="@+id/fork_bookmarks"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_bookmarks"
+            android:scaleType="center"
+            android:src="@drawable/ic_bookmarks_24"
+            app:tint="@color/sel_activatable_icon" />
+
+        <ImageView
+            android:id="@+id/fork_timer"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_sleep_timer"
+            android:scaleType="center"
+            android:src="@drawable/ic_snooze_24"
+            app:tint="@color/sel_activatable_icon" />
+
+        <ImageView
+            android:id="@+id/fork_more"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/lbl_more"
+            android:scaleType="center"
+            android:src="@drawable/ic_more_24"
+            app:tint="@color/sel_activatable_icon" />
+
+        <ImageView
+            android:id="@+id/fork_end_mode"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1.4"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_end_mode"
+            android:scaleType="center" />
+
+        <ImageView
+            android:id="@+id/fork_shuffle"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_shuffle"
+            android:scaleType="center"
+            android:src="@drawable/ic_shuffle_off_24"
+            app:tint="@color/sel_activatable_icon" />
+
+    </LinearLayout>
 
     <org.oxycblt.auxio.playback.ui.StyledSeekBar
         android:id="@+id/playback_seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_small"
         app:layout_constraintBottom_toTopOf="@+id/playback_controls_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playback_info_container" />
+        app:layout_constraintTop_toBottomOf="@+id/fork_actions" />
 
     <org.oxycblt.auxio.playback.ui.ForcedLTRFrameLayout
         android:id="@+id/playback_controls_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_medium"
+        android:layout_marginTop="@dimen/spacing_small"
         android:layout_marginEnd="@dimen/spacing_medium"
         android:layout_marginBottom="@dimen/spacing_medium"
-        app:layout_constraintTop_toBottomOf="@+id/playback_seek_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playback_seek_bar"
         app:layout_constraintWidth_max="400dp">
 
         <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButtonGroup
@@ -156,12 +222,12 @@
             android:spacing="@dimen/spacing_small">
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
-                android:id="@+id/playback_repeat"
+                android:id="@+id/fork_volume"
                 style="@style/Widget.Auxio.Button.Playback.Toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_change_repeat"
-                app:icon="@drawable/ic_repeat_off_24"
+                android:contentDescription="@string/desc_volume"
+                app:icon="@drawable/ic_volume_24"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
@@ -192,15 +258,18 @@
                 app:icon="@drawable/ic_skip_next_24"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large.Narrow" />
 
+            <!-- Espaço vazio do lado direito, para o play ficar no meio (o equalizador saiu). -->
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
-                android:id="@+id/playback_shuffle"
+                android:id="@+id/fork_spacer"
                 style="@style/Widget.Auxio.Button.Playback.Toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_shuffle"
-                app:icon="@drawable/sel_shuffle_state_24"
-                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium"
-                app:tint="@color/sel_activatable_icon" />
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                android:visibility="invisible"
+                app:icon="@drawable/ic_volume_24"
+                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
         </org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButtonGroup>
     </org.oxycblt.auxio.playback.ui.ForcedLTRFrameLayout>

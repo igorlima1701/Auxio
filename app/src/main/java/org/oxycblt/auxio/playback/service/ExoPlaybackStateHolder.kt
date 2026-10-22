@@ -18,6 +18,8 @@
  
 package org.oxycblt.auxio.playback.service
 
+import org.oxycblt.auxio.playback.EndMode
+import org.oxycblt.auxio.playback.SleepTimer
 import org.oxycblt.auxio.playback.StopAfterSong
 
 import android.content.Context
@@ -103,6 +105,15 @@ class ExoPlaybackStateHolder(
         // Fork pessoal: volume sobe aos poucos ao voltar da pausa.
         resumeFade = ResumeFade(player).also { player.addListener(it) }
         StopAfterSong.listener = { updatePauseOnRepeat() }
+        // Fork pessoal: o que fazer quando a música/fila acaba, e o timer.
+        EndMode.listener = {
+            applyEndMode()
+            playbackManager.ack(this, StateAck.RepeatModeChanged)
+            deferSave()
+        }
+        SleepTimer.pause = { player.pause() }
+        SleepTimer.listener = { updatePauseOnRepeat() }
+        applyEndMode()
         replayGainProcessor.attach()
         playbackSettings.registerListener(this)
         imageSettings.registerListener(this)
@@ -121,6 +132,9 @@ class ExoPlaybackStateHolder(
         musicRepository.removeUpdateListener(this)
         player.removeListener(this)
         StopAfterSong.listener = null
+        EndMode.listener = null
+        SleepTimer.pause = null
+        SleepTimer.listener = null
         replayGainProcessor.release()
         imageSettings.unregisterListener(this)
         playbackSettings.unregisterListener(this)
@@ -138,14 +152,9 @@ class ExoPlaybackStateHolder(
             return Progression.from(player.playWhenReady, player.isPlaying, clampedPosition)
         }
 
+    // Fork pessoal: o modo de repetição vem do [EndMode] (repetir a fila é feito à mão, no fim da fila).
     override val repeatMode
-        get() =
-            when (val repeatMode = player.repeatMode) {
-                Player.REPEAT_MODE_OFF -> RepeatMode.NONE
-                Player.REPEAT_MODE_ONE -> RepeatMode.TRACK
-                Player.REPEAT_MODE_ALL -> RepeatMode.ALL
-                else -> throw IllegalStateException("Unknown repeat mode: $repeatMode")
-            }
+        get() = EndMode.state.value.repeatMode
 
     override val audioSessionId: Int
         get() = player.audioSessionId
@@ -250,13 +259,8 @@ class ExoPlaybackStateHolder(
     }
 
     override fun repeatMode(repeatMode: RepeatMode) {
-        player.repeatMode =
-            when (repeatMode) {
-                RepeatMode.NONE -> Player.REPEAT_MODE_OFF
-                RepeatMode.ALL -> Player.REPEAT_MODE_ALL
-                RepeatMode.TRACK -> Player.REPEAT_MODE_ONE
-            }
-        updatePauseOnRepeat()
+        EndMode.applyRepeatMode(repeatMode)
+        applyEndMode()
         playbackManager.ack(this, StateAck.RepeatModeChanged)
         deferSave()
     }
@@ -296,8 +300,17 @@ class ExoPlaybackStateHolder(
         // Replicate the old pseudo-circular queue behavior when no repeat option is implemented.
         // Basically, you can't skip back and wrap around the queue, but you can skip forward and
         // wrap around the queue, albeit playback will be paused.
-        if (player.repeatMode == Player.REPEAT_MODE_ALL || player.hasNextMediaItem()) {
+        if (player.hasNextMediaItem()) {
             player.seekToNext()
+            if (!playbackSettings.rememberPause) {
+                player.play()
+            }
+        } else if (EndMode.state.value.queueEnd == EndMode.QueueEnd.REPEAT) {
+            // Fork pessoal: repetir a fila volta ao começo e continua tocando.
+            player.seekTo(
+                player.currentTimeline.getFirstWindowIndex(player.shuffleModeEnabled),
+                C.TIME_UNSET,
+            )
             if (!playbackSettings.rememberPause) {
                 player.play()
             }
@@ -485,7 +498,27 @@ class ExoPlaybackStateHolder(
 
         // Fork pessoal: a música marcada terminou e o player pausou; a marcação vale só uma vez.
         if (!playWhenReady && reason == Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
-            if (StopAfterSong.target.value != null) StopAfterSong.set(null)
+            val stopAfter = StopAfterSong.target.value != null
+            if (stopAfter) StopAfterSong.set(null)
+            val timerDone = SleepTimer.stopsAtEndOfSong
+            SleepTimer.onPausedAtEnd()
+            // Fork pessoal: "carregar a próxima e pausar".
+            if (
+                !stopAfter &&
+                    !timerDone &&
+                    EndMode.state.value.songEnd == EndMode.SongEnd.LOAD_NEXT
+            ) {
+                mainHandler.post {
+                    if (player.hasNextMediaItem()) {
+                        player.seekToNextMediaItem()
+                        player.pause()
+                        playbackManager.ack(this, StateAck.IndexMoved)
+                        deferSave()
+                    } else {
+                        handleQueueEnd(autoplay = false)
+                    }
+                }
+            }
         }
 
         if (player.playWhenReady) {
@@ -511,14 +544,60 @@ class ExoPlaybackStateHolder(
         super.onPlaybackStateChanged(playbackState)
 
         if (playbackState == Player.STATE_ENDED && player.repeatMode == Player.REPEAT_MODE_OFF) {
-            goto(0)
-            player.pause()
+            SleepTimer.onSongFinished()
+            mainHandler.post { handleQueueEnd(autoplay = true) }
         }
+    }
+
+    private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /**
+     * Fork pessoal: a fila acabou. Reembaralha (se marcado e o aleatório estiver ligado), volta à
+     * primeira música (se marcado) e então para, repete a fila ou pula para a próxima fila.
+     */
+    private fun handleQueueEnd(autoplay: Boolean) {
+        if (player.mediaItemCount == 0) return
+        val mode = EndMode.state.value
+        if (mode.reshuffle && player.shuffleModeEnabled) {
+            player.setShuffleOrder(BetterShuffleOrder(player.mediaItemCount, -1))
+            playbackManager.ack(this, StateAck.QueueReordered)
+        }
+        val first = player.currentTimeline.getFirstWindowIndex(player.shuffleModeEnabled)
+        when (mode.queueEnd) {
+            EndMode.QueueEnd.REPEAT -> {
+                player.seekTo(first, C.TIME_UNSET)
+                if (autoplay) player.play() else player.pause()
+            }
+            EndMode.QueueEnd.STOP,
+            EndMode.QueueEnd.NEXT_QUEUE -> {
+                if (mode.toFirst) player.seekTo(first, C.TIME_UNSET)
+                else player.seekTo(player.currentMediaItemIndex, 0)
+                player.pause()
+            }
+        }
+        playbackManager.ack(this, StateAck.IndexMoved)
+        deferSave()
+        if (mode.queueEnd == EndMode.QueueEnd.NEXT_QUEUE) {
+            mainHandler.post { EndMode.nextQueue?.invoke(autoplay) }
+        }
+    }
+
+    private fun applyEndMode() {
+        player.repeatMode =
+            if (EndMode.state.value.songEnd == EndMode.SongEnd.REPEAT) Player.REPEAT_MODE_ONE
+            else Player.REPEAT_MODE_OFF
+        updatePauseOnRepeat()
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
 
+        if (
+            reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO ||
+                reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
+        ) {
+            SleepTimer.onSongFinished()
+        }
         if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
             playbackManager.ack(this, StateAck.IndexMoved)
             deferSave()
@@ -587,7 +666,9 @@ class ExoPlaybackStateHolder(
             StopAfterSong.target.value?.let { it == playbackManager.currentSong?.uid } ?: false
         player.pauseAtEndOfMediaItems =
             (player.repeatMode == Player.REPEAT_MODE_ONE && playbackSettings.pauseOnRepeat) ||
-                stopHere
+                stopHere ||
+                EndMode.state.value.pausesAtEnd ||
+                SleepTimer.stopsAtEndOfSong
     }
 
     private fun save(cb: () -> Unit) {

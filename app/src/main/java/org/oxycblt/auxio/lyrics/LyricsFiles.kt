@@ -169,6 +169,75 @@ object LyricsFiles {
         }
     }
 
+    // --- OUTROS ARQUIVOS AO LADO DA MÚSICA (ex.: marcadores .txt) ---
+
+    /** Resultado da leitura de um arquivo irmão: [text] null = não existe. */
+    data class Sibling(val text: String?, val fileName: String, val needsAccess: Boolean)
+
+    /** Nome do arquivo irmão: o nome da música com a extensão [ext] (sem o ponto). */
+    fun siblingName(song: Song, ext: String): String {
+        val name = song.path.name ?: "musica"
+        return name.substringBeforeLast('.', name) + "." + ext
+    }
+
+    private fun findSibling(children: List<Pair<Uri, String>>, wanted: String) =
+        children.firstOrNull { normalize(it.second) == normalize(wanted) }
+
+    /** Lê o arquivo irmão com extensão [ext]. Rodar fora da main. */
+    fun readSibling(context: Context, song: Song, ext: String): Sibling {
+        val wanted = siblingName(song, ext)
+        val place = locate(context, song)
+        if (place != null) {
+            val match = findSibling(listChildren(context, place), wanted)
+            return Sibling(match?.let { readText(context, it.first).first }, match?.second ?: wanted, false)
+        }
+        val dir = directFolder(song) ?: return Sibling(null, wanted, true)
+        val name = dir.list()?.firstOrNull { normalize(it) == normalize(wanted) }
+        return Sibling(name?.let { decode(File(dir, it).readBytes()) }, name ?: wanted, true)
+    }
+
+    /**
+     * Grava [text] no arquivo irmão (cria se não existir). [name] = outro nome na mesma pasta.
+     * Retorna null se deu certo, ou o problema.
+     */
+    fun writeSibling(context: Context, song: Song, ext: String, text: String, name: String? = null): String? {
+        return try {
+            val place =
+                locate(context, song)
+                    ?: return "o app não tem acesso à pasta da música; libere a pasta"
+            val resolver = context.contentResolver
+            val wanted = name ?: siblingName(song, ext)
+            var target = findSibling(listChildren(context, place), wanted)?.first
+            if (target == null) {
+                val parent = DocumentsContract.buildDocumentUriUsingTree(place.tree, place.parentId)
+                target =
+                    DocumentsContract.createDocument(resolver, parent, "application/octet-stream", wanted)
+                        ?: return "o Android não deixou criar o arquivo"
+            }
+            resolver.openOutputStream(target, "wt")?.use { it.write(text.toByteArray(Charsets.UTF_8)) }
+                ?: return "não consegui abrir o arquivo para gravar"
+            null
+        } catch (e: Exception) {
+            L.w(e, "Falha ao gravar arquivo ao lado da música")
+            e.message ?: e.javaClass.simpleName
+        }
+    }
+
+    /** Apaga o arquivo irmão. Retorna null se deu certo (ou se não existia), ou o problema. */
+    fun deleteSibling(context: Context, song: Song, ext: String): String? {
+        return try {
+            val place =
+                locate(context, song)
+                    ?: return "o app não tem acesso à pasta da música; libere a pasta"
+            val target = findSibling(listChildren(context, place), siblingName(song, ext)) ?: return null
+            if (DocumentsContract.deleteDocument(context.contentResolver, target.first)) null
+            else "o Android não deixou apagar"
+        } catch (e: Exception) {
+            L.w(e, "Falha ao apagar arquivo ao lado da música")
+            e.message ?: e.javaClass.simpleName
+        }
+    }
+
     /** Endereço da pasta da música no seletor de pastas do Android (para pedir acesso a ela). */
     fun folderHint(song: Song): Uri? {
         val docId = documentId(song) ?: return null
