@@ -145,6 +145,7 @@
     <string name="lng_rating_tag_saved" translatable="false">Nota gravada em %d músicas</string>
     <string name="lng_rating_tag_failed" translatable="false">Nota não gravada em %1$d músicas: %2$s</string>
     <string name="lbl_info_rating_tag" translatable="false">Nota do álbum (tag)</string>
+    <string name="lbl_info_collection_tag" translatable="false">Coleções (tag)</string>
     <string name="lng_info_rating_tag_none" translatable="false">sem a tag</string>
     <string name="lbl_last_crash" translatable="false">O app fechou com um erro da última vez</string>
     <string name="lbl_last_crash_copy" translatable="false">Copiar o erro</string>
