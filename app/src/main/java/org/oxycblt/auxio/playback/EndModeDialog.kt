@@ -19,7 +19,6 @@
 package org.oxycblt.auxio.playback
 
 import android.content.Context
-import android.content.DialogInterface
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -144,7 +143,6 @@ object EndModeDialog {
             MaterialButtonToggleGroup(context).apply {
                 isSingleSelection = true
                 isSelectionRequired = true
-                setPadding(0, dp(12), 0, dp(4))
             }
         val simpleButton =
             MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle)
@@ -158,12 +156,81 @@ object EndModeDialog {
                     id = View.generateViewId()
                     setText(R.string.lbl_end_advanced)
                 }
-        toggle.addView(simpleButton)
-        toggle.addView(advancedButton)
+        toggle.addView(
+            simpleButton,
+            LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+        )
+        toggle.addView(
+            advancedButton,
+            LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+        )
 
         root.addView(simple)
         root.addView(advanced)
-        root.addView(toggle)
+
+        // Rodapé fixo (fora da rolagem): Simples|Avançado e, embaixo, Padrão, Cancelar e OK, todos
+        // sempre à vista.
+        fun action(label: Int, filled: Boolean) =
+            MaterialButton(
+                    context,
+                    null,
+                    if (filled) com.google.android.material.R.attr.materialButtonStyle
+                    else com.google.android.material.R.attr.materialButtonOutlinedStyle,
+                )
+                .apply { setText(label) }
+        val reset = action(R.string.lbl_end_reset, false)
+        val cancel = action(R.string.lbl_cancel, false)
+        val ok = action(R.string.lbl_ok, true)
+        val actions =
+            LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                for ((i, b) in listOf(reset, cancel, ok).withIndex()) {
+                    addView(
+                        b,
+                        LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+                            if (i > 0) marginStart = dp(8)
+                        },
+                    )
+                }
+            }
+        val footer =
+            LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(20), dp(8), dp(20), dp(16))
+                addView(
+                    toggle,
+                    LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ),
+                )
+                addView(
+                    actions,
+                    LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                        )
+                        .apply { topMargin = dp(4) },
+                )
+            }
+        // A lista rola sozinha, até 60% da tela; o rodapé fica sempre embaixo.
+        val scroll =
+            object : ScrollView(context) {
+                override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                    val max = (resources.displayMetrics.heightPixels * 0.6f).toInt()
+                    super.onMeasure(
+                        widthMeasureSpec,
+                        View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.AT_MOST),
+                    )
+                }
+            }
+        scroll.addView(root)
+        val content =
+            LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                addView(scroll)
+                addView(footer)
+            }
 
         var dialog: AlertDialog? = null
         var binding = false
@@ -184,7 +251,6 @@ object EndModeDialog {
             queueGroup.check(queueIds.getValue(draft.queueEnd))
             first.isChecked = draft.toFirst
             reshuffle.isChecked = draft.reshuffle
-            dialog?.getButton(DialogInterface.BUTTON_NEUTRAL)?.isVisible = draft.advanced
             binding = false
         }
 
@@ -218,21 +284,18 @@ object EndModeDialog {
             render()
         }
 
-        val dlg =
-            MaterialAlertDialogBuilder(context)
-                .setView(ScrollView(context).apply { addView(root) })
-                .setPositiveButton(R.string.lbl_ok) { _, _ -> EndMode.set(draft) }
-                .setNegativeButton(R.string.lbl_cancel, null)
-                .setNeutralButton(R.string.lbl_end_reset, null)
-                .create()
+        val dlg = MaterialAlertDialogBuilder(context).setView(content).create()
         dialog = dlg
-        dlg.setOnShowListener {
-            dlg.getButton(DialogInterface.BUTTON_NEUTRAL)?.setOnClickListener {
-                draft = EndMode.DEFAULT.copy(advanced = draft.advanced)
-                render()
-            }
+        reset.setOnClickListener {
+            draft = EndMode.DEFAULT.copy(advanced = draft.advanced)
             render()
         }
+        cancel.setOnClickListener { dlg.dismiss() }
+        ok.setOnClickListener {
+            EndMode.set(draft)
+            dlg.dismiss()
+        }
+        render()
         dlg.show()
     }
 
