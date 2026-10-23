@@ -68,23 +68,38 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var longMode = false
     private var confirming = false
 
-    /**
-     * Mostra/esconde os botões "Ir para"/"Cancelar" (ficam no layout do player). Sem ele, segurar a
-     * bolinha funciona como arrastar normal.
-     */
-    var confirmHost: ((show: Boolean) -> Unit)? = null
+    /** Quem mostra os botões "Ir para"/"Cancelar" (ficam no layout do player). */
+    interface ConfirmHost {
+        fun show(visible: Boolean)
+
+        /** Qual botão está sob o dedo (coordenadas da tela): [GO], [CANCEL] ou [NONE]. */
+        fun hit(rawX: Float, rawY: Float): Int
+
+        /** Destaca o botão sob o dedo ([NONE] = nenhum). */
+        fun highlight(which: Int)
+    }
+
+    /** Sem ele, segurar a bolinha funciona como arrastar normal. */
+    var confirmHost: ConfirmHost? = null
+
+    /** Ponto escolhido enquanto os botões estão à vista. */
+    private var targetDs = 0L
+    /** Último x do dedo dentro da barra (para o dedo que sobe até os botões não mexer no ponto). */
+    private var lastInsideX = 0f
 
     /** Última posição mandada pelo player (para o "Cancelar" voltar a ela). */
     private var playerPositionDs = 0L
     private val enterLongMode = Runnable { startConfirm() }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val host = confirmHost
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 // Um toque novo na barra desfaz a escolha anterior.
                 if (confirming) finishConfirm(apply = false)
                 downX = ev.x
                 downY = ev.y
+                lastInsideX = ev.x
                 downTime = ev.eventTime
                 movedEarly = false
                 longMode = false
@@ -92,17 +107,44 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 parent?.requestDisallowInterceptTouchEvent(true)
                 longHandler.postDelayed(enterLongMode, LONG_PRESS_MS)
             }
-            MotionEvent.ACTION_MOVE ->
+            MotionEvent.ACTION_MOVE -> {
                 if (!longMode && (abs(ev.x - downX) > touchSlop || abs(ev.y - downY) > touchSlop)) {
                     movedEarly = true
                     longHandler.removeCallbacks(enterLongMode)
                 }
+                if (confirming && host != null) {
+                    if (ev.y < 0) {
+                        // Dedo subiu até os botões: o ponto fica onde estava.
+                        host.highlight(host.hit(ev.rawX, ev.rawY))
+                        return true
+                    }
+                    host.highlight(NONE)
+                    lastInsideX = ev.x
+                }
+            }
             MotionEvent.ACTION_UP,
             MotionEvent.ACTION_CANCEL -> {
                 longHandler.removeCallbacks(enterLongMode)
                 // Segurou parado e soltou antes do aviso disparar: vale como segurar.
                 if (!longMode && !movedEarly && ev.eventTime - downTime >= LONG_PRESS_MS) {
                     startConfirm()
+                }
+                if (confirming && host != null && ev.y < 0) {
+                    // Soltou em cima de um botão: encerra o arrasto da barra no último ponto e
+                    // aciona o botão.
+                    val which =
+                        if (ev.actionMasked == MotionEvent.ACTION_UP) host.hit(ev.rawX, ev.rawY)
+                        else NONE
+                    host.highlight(NONE)
+                    val end = MotionEvent.obtain(ev)
+                    end.setLocation(lastInsideX, height / 2f)
+                    super.dispatchTouchEvent(end)
+                    end.recycle()
+                    when (which) {
+                        GO -> finishConfirm(apply = true)
+                        CANCEL -> finishConfirm(apply = false)
+                    }
+                    return true
                 }
             }
         }
@@ -115,10 +157,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         longMode = true
         confirming = true
         isActivated = true
+        targetDs = binding.seekBarSlider.value.toLong()
         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         binding.seekBarSlider.labelBehavior = LabelFormatter.LABEL_FLOATING
         binding.seekBarSlider.invalidate()
-        host(true)
+        host.show(true)
     }
 
     /** Fecha os botões; [apply] = vai para o ponto escolhido, senão volta para onde estava. */
@@ -128,9 +171,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         longMode = false
         isActivated = false
         binding.seekBarSlider.labelBehavior = LabelFormatter.LABEL_GONE
-        confirmHost?.invoke(false)
+        confirmHost?.highlight(NONE)
+        confirmHost?.show(false)
         if (apply) {
-            listener?.onSeekConfirmed(binding.seekBarSlider.value.toLong())
+            val target = targetDs.coerceIn(0, durationDs)
+            binding.seekBarSlider.value = target.toFloat()
+            binding.seekBarPosition.text = target.formatDurationDs(true)
+            listener?.onSeekConfirmed(target)
         } else {
             val back = playerPositionDs.coerceIn(0, durationDs)
             binding.seekBarSlider.value = back.toFloat()
@@ -250,10 +297,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
         binding.seekBarPosition.text = value.toLong().formatDurationDs(true)
+        if (confirming && fromUser) targetDs = value.toLong()
     }
 
-    private companion object {
-        const val LONG_PRESS_MS = 450L
+    companion object {
+        private const val LONG_PRESS_MS = 300L
+        const val NONE = 0
+        const val GO = 1
+        const val CANCEL = 2
     }
 
     /** A listener for SeekBar interactions. */

@@ -411,9 +411,38 @@ class PlaybackPanelFragment :
         if (binding.forkActions == null) return
         binding.playbackSeekBar?.useInlineTimes()
         // Segurar a bolinha: botões "Ir para"/"Cancelar" no próprio player.
-        binding.playbackSeekBar?.confirmHost = { show ->
-            this.binding?.forkSeekConfirm?.isVisible = show
-        }
+        binding.playbackSeekBar?.confirmHost =
+            object : StyledSeekBar.ConfirmHost {
+                override fun show(visible: Boolean) {
+                    this@PlaybackPanelFragment.binding?.forkSeekConfirm?.isVisible = visible
+                }
+
+                override fun hit(rawX: Float, rawY: Float): Int {
+                    val b = this@PlaybackPanelFragment.binding ?: return StyledSeekBar.NONE
+                    fun inside(v: View?): Boolean {
+                        if (v == null || !v.isShown) return false
+                        val loc = IntArray(2)
+                        v.getLocationOnScreen(loc)
+                        // Um pouco de folga em volta, para facilitar acertar com o dedo.
+                        val pad = 12 * resources.displayMetrics.density
+                        return rawX >= loc[0] - pad &&
+                            rawX <= loc[0] + v.width + pad &&
+                            rawY >= loc[1] - pad &&
+                            rawY <= loc[1] + v.height + pad
+                    }
+                    return when {
+                        inside(b.forkSeekGo) -> StyledSeekBar.GO
+                        inside(b.forkSeekCancel) -> StyledSeekBar.CANCEL
+                        else -> StyledSeekBar.NONE
+                    }
+                }
+
+                override fun highlight(which: Int) {
+                    val b = this@PlaybackPanelFragment.binding ?: return
+                    b.forkSeekGo?.isPressed = which == StyledSeekBar.GO
+                    b.forkSeekCancel?.isPressed = which == StyledSeekBar.CANCEL
+                }
+            }
         binding.forkSeekGo?.setOnClickListener { this.binding?.playbackSeekBar?.finishConfirm(true) }
         binding.forkSeekCancel?.setOnClickListener {
             this.binding?.playbackSeekBar?.finishConfirm(false)
