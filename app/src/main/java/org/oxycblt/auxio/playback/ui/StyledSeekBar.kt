@@ -76,14 +76,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     /** Última posição mandada pelo player (para o "Cancelar" voltar a ela). */
     private var playerPositionDs = 0L
     private val enterLongMode = Runnable {
+        // Segurou parado: congela a barra, mostra o balão com o tempo e já mostra os botões.
         longMode = true
+        isActivated = true
         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         binding.seekBarSlider.labelBehavior = LabelFormatter.LABEL_FLOATING
+        binding.seekBarSlider.invalidate()
+        if (confirmPopup == null) showConfirm()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                // Um toque novo na barra (fora dos botões) desfaz a escolha anterior.
                 dismissConfirm(apply = false)
                 downX = ev.x
                 downY = ev.y
@@ -120,6 +125,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 marginEnd = (12 * density).toInt()
             }
             view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        }
+        // Bolinha redonda (como no Music OLED) no lugar do tracinho, e trilha fina.
+        binding.seekBarSlider.apply {
+            val thumb = (18 * density).toInt()
+            thumbWidth = thumb
+            thumbHeight = thumb
+            thumbTrackGapSize = 0
+            trackHeight = (4 * density).toInt()
         }
         requestLayout()
     }
@@ -260,7 +273,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             // Fork pessoal: segurou a bolinha; só vai para o ponto se confirmar.
             longMode = false
             slider.labelBehavior = LabelFormatter.LABEL_GONE
-            showConfirm()
+            isActivated = true
+            if (confirmPopup == null) showConfirm()
             return
         }
         L.d("Confirming seek")

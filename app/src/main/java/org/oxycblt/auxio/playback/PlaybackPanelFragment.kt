@@ -409,6 +409,32 @@ class PlaybackPanelFragment :
     private fun setupOledControls(binding: FragmentPlaybackPanelBinding) {
         if (binding.forkActions == null) return
         binding.playbackSeekBar?.useInlineTimes()
+        // Ao tocar, só um círculo pequeno em volta do ícone (sem o retângulo grande).
+        val pressColor =
+            com.google.android.material.color.MaterialColors.getColor(
+                binding.root,
+                com.google.android.material.R.attr.colorOnSurface,
+            )
+        val radius = (30 * resources.displayMetrics.density).toInt()
+        listOfNotNull(
+                binding.forkVolume,
+                binding.playbackSkipPrev,
+                binding.playbackPlayPause,
+                binding.playbackSkipNext,
+            )
+            .forEach { button ->
+                button.rippleColor =
+                    android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
+                button.foreground =
+                    android.graphics.drawable.RippleDrawable(
+                            android.content.res.ColorStateList.valueOf(
+                                androidx.core.graphics.ColorUtils.setAlphaComponent(pressColor, 40)
+                            ),
+                            null,
+                            null,
+                        )
+                        .apply { this.radius = radius }
+            }
         binding.forkMore?.setOnClickListener {
             playbackModel.song.value?.let {
                 listModel.openMenu(R.menu.playback_song, it, PlaySong.ByItself)

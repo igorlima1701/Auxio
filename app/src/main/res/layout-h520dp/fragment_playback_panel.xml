@@ -25,7 +25,10 @@
         android:id="@+id/playback_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/spacing_medium"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_small"
+        android:layout_marginEnd="@dimen/spacing_small"
+        android:layout_marginBottom="@dimen/spacing_mid_medium"
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintDimensionRatio="1"
@@ -77,7 +80,7 @@
             style="@style/Widget.Auxio.TextView.Secondary.Marquee"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_tiny"
+            android:layout_marginTop="0dp"
             android:fallbackLineSpacing="false"
             android:gravity="center"
             android:textAlignment="center"
@@ -87,7 +90,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_tiny">
+            android:layout_marginTop="0dp">
 
             <TextView
                 android:id="@+id/playback_album"
@@ -127,7 +130,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_small"
-        android:layout_marginTop="@dimen/spacing_medium"
+        android:layout_marginTop="@dimen/spacing_tiny"
         android:layout_marginEnd="@dimen/spacing_small"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -139,7 +142,7 @@
         <ImageView
             android:id="@+id/fork_bookmarks"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_bookmarks"
@@ -150,7 +153,7 @@
         <ImageView
             android:id="@+id/fork_timer"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_sleep_timer"
@@ -161,7 +164,7 @@
         <ImageView
             android:id="@+id/fork_more"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/lbl_more"
@@ -172,7 +175,7 @@
         <ImageView
             android:id="@+id/fork_end_mode"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1.4"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_end_mode"
@@ -181,7 +184,7 @@
         <ImageView
             android:id="@+id/fork_shuffle"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_shuffle"
@@ -195,7 +198,7 @@
         android:id="@+id/playback_seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_small"
+        android:layout_marginTop="0dp"
         app:layout_constraintBottom_toTopOf="@+id/playback_controls_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -207,9 +210,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_medium"
-        android:layout_marginTop="@dimen/spacing_small"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="@dimen/spacing_medium"
-        android:layout_marginBottom="@dimen/spacing_medium"
+        android:layout_marginBottom="@dimen/spacing_small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
