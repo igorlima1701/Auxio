@@ -32,6 +32,7 @@
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintDimensionRatio="1"
+        app:layout_constraintVertical_bias="1.0"
         app:layout_constraintBottom_toTopOf="@+id/playback_info_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -232,6 +233,10 @@
                 android:contentDescription="@string/desc_volume"
                 app:icon="@drawable/ic_volume_24"
                 app:iconSize="28dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
@@ -242,7 +247,11 @@
                 android:contentDescription="@string/desc_skip_prev"
                 app:icon="@drawable/ic_skip_prev_24"
                 app:iconSize="40dp"
-                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large.Narrow" />
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
                 android:id="@+id/playback_play_pause"
@@ -252,7 +261,11 @@
                 android:contentDescription="@string/desc_play_pause"
                 app:icon="@drawable/sel_playing_state_24"
                 app:iconSize="56dp"
-                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium"
                 tools:icon="@drawable/ic_play_24" />
 
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
@@ -263,7 +276,11 @@
                 android:contentDescription="@string/desc_skip_next"
                 app:icon="@drawable/ic_skip_next_24"
                 app:iconSize="40dp"
-                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Large.Narrow" />
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
             <!-- Espaço vazio do lado direito, para o play ficar no meio (o equalizador saiu). -->
             <org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButton
@@ -277,6 +294,10 @@
                 android:visibility="invisible"
                 app:icon="@drawable/ic_volume_24"
                 app:iconSize="28dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
                 app:materialSizeOverlay="@style/SizeOverlay.Material3Expressive.Button.IconButton.Medium" />
 
         </org.oxycblt.auxio.playback.ui.button.ScaledPlaybackButtonGroup>
