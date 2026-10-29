@@ -19,18 +19,11 @@
 package org.oxycblt.auxio.playback.ui
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.HapticFeedbackConstants
-import android.view.MotionEvent
-import android.view.ViewConfiguration
 import android.widget.FrameLayout
-import com.google.android.material.slider.LabelFormatter
 import com.google.android.material.slider.Slider
-import kotlin.math.abs
 import kotlin.math.max
 import org.oxycblt.auxio.databinding.ViewSeekBarBinding
 import org.oxycblt.auxio.playback.formatDurationDs
@@ -54,88 +47,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     init {
         binding.seekBarSlider.addOnSliderTouchListener(this)
         binding.seekBarSlider.addOnChangeListener(this)
-        binding.seekBarSlider.setLabelFormatter { it.toLong().formatDurationDs(false) }
-    }
-
-    // --- Fork pessoal: segurar a bolinha = escolher o ponto e confirmar ("Ir para"/"Cancelar") ---
-
-    private val longHandler = Handler(Looper.getMainLooper())
-    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
-    private var downX = 0f
-    private var downY = 0f
-    private var downTime = 0L
-    private var movedEarly = false
-    private var longMode = false
-    private var confirming = false
-
-    /**
-     * Mostra/esconde os botões "Ir para"/"Cancelar" (ficam no layout do player). Sem ele, segurar a
-     * bolinha funciona como arrastar normal.
-     */
-    var confirmHost: ((show: Boolean) -> Unit)? = null
-
-    /** Última posição mandada pelo player (para o "Cancelar" voltar a ela). */
-    private var playerPositionDs = 0L
-    private val enterLongMode = Runnable { startConfirm() }
-
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        when (ev.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                // Um toque novo na barra desfaz a escolha anterior.
-                if (confirming) finishConfirm(apply = false)
-                downX = ev.x
-                downY = ev.y
-                downTime = ev.eventTime
-                movedEarly = false
-                longMode = false
-                // Ninguém acima (painel, fila) rouba o toque enquanto o dedo está na barra.
-                parent?.requestDisallowInterceptTouchEvent(true)
-                longHandler.postDelayed(enterLongMode, LONG_PRESS_MS)
-            }
-            MotionEvent.ACTION_MOVE ->
-                if (!longMode && (abs(ev.x - downX) > touchSlop || abs(ev.y - downY) > touchSlop)) {
-                    movedEarly = true
-                    longHandler.removeCallbacks(enterLongMode)
-                }
-            MotionEvent.ACTION_UP,
-            MotionEvent.ACTION_CANCEL -> {
-                longHandler.removeCallbacks(enterLongMode)
-                // Segurou parado e soltou antes do aviso disparar: vale como segurar.
-                if (!longMode && !movedEarly && ev.eventTime - downTime >= LONG_PRESS_MS) {
-                    startConfirm()
-                }
-            }
-        }
-        return super.dispatchTouchEvent(ev)
-    }
-
-    private fun startConfirm() {
-        if (confirming) return
-        val host = confirmHost ?: return
-        longMode = true
-        confirming = true
-        isActivated = true
-        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-        binding.seekBarSlider.labelBehavior = LabelFormatter.LABEL_FLOATING
-        binding.seekBarSlider.invalidate()
-        host(true)
-    }
-
-    /** Fecha os botões; [apply] = vai para o ponto escolhido, senão volta para onde estava. */
-    fun finishConfirm(apply: Boolean) {
-        if (!confirming) return
-        confirming = false
-        longMode = false
-        isActivated = false
-        binding.seekBarSlider.labelBehavior = LabelFormatter.LABEL_GONE
-        confirmHost?.invoke(false)
-        if (apply) {
-            listener?.onSeekConfirmed(binding.seekBarSlider.value.toLong())
-        } else {
-            val back = playerPositionDs.coerceIn(0, durationDs)
-            binding.seekBarSlider.value = back.toFloat()
-            binding.seekBarPosition.text = back.formatDurationDs(true)
-        }
     }
 
     /** Põe os tempos nas pontas da barra, na mesma linha (como no Music OLED). */
@@ -170,12 +81,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         requestLayout()
     }
 
-    override fun onDetachedFromWindow() {
-        longHandler.removeCallbacks(enterLongMode)
-        if (confirming) finishConfirm(apply = false)
-        super.onDetachedFromWindow()
-    }
-
     /** Enables/disables wavy active-track rendering to match playback state. */
     fun setWaveEnabled(enabled: Boolean) {
         binding.seekBarSlider.setWaveEnabled(enabled)
@@ -194,7 +99,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             // Sanity check 1: Ensure that no negative values are sneaking their way into
             // this component.
             val from = max(value, 0)
-            playerPositionDs = from
             // Sanity check 2: Ensure that this value is within the duration and will not crash
             // the app, and that the user is not currently seeking (which would cause the SeekBar
             // to jump around).
@@ -236,12 +140,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     override fun onStopTrackingTouch(slider: Slider) {
-        longHandler.removeCallbacks(enterLongMode)
-        if (confirming) {
-            // Fork pessoal: segurou a bolinha; só vai para o ponto com "Ir para".
-            isActivated = true
-            return
-        }
         L.d("Confirming seek")
         // End of seek event, send off new value to listener.
         isActivated = false
@@ -250,10 +148,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
         binding.seekBarPosition.text = value.toLong().formatDurationDs(true)
-    }
-
-    private companion object {
-        const val LONG_PRESS_MS = 450L
     }
 
     /** A listener for SeekBar interactions. */

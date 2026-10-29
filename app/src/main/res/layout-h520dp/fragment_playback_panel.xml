@@ -206,37 +206,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fork_actions" />
 
-    <!-- Fork pessoal: aparece ao segurar a bolinha da barra. -->
-    <LinearLayout
-        android:id="@+id/fork_seek_confirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/spacing_tiny"
-        android:elevation="8dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/fork_actions"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/fork_seek_go"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/spacing_small"
-            android:text="@string/lbl_seek_to" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/fork_seek_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_small"
-            android:text="@string/lbl_seek_cancel" />
-
-    </LinearLayout>
-
     <org.oxycblt.auxio.playback.ui.ForcedLTRFrameLayout
         android:id="@+id/playback_controls_container"
         android:layout_width="0dp"

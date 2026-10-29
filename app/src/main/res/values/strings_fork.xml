@@ -209,8 +209,6 @@
     <string name="desc_bookmarks" translatable="false">Marcadores e notas</string>
     <string name="desc_sleep_timer" translatable="false">Timer para parar</string>
     <string name="desc_end_mode" translatable="false">O que fazer quando acaba</string>
-    <string name="lbl_seek_to" translatable="false">Ir para</string>
-    <string name="lbl_seek_cancel" translatable="false">Cancelar</string>
 
     <string name="lbl_end_song_title" translatable="false">Quando a música acaba…</string>
     <string name="lbl_end_queue_title" translatable="false">Quando a fila acaba…</string>

@@ -300,7 +300,6 @@ class PlaybackPanelFragment :
         binding.playbackArtist.isSelected = false
         binding.playbackAlbum?.isSelected = false
         binding.playbackToolbar.setOnMenuItemClickListener(null)
-        binding.playbackSeekBar?.confirmHost = null
         userAwarePagerCallback?.release()
         binding.playbackPager?.adapter = null
     }
@@ -410,14 +409,6 @@ class PlaybackPanelFragment :
     private fun setupOledControls(binding: FragmentPlaybackPanelBinding) {
         if (binding.forkActions == null) return
         binding.playbackSeekBar?.useInlineTimes()
-        // Segurar a bolinha: botões "Ir para"/"Cancelar" no próprio player.
-        binding.playbackSeekBar?.confirmHost = { show ->
-            this.binding?.forkSeekConfirm?.isVisible = show
-        }
-        binding.forkSeekGo?.setOnClickListener { this.binding?.playbackSeekBar?.finishConfirm(true) }
-        binding.forkSeekCancel?.setOnClickListener {
-            this.binding?.playbackSeekBar?.finishConfirm(false)
-        }
         // Ao tocar, só um círculo pequeno em volta do ícone (sem o retângulo grande).
         val pressColor =
             com.google.android.material.color.MaterialColors.getColor(
