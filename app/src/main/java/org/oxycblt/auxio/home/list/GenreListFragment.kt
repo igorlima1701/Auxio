@@ -19,8 +19,24 @@
 package org.oxycblt.auxio.home.list
 
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.oxycblt.auxio.home.genre.GenreNodeFragment
+import org.oxycblt.auxio.home.genre.GenreTree
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -63,6 +79,15 @@ class GenreListFragment :
     override val playbackModel: PlaybackViewModel by activityViewModels()
     private val genreAdapter = GenreAdapter(this)
 
+    // Fork pessoal: a aba mostra os gêneros em árvore (subgêneros dentro dos gêneros).
+    private val treeAdapter = TreeAdapter()
+    private var roots: List<GenreTree.Node> = emptyList()
+    private var rows: List<TreeRow> = emptyList()
+    private var buildJob: Job? = null
+
+    /** Uma linha da árvore. [path] identifica o lugar (um gênero pode estar em dois pais). */
+    private class TreeRow(val node: GenreTree.Node, val depth: Int, val path: String)
+
     override fun onCreateBinding(inflater: LayoutInflater) =
         FragmentHomeListBinding.inflate(inflater)
 
@@ -71,7 +96,7 @@ class GenreListFragment :
 
         binding.homeRecycler.apply {
             id = R.id.home_genre_recycler
-            adapter = genreAdapter
+            adapter = treeAdapter
             popupProvider = this@GenreListFragment
             listener = this@GenreListFragment
         }
@@ -105,6 +130,13 @@ class GenreListFragment :
     }
 
     override fun getPopupData(pos: Int): FastScrollRecyclerView.PopupProvider.PopupData? {
+        // Fork pessoal: na árvore, a letra do gênero de primeiro nível daquela altura.
+        rows.getOrNull(pos)?.let { row ->
+            val root = rows.subList(0, pos + 1).lastOrNull { it.depth == 0 } ?: row
+            return FastScrollRecyclerView.PopupProvider.PopupData(
+                root.node.name.firstOrNull()?.uppercase() ?: "?"
+            )
+        }
         val genre = homeModel.genreList.value.getOrNull(pos) ?: return null
         // Change how we display the popup depending on the current sort mode.
         return when (homeModel.genreSort.mode) {
@@ -140,7 +172,156 @@ class GenreListFragment :
     }
 
     private fun updateGenres(genres: List<Genre>) {
-        genreAdapter.update(genres, homeModel.genreInstructions.consume())
+        homeModel.genreInstructions.consume()
+        val context = requireContext().applicationContext
+        buildJob?.cancel()
+        buildJob =
+            viewLifecycleOwner.lifecycleScope.launch {
+                val built = withContext(Dispatchers.Default) { GenreTree.build(context, genres) }
+                roots = built
+                lastRoots = built
+                refreshRows()
+            }
+    }
+
+    private fun refreshRows() {
+        val out = mutableListOf<TreeRow>()
+        fun add(node: GenreTree.Node, depth: Int, parentPath: String) {
+            val path = parentPath + "/" + node.key
+            out += TreeRow(node, depth, path)
+            if (path in expanded) node.children.forEach { add(it, depth + 1, path) }
+        }
+        roots.forEach { add(it, 0, "") }
+        rows = out
+        treeAdapter.notifyDataSetChanged()
+    }
+
+    private fun toggle(row: TreeRow) {
+        if (!expanded.remove(row.path)) expanded += row.path
+        refreshRows()
+    }
+
+    /** Abre o gênero: sem subgêneros, a tela normal do gênero; com subgêneros, a lista de tudo. */
+    private fun open(row: TreeRow) {
+        val node = row.node
+        val genre = node.genre
+        if (node.children.isEmpty() && genre != null) {
+            detailModel.showGenre(genre)
+            return
+        }
+        NavHostFragment.findNavController(this)
+            .navigate(R.id.genre_node_fragment, bundleOf(GenreNodeFragment.ARG_KEY to node.key))
+    }
+
+    private inner class TreeAdapter : RecyclerView.Adapter<TreeHolder>() {
+        override fun getItemCount() = rows.size
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TreeHolder.create(parent)
+
+        override fun onBindViewHolder(holder: TreeHolder, position: Int) {
+            val row = rows[position]
+            val context = holder.itemView.context
+            val density = context.resources.displayMetrics.density
+            val node = row.node
+            holder.indent.layoutParams.width = (row.depth * 20 * density).toInt()
+            holder.indent.requestLayout()
+            val hasKids = node.children.isNotEmpty()
+            holder.arrow.visibility = if (hasKids) View.VISIBLE else View.INVISIBLE
+            holder.arrow.rotation = if (row.path in expanded) 0f else -90f
+            holder.arrow.setOnClickListener { if (hasKids) toggle(row) }
+            holder.name.text = node.name
+            val albums = node.albums.size
+            holder.count.text =
+                context.resources.getQuantityString(R.plurals.fmt_album_count, albums, albums)
+            holder.itemView.setOnClickListener { open(row) }
+            holder.itemView.setOnLongClickListener {
+                val genre = node.genre
+                if (genre != null && !hasKids) listModel.openMenu(R.menu.parent, genre)
+                else if (hasKids) toggle(row)
+                true
+            }
+        }
+    }
+
+    private class TreeHolder(
+        root: View,
+        val indent: View,
+        val arrow: ImageView,
+        val name: TextView,
+        val count: TextView,
+    ) : RecyclerView.ViewHolder(root) {
+        companion object {
+            fun create(parent: ViewGroup): TreeHolder {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                fun dp(v: Int) = (v * density).toInt()
+                val root =
+                    LinearLayout(context).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        gravity = Gravity.CENTER_VERTICAL
+                        minimumHeight = dp(56)
+                        setPadding(dp(4), 0, dp(16), 0)
+                        layoutParams =
+                            RecyclerView.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                            )
+                        val ripple = TypedValue()
+                        context.theme.resolveAttribute(
+                            android.R.attr.selectableItemBackground,
+                            ripple,
+                            true,
+                        )
+                        setBackgroundResource(ripple.resourceId)
+                    }
+                val indent = View(context)
+                root.addView(indent, LinearLayout.LayoutParams(0, 1))
+                val arrow =
+                    ImageView(context).apply {
+                        setImageResource(R.drawable.drop_down_24)
+                        scaleType = ImageView.ScaleType.CENTER
+                        val ripple = TypedValue()
+                        context.theme.resolveAttribute(
+                            android.R.attr.selectableItemBackgroundBorderless,
+                            ripple,
+                            true,
+                        )
+                        setBackgroundResource(ripple.resourceId)
+                    }
+                root.addView(arrow, LinearLayout.LayoutParams(dp(48), dp(48)))
+                val name =
+                    TextView(context).apply {
+                        setTextAppearance(
+                            com.google.android.material.R.style.TextAppearance_Material3_TitleMedium
+                        )
+                        maxLines = 2
+                        ellipsize = android.text.TextUtils.TruncateAt.END
+                    }
+                root.addView(
+                    name,
+                    LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+                )
+                val count =
+                    TextView(context).apply {
+                        setTextAppearance(
+                            com.google.android.material.R.style.TextAppearance_Material3_BodyMedium
+                        )
+                        alpha = 0.7f
+                        setPadding(dp(12), 0, 0, 0)
+                    }
+                root.addView(count)
+                return TreeHolder(root, indent, arrow, name, count)
+            }
+        }
+    }
+
+    companion object {
+        /** Gêneros abertos na árvore (valem enquanto o app está aberto). */
+        private val expanded = HashSet<String>()
+
+        /** Última árvore montada (para a tela de um gênero achar o nó). */
+        @Volatile var lastRoots: List<GenreTree.Node> = emptyList()
+            private set
     }
 
     private fun updateNoMusicIndicator(empty: Boolean, indexingState: IndexingState?) {

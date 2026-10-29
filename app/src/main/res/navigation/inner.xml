@@ -213,6 +213,16 @@
             app:argType="integer" />
     </fragment>
 
+    <!-- Fork pessoal: um gênero com subgêneros (aba Gêneros em árvore). -->
+    <fragment
+        android:id="@+id/genre_node_fragment"
+        android:name="org.oxycblt.auxio.home.genre.GenreNodeFragment"
+        android:label="genre_node_fragment">
+        <argument
+            android:name="genreKey"
+            app:argType="string" />
+    </fragment>
+
     <fragment
         android:id="@+id/album_detail_fragment"
         android:name="org.oxycblt.auxio.detail.AlbumDetailFragment"
