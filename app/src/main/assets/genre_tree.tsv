@@ -1,49 +1,3613 @@
-# Fork pessoal: árvore de gêneros (RateYourMusic). Uma linha por gênero: gênero<TAB>pai (vazio = primeiro nível).
+# Fork pessoal: árvore de gêneros do RateYourMusic (cópia de github.com/FlakyBlueJay/mb-rym-hierarchy, atualizada em 2026-10-26).
+# Uma linha por ligação: gênero<TAB>pai (pai vazio = primeiro nível). Um gênero pode ter mais de um pai.
 Ambient	
+Ambient Americana	Ambient
+Dark Ambient	Ambient
+Black Ambient	Dark Ambient
+Ritual Ambient	Dark Ambient
+Space Ambient	Ambient
+Tribal Ambient	Ambient
 Blues	
+Acoustic Blues	Blues
+Acoustic Chicago Blues	Acoustic Blues
+Acoustic Texas Blues	Acoustic Blues
+Jug Band	Acoustic Blues
+Piedmont Blues	Acoustic Blues
+Boogie Woogie	Blues
+Country Blues	Blues
+Acoustic Texas Blues	Country Blues
+Delta Blues	Country Blues
+Bentonia School	Delta Blues
+Hill Country Blues	Country Blues
+Piedmont Blues	Country Blues
+Electric Blues	Blues
+British Blues	Electric Blues
+Chicago Blues	Electric Blues
+Electric Texas Blues	Electric Blues
+Swamp Blues	Electric Blues
+Fife and Drum Blues	Blues
+Jump Blues	Blues
+Piano Blues	Blues
+Soul Blues	Blues
+Vaudeville Blues	Blues
 Classical Music	
+Buganda Royal Court Music	Classical Music
+East Asian Classical Music	Classical Music
+Chinese Classical Music	East Asian Classical Music
+Baisha xiyue	Chinese Classical Music
+Chinese Literati Music	Chinese Classical Music
+Dongjing	Chinese Classical Music
+Yanyue	Chinese Classical Music
+Yayue	Chinese Classical Music
+Japanese Classical Music	East Asian Classical Music
+Gagaku	Japanese Classical Music
+Heikyoku	Japanese Classical Music
+Honkyoku	Japanese Classical Music
+Jiuta	Japanese Classical Music
+Jōruri	Japanese Classical Music
+Meiji shinkyoku	Japanese Classical Music
+Nagauta	Japanese Classical Music
+Noh	Japanese Classical Music
+Shōmyō	Japanese Classical Music
+Sōkyoku	Japanese Classical Music
+Danmono	Sōkyoku
+Kumiuta	Sōkyoku
+Korean Classical Music	East Asian Classical Music
+Aak	Korean Classical Music
+Dang-ak	Korean Classical Music
+Hyang-ak	Korean Classical Music
+Jeong-ak	Korean Classical Music
+Gagok	Jeong-ak
+Vietnamese Court Music	East Asian Classical Music
+Vietnamese Opera	Vietnamese Court Music
+Inkiranya	Classical Music
+Kete	Classical Music
+Maqāmic Music	Classical Music
+Arabic Classical Music	Maqāmic Music
+Andalusian Classical Music	Arabic Classical Music
+Iraqi Maqam	Arabic Classical Music
+Sana'ani Song	Arabic Classical Music
+Sawt	Arabic Classical Music
+Azerbaijani Mugham	Maqāmic Music
+Bayawan	Maqāmic Music
+Persian Classical Music	Maqāmic Music
+Shashmaqam	Maqāmic Music
+Sufiana kalam	Maqāmic Music
+Turkish Classical Music	Maqāmic Music
+Turkish Mevlevi Music	Turkish Classical Music
+Twelve Muqam	Maqāmic Music
+Minyue	Classical Music
+Pìobaireachd	Classical Music
+South Asian Classical Music	Classical Music
+Carnatic Classical Music	South Asian Classical Music
+Konnakol	Carnatic Classical Music
+Hindustani Classical Music	South Asian Classical Music
+Dhrupad	Hindustani Classical Music
+Kafi	Hindustani Classical Music
+Khayal	Hindustani Classical Music
+Klasik	Hindustani Classical Music
+Qawwali	Hindustani Classical Music
+Shabad kirtan	Hindustani Classical Music
+Tappa	Hindustani Classical Music
+Tarana	Hindustani Classical Music
+Thumri	Hindustani Classical Music
+Odissi Classical Music	South Asian Classical Music
+Southeast Asian Classical Music	Classical Music
+Burmese Classical Music	Southeast Asian Classical Music
+Gamelan	Southeast Asian Classical Music
+Balinese Gamelan	Gamelan
+Gamelan angklung	Balinese Gamelan
+Gamelan gambang	Balinese Gamelan
+Gamelan gender wayang	Balinese Gamelan
+Gamelan gong gede	Balinese Gamelan
+Gamelan gong kebyar	Balinese Gamelan
+Gamelan jegog	Balinese Gamelan
+Gamelan semar pegulingan	Balinese Gamelan
+Gamelan beleganjur	Gamelan
+Gamelan degung	Gamelan
+Gamelan selonding	Gamelan
+Javanese Gamelan	Gamelan
+Gamelan sekaten	Javanese Gamelan
+Solonese Gamelan	Javanese Gamelan
+Malay Gamelan	Gamelan
+Kacapi suling	Southeast Asian Classical Music
+Kakawin	Southeast Asian Classical Music
+Kulintang	Southeast Asian Classical Music
+Mahori	Southeast Asian Classical Music
+Malay Classical Music	Southeast Asian Classical Music
+Malay Gamelan	Malay Classical Music
+Pinpeat	Southeast Asian Classical Music
+Saluang klasik	Southeast Asian Classical Music
+Talempong	Southeast Asian Classical Music
+Tembang Sunda Cianjuran	Southeast Asian Classical Music
+Thai Classical Music	Southeast Asian Classical Music
+Fon leb	Thai Classical Music
+Khrueang sai	Thai Classical Music
+Piphat	Thai Classical Music
+Tibetan Buddhist Chant	Classical Music
+Ufie Music	Classical Music
+Western Classical Music	Classical Music
+Art Song	Western Classical Music
+Elizabethan Song	Art Song
+Lied	Art Song
+Mélodie	Art Song
+Orchestral Song	Art Song
+Spiritual Art Song	Art Song
+Bagatelle	Western Classical Music
+Ballet	Western Classical Music
+Ballet de cour	Ballet
+Comédie-ballet	Ballet
+Opéra-ballet	Ballet
+Baroque Music	Western Classical Music
+Ballet de cour	Baroque Music
+Comédie-ballet	Baroque Music
+Opéra-ballet	Baroque Music
+Zarzuela barroca	Baroque Music
+Baroque Suite	Western Classical Music
+Brazilian Classical Music	Western Classical Music
+Valsa brasileira	Brazilian Classical Music
+Byzantine Music	Western Classical Music
+Byzantine Chant	Byzantine Music
+Cantata	Western Classical Music
+Canzona	Western Classical Music
+Capriccio	Western Classical Music
+Chamber Music	Western Classical Music
+String Quartet	Chamber Music
+Character Piece	Western Classical Music
+Impromptu	Character Piece
+Nocturne	Character Piece
+Choral	Western Classical Music
+Choral Concerto	Choral
+Choral Symphony	Choral
+Cinematic Classical	Western Classical Music
+Epic Music	Cinematic Classical
+Spaghetti Western	Cinematic Classical
+Classic Ragtime	Western Classical Music
+Classical Period	Western Classical Music
+Concerto	Western Classical Music
+Concerto for Orchestra	Concerto
+Concerto grosso	Concerto
+Sinfonia concertante	Concerto
+Divertissement	Western Classical Music
+English Pastoral School	Western Classical Music
+Étude	Western Classical Music
+Fantasia	Western Classical Music
+Fugue	Western Classical Music
+Latin American Classical Music	Western Classical Music
+Light Music	Western Classical Music
+Madrigal	Western Classical Music
+Medieval Classical Music	Western Classical Music
+Ars antiqua	Medieval Classical Music
+Ars nova	Medieval Classical Music
+Ars subtilior	Medieval Classical Music
+Contenance angloise	Medieval Classical Music
+Medieval Lyric Poetry	Medieval Classical Music
+Minnesang	Medieval Lyric Poetry
+Troubador Song	Medieval Lyric Poetry
+Plainsong	Medieval Classical Music
+Ambrosian Chant	Plainsong
+Canto beneventano	Plainsong
+Canto mozárabe	Plainsong
+Celtic Chant	Plainsong
+Gallican Chant	Plainsong
+Gregorian Chant	Plainsong
+Sarum Chant	Gregorian Chant
+Old Roman Chant	Plainsong
+Modern Classical	Western Classical Music
+American Gamelan	Modern Classical
+Expressionism	Modern Classical
+Futurism	Modern Classical
+Impressionism	Modern Classical
+Indeterminacy	Modern Classical
+Microtonal Classical	Modern Classical
+Minimalism	Modern Classical
+Holy Minimalism	Minimalism
+Musique concrète instrumentale	Modern Classical
+Neoromanticism	Modern Classical
+New Complexity	Modern Classical
+Post-Minimalism	Modern Classical
+Totalism	Post-Minimalism
+Process Music	Modern Classical
+Serialism	Modern Classical
+Integral Serialism	Serialism
+Sonorism	Modern Classical
+Spectralism	Modern Classical
+Stochastic Music	Modern Classical
+Motet	Western Classical Music
+Neoclassicism	Western Classical Music
+Opera	Western Classical Music
+Ballad Opera	Opera
+Grand opéra	Opera
+Monodrama	Opera
+Opera buffa	Opera
+Opera semiseria	Opera
+Opera seria	Opera
+Opéra-ballet	Opera
+Opéra-comique	Opera
+Operetta	Opera
+Kalon'ny fahiny	Operetta
+Romantische Oper	Opera
+Singspiel	Opera
+Tragédie en musique	Opera
+Verismo	Opera
+Zarzuela	Opera
+Género chico	Zarzuela
+Zarzuela barroca	Zarzuela
+Zarzuela grande	Zarzuela
+Zeitoper	Opera
+Oratorio	Western Classical Music
+Orchestral Music	Western Classical Music
+Orchestral Song	Orchestral Music
+Symphonic Mugham	Orchestral Music
+Tone Poem	Orchestral Music
+Overture	Western Classical Music
+Passion	Western Classical Music
+Prelude	Western Classical Music
+Renaissance Music	Western Classical Music
+Contenance angloise	Renaissance Music
+Elizabethan Song	Renaissance Music
+Franco-Flemish School	Renaissance Music
+Ricercar	Western Classical Music
+Roman School	Western Classical Music
+Romanticism	Western Classical Music
+Grand opéra	Romanticism
+New German School	Romanticism
+Romantische Oper	Romanticism
+Saint Petersburg School	Romanticism
+Serenade	Western Classical Music
+Seresta	Serenade
+Sonata	Western Classical Music
+Spanish Classical Music	Western Classical Music
+Canto mozárabe	Spanish Classical Music
+Zarzuela	Spanish Classical Music
+Symphony	Western Classical Music
+Choral Symphony	Symphony
+Sinfonia concertante	Symphony
+Theme and Variation	Western Classical Music
+Toccata	Western Classical Music
 Country	
+Alt-Country	Country
+Gothic Country	Alt-Country
+Americana	Country
+Bluegrass	Country
+Progressive Bluegrass	Bluegrass
+Jamgrass	Progressive Bluegrass
+Traditional Bluegrass	Bluegrass
+Bluegrass Gospel	Traditional Bluegrass
+Contemporary Country	Country
+Boyfriend Country	Contemporary Country
+Bro-Country	Contemporary Country
+Neo-Traditionalist Country	Contemporary Country
+Country & Irish	Country
+Country Boogie	Country
+Country Folk	Country
+Country Pop	Country
+Boyfriend Country	Country Pop
+Bro-Country	Country Pop
+Countrypolitan	Country Pop
+Urban Cowboy	Country Pop
+Honky Tonk	Country
+Bakersfield Sound	Honky Tonk
+Truck Driving Country	Honky Tonk
+Nashville Sound	Country
+Countrypolitan	Nashville Sound
+Progressive Country	Country
+Outlaw Country	Progressive Country
+Traditional Country	Country
+Close Harmony	Traditional Country
+Country Gospel	Traditional Country
+Bluegrass Gospel	Country Gospel
+Country Yodeling	Traditional Country
+Traditional Bluegrass	Traditional Country
+Western	Country
+Western Swing	Country
 Dance	
+Alternative Dance	Dance
+New Rave	Alternative Dance
+Dance-Pop	Dance
+Bubblegum Dance	Dance-Pop
+Disco polo	Dance-Pop
+Freestyle	Dance-Pop
+Latin Freestyle	Freestyle
+Funk Melody	Dance-Pop
+Romanian Popcorn	Dance-Pop
+Tecnorumba	Dance-Pop
+Township Bubblegum	Dance-Pop
+Disco	Dance
+Boogie	Disco
+Electro-Disco	Disco
+Hi-NRG	Electro-Disco
+Italo-Disco	Electro-Disco
+Spacesynth	Italo-Disco
+Doskpop	Spacesynth
+Red Disco	Electro-Disco
+Space Disco	Electro-Disco
+Euro-Disco	Disco
+Latin Disco	Disco
+Mutant Disco	Disco
+Nu-Disco	Disco
+Electronic Dance Music	Dance
+Artcore	Electronic Dance Music
+Hard Renaissance	Artcore
+Balani Show	Electronic Dance Music
+Balearic Beat	Electronic Dance Music
+Bérite Club	Electronic Dance Music
+Breakbeat	Electronic Dance Music
+Acid Breaks	Breakbeat
+Baltimore Club	Breakbeat
+Big Beat	Breakbeat
+Breakbeat Hardcore	Breakbeat
+Darkside	Breakbeat Hardcore
+Hardcore Breaks	Breakbeat Hardcore
+Jungle Techno	Breakbeat Hardcore
+Breakbeat Kota	Breakbeat
+Jungle Dutch	Breakbeat Kota
+Florida Breaks	Breakbeat
+Funky Breaks	Breakbeat
+Nu Skool Breaks	Breakbeat
+Progressive Breaks	Breakbeat
+Psybreaks	Breakbeat
+West Coast Breaks	Breakbeat
+Broken Beat	Electronic Dance Music
+Bubblegum Bass	Electronic Dance Music
+Bubbling	Electronic Dance Music
+Budots	Electronic Dance Music
+Coupé-décalé	Electronic Dance Music
+Cruise	Electronic Dance Music
+Dariacore	Electronic Dance Music
+Dark Disco	Electronic Dance Music
+Deconstructed Club	Electronic Dance Music
+Dek Bass	Electronic Dance Music
+Digital Cumbia	Electronic Dance Music
+Drum and Bass	Electronic Dance Music
+Atmospheric Drum and Bass	Drum and Bass
+Dancefloor Drum and Bass	Drum and Bass
+Darkstep	Drum and Bass
+Crossbreed	Darkstep
+Skullstep	Darkstep
+Deep Drum and Bass	Drum and Bass
+Drumfunk	Drum and Bass
+Drumstep	Drum and Bass
+Dubwise Drum and Bass	Drum and Bass
+Footwork Jungle	Drum and Bass
+Halftime	Drum and Bass
+Hardstep	Drum and Bass
+Jazzstep	Drum and Bass
+Jump-Up	Drum and Bass
+Jungle	Drum and Bass
+Ragga Jungle	Jungle
+Liquid Drum and Bass	Drum and Bass
+Sambass	Liquid Drum and Bass
+Minimal Drum and Bass	Drum and Bass
+Autonomic	Minimal Drum and Bass
+Microfunk	Minimal Drum and Bass
+Neurofunk	Drum and Bass
+Technoid	Drum and Bass
+Techstep	Drum and Bass
+Trancestep	Drum and Bass
+Dubstep	Electronic Dance Music
+Brostep	Dubstep
+Briddim	Brostep
+Colour Bass	Brostep
+Deathstep	Brostep
+Minatory	Deathstep
+Drumstep	Brostep
+Tearout [Brostep]	Brostep
+Chillstep	Dubstep
+Dungeon Sound	Dubstep
+Melodic Dubstep	Dubstep
+Purple Sound	Dubstep
+Riddim	Dubstep
+Future Riddim	Riddim
+Liquid Riddim	Riddim
+Tearout	Dubstep
+East Coast Club	Electronic Dance Music
+Baltimore Club	East Coast Club
+Jersey Club	East Coast Club
+Philly Club	East Coast Club
+EBM	Electronic Dance Music
+Dark Electro	EBM
+Aggrotech	Dark Electro
+Futurepop	EBM
+New Beat	EBM
+Hard Beat	New Beat
+Skizzo	New Beat
+TBM	EBM
+Electro	Electronic Dance Music
+Electro latino	Electronic Dance Music
+Electro Swing	Electronic Dance Music
+Electro-Disco	Electronic Dance Music
+Electroclash	Electronic Dance Music
+Eurobeat	Electronic Dance Music
+J-Euro	Eurobeat
+Eurodance	Electronic Dance Music
+Bubblegum Dance	Eurodance
+Italo Dance	Eurodance
+Flex Dance Music	Electronic Dance Music
+Footwork	Electronic Dance Music
+Footwork Jungle	Footwork
+Freestyle	Electronic Dance Music
+Funk mandelão	Electronic Dance Music
+Beat bruxaria	Funk mandelão
+Brazilian Phonk	Funk mandelão
+Funk automotivo	Funk mandelão
+Ritmada	Funk mandelão
+Funkot	Electronic Dance Music
+Breakbeat Kota	Funkot
+Future Bass	Electronic Dance Music
+Kawaii Future Bass	Future Bass
+Future Core	Kawaii Future Bass
+Future Rave	Electronic Dance Music
+Ghettotech	Electronic Dance Music
+Glitch Hop [EDM]	Electronic Dance Music
+Ghetto Funk	Glitch Hop [EDM]
+Neurohop	Glitch Hop [EDM]
+Gqom	Electronic Dance Music
+Grime	Electronic Dance Music
+Neo-Grime	Grime
+Weightless	Grime
+Hard Dance	Electronic Dance Music
+Hard Trance	Hard Dance
+Hardstyle	Hard Dance
+Dubstyle	Hardstyle
+Early Hardstyle	Hardstyle
+Euphoric Hardstyle	Hardstyle
+Nustyle	Hardstyle
+Psystyle	Hardstyle
+Rawstyle	Hardstyle
+Rawphoric	Rawstyle
+Xtra Raw	Rawstyle
+Hardtek	Hard Dance
+Raggatek	Hardtek
+Jumpstyle	Hard Dance
+Frenchtek	Jumpstyle
+Lento violento	Hard Dance
+Neo Rave	Hard Dance
+NRG	Hard Dance
+UK Hard House	Hard Dance
+Scouse House	UK Hard House
+Hardbass	Scouse House
+Speed House	UK Hard House
+UK Hardcore	Hard Dance
+Future Core	UK Hardcore
+Powerstomp	UK Hardcore
+Hard Drum	Electronic Dance Music
+Hardcore [EDM]	Electronic Dance Music
+Acidcore	Hardcore [EDM]
+Amigacore	Hardcore [EDM]
+Belgian Techno	Hardcore [EDM]
+Breakbeat Hardcore	Hardcore [EDM]
+Breakcore	Hardcore [EDM]
+Lolicore	Breakcore
+Mashcore	Breakcore
+Raggacore	Breakcore
+Crossbreed	Hardcore [EDM]
+Darkcore	Hardcore [EDM]
+Deathchant Hardcore	Hardcore [EDM]
+Digital Hardcore	Hardcore [EDM]
+Doomcore	Hardcore [EDM]
+Frapcore	Hardcore [EDM]
+Freeform Hardcore	Hardcore [EDM]
+Frenchcore	Hardcore [EDM]
+Gabber	Hardcore [EDM]
+Dutch Trancecore	Gabber
+Nu Style Gabber	Gabber
+Happy Hardcore	Hardcore [EDM]
+Bouncy Techno	Happy Hardcore
+UK Hardcore	Happy Hardcore
+Hard Renaissance	Hardcore [EDM]
+Hardtek	Hardcore [EDM]
+Industrial Hardcore	Hardcore [EDM]
+Speedcore	Hardcore [EDM]
+Extratone	Speedcore
+Splittercore	Speedcore
+Terrorcore	Hardcore [EDM]
+Uptempo Hardcore	Hardcore [EDM]
+Hardtekk	Electronic Dance Music
+Hardvapour	Electronic Dance Music
+Hardwave	Electronic Dance Music
+House	Electronic Dance Music
+Acid House	House
+Afro House	House
+3-Step	Afro House
+Amapiano	House
+Afropiano	Amapiano
+Ambient House	House
+Ballroom	House
+Baltimore Club	House
+Bass House	House
+Speed House	Bass House
+Bassline	House
+Big Room House	House
+Brazilian Bass	House
+Mega funk	Brazilian Bass
+Slap House	Brazilian Bass
+Bubbling House	House
+Changa tuki	House
+Chicago Hard House	House
+LA Hard House	Chicago Hard House
+Chicago House	House
+Deep House	House
+Lo-Fi House	Deep House
+Diva House	House
+Hardbag	Diva House
+Electro House	House
+Complextro	Electro House
+Dutch House	Electro House
+Noiadance	Dutch House
+Fidget House	Electro House
+French Electro	Electro House
+Melbourne Bounce	Electro House
+Eletrofunk	House
+Euro House	House
+Hardbag	Euro House
+Festival Progressive House	House
+French House	House
+Funky House	House
+Future Funk	House
+Future House	House
+Future Bounce	Future House
+Slap House	Future House
+G-House	House
+Garage House	House
+Gospel House	Garage House
+Jersey Sound	Garage House
+Ghetto House	House
+Juke	Ghetto House
+Hip House	House
+Italo House	House
+Jackin' House	House
+Kwaito	House
+Bacardi	Kwaito
+Latin House	House
+Melodic House	House
+Microhouse	House
+Organic House	House
+Outsider House	House
+Lo-Fi House	Outsider House
+Phonk House	House
+Progressive House	House
+Epic House	Progressive House
+Romanian Popcorn	House
+Speed Garage	House
+Stutter House	House
+Tech House	House
+Deep Tech	Tech House
+Rominimal	Tech House
+Tribal House	House
+Guaracha [EDM]	Tribal House
+Tropical House	House
+UK Hard House	House
+UK Jackin'	House
+Vinahouse	House
+Hyper Techno	Electronic Dance Music
+Hypertechno	Electronic Dance Music
+Jungle Terror	Electronic Dance Music
+Krushclub	Electronic Dance Music
+Kuduro	Electronic Dance Music
+Batida	Kuduro
+Makina	Electronic Dance Music
+Manyao	Electronic Dance Music
+Melodic Bass	Electronic Dance Music
+Midtempo Bass	Electronic Dance Music
+Moombahcore	Electronic Dance Music
+Moombahton	Electronic Dance Music
+Nerdcore Techno	Electronic Dance Music
+Nu-Disco	Electronic Dance Music
+Ori deck	Electronic Dance Music
+Outrun	Electronic Dance Music
+Post-Dubstep	Electronic Dance Music
+Shangaan Electro	Electronic Dance Music
+Singeli	Electronic Dance Music
+Skweee	Electronic Dance Music
+Slimepunk	Electronic Dance Music
+Techno	Electronic Dance Music
+Acid Techno	Techno
+Ambient Techno	Techno
+Belgian Techno	Techno
+Bleep Techno	Techno
+Detroit Techno	Techno
+Freetekno	Techno
+Hard Techno	Techno
+Schranz	Hard Techno
+Hardgroove Techno	Techno
+Industrial Techno	Techno
+Birmingham Sound	Industrial Techno
+Melodic Techno	Techno
+Minimal Techno	Techno
+Dub Techno	Minimal Techno
+Neo-Trance	Minimal Techno
+Peak Time Techno	Techno
+TBM	Techno
+Wonky Techno	Techno
+Techno Bass	Electronic Dance Music
+Car Audio Bass	Techno Bass
+Tecnorumba	Electronic Dance Music
+Toytown Techno	Electronic Dance Music
+Trance	Electronic Dance Music
+Acid Trance	Trance
+Balearic Trance	Trance
+Big Room Trance	Trance
+Dream Trance	Trance
+Electro Trance	Trance
+Euro Trance	Trance
+Hands Up	Euro Trance
+Buchiage Trance	Hands Up
+Hard Trance	Trance
+Hi-Tech Full-On	Trance
+NRG	Trance
+Progressive Trance	Trance
+Psytrance	Trance
+Dark Psytrance	Psytrance
+Hi-Tech Psytrance	Dark Psytrance
+Psycore	Dark Psytrance
+Forest Psytrance	Psytrance
+Full-On Psytrance	Psytrance
+Goa Trance	Psytrance
+Nitzhonot	Goa Trance
+Progressive Psytrance	Psytrance
+Zenonesque	Progressive Psytrance
+Suomisaundi	Psytrance
+Tech Trance	Trance
+Trance 2.0	Trance
+Uplifting Trance	Trance
+Vocal Trance	Trance
+Trap [EDM]	Electronic Dance Music
+Festival Trap	Trap [EDM]
+Hard Trap	Trap [EDM]
+Heaven Trap	Trap [EDM]
+Hybrid Trap	Trap [EDM]
+Twerk	Trap [EDM]
+Tribal Guarachero	Electronic Dance Music
+UK Bass	Electronic Dance Music
+UK Funky	Electronic Dance Music
+UK Garage	Electronic Dance Music
+2-Step	UK Garage
+Bassline	UK Garage
+Breakstep	UK Garage
+Dark Garage	UK Garage
+Future Garage	UK Garage
+Speed Garage	UK Garage
+Wonky	Electronic Dance Music
+Aquacrunk	Wonky
+Miami Bass	Dance
+Atlanta Bass	Miami Bass
+Tamborzão	Miami Bass
+Techno Bass	Miami Bass
+Wa Euro	Dance
+J-Euro	Wa Euro
 Easy Listening	
+Cocktail Nation	Easy Listening
+Exotica	Easy Listening
+Sitarsploitation	Exotica
+Light Music	Easy Listening
+Lounge	Easy Listening
+Pops Orchestra	Easy Listening
+Space Age Pop	Easy Listening
 Electronic	
+Acholitronix	Electronic
+Algorave	Electronic
+Binaural Beats	Electronic
+Bit Music	Electronic
+Chiptune	Bit Music
+Dungeon Chip	Bit Music
+FM Synthesis	Bit Music
+MIDI Music	Bit Music
+Black MIDI	MIDI Music
+Sequencer & Tracker	Bit Music
+16-bit	Sequencer & Tracker
+Tracker Music	Sequencer & Tracker
+Amigacore	Tracker Music
+Demostyle	Tracker Music
+Doskpop	Demostyle
+Bitpop	Electronic
+Celtic Electronica	Electronic
+Chillout	Electronic
+Ambient Dub	Chillout
+Ambient House	Chillout
+Ambient Trance	Chillout
+Balearic Beat	Chillout
+Barber Beats	Chillout
+Downtempo	Chillout
+Trip Hop	Downtempo
+Psybient	Chillout
+Digital Fusion	Electronic
+Drift Phonk	Electronic
+Brazilian Phonk	Drift Phonk
+Phonk House	Drift Phonk
+Dungeon Synth	Electronic
+Comfy Synth	Dungeon Synth
+Dungeon Chip	Dungeon Synth
+Keller Synth	Dungeon Synth
+Winter Synth	Dungeon Synth
+Electro Hop	Electronic
+Electro-Industrial	Electronic
+Dark Electro	Electro-Industrial
+Electroacoustic	Electronic
+Acousmatic Music	Electroacoustic
+EAI	Electroacoustic
+Musique concrète	Electroacoustic
+Electronic Dance Music	Electronic
+Electropop	Electronic
+Epic Collage	Electronic
+Flashcore	Electronic
+Folktronica	Electronic
+Funktronica	Electronic
+Glitch	Electronic
+Glitch Hop	Electronic
+Graphical Sound	Electronic
+HexD	Electronic
+Krushclub	HexD
+Horror Synth	Electronic
+Hyperpop	Electronic
+IDM	Electronic
+Drill and Bass	IDM
+Illbient	Electronic
+Indietronica	Electronic
+Chillwave	Indietronica
+Chillsynth	Chillwave
+Glitch Pop	Indietronica
+Picopop	Indietronica
+Latin Electronic	Electronic
+Changa tuki	Latin Electronic
+Digital Cumbia	Latin Electronic
+Electro latino	Latin Electronic
+Electrotango	Latin Electronic
+Nortec	Latin Electronic
+Tribal Guarachero	Latin Electronic
+Livetronica	Electronic
+Maloya électronique	Electronic
+Micromontage	Electronic
+Minimal Wave	Electronic
+Minimal Synth	Minimal Wave
+Moogsploitation	Electronic
+Nightcore	Electronic
+Nu Jazz	Electronic
+Power Electronics	Electronic
+Death Industrial	Power Electronics
+Power Noise	Electronic
+Progressive Electronic	Electronic
+Berlin School	Progressive Electronic
+Space Ambient	Electronic
+Synth Punk	Electronic
+Synthpop	Electronic
+Futurepop	Synthpop
+Pon-chak disco	Synthpop
+Techno kayō	Synthpop
+Synthwave	Electronic
+Chillsynth	Synthwave
+Darksynth	Synthwave
+Dreamwave	Synthwave
+Outrun	Synthwave
+Tecnobrega	Electronic
+Brega funk	Tecnobrega
+Batidão romântico	Brega funk
+Tecnofunk	Tecnobrega
+Vapor	Electronic
+Barber Beats	Vapor
+Dreampunk	Vapor
+Future Funk	Vapor
+Hardvapour	Vapor
+Utopian Virtual	Vapor
+Vapornoise	Vapor
+Vaportrap	Vapor
+Vaporwave	Vapor
+Broken Transmission	Vaporwave
+Eccojams	Vaporwave
+Mallsoft	Vaporwave
+Slushwave	Vaporwave
+Wave	Electronic
+Hardwave	Wave
+Neo-Grime	Wave
+Witch House	Electronic
 Experimental	
+Conducted Improvisation	Experimental
+Data Sonification	Experimental
+Drone	Experimental
+Electroacoustic	Experimental
+Free Improvisation	Experimental
+Futurism	Experimental
+Glitch	Experimental
+Graphical Sound	Experimental
+Indeterminacy	Experimental
+Industrial	Experimental
+Power Electronics	Industrial
+Modern Creative	Experimental
+Musique concrète instrumentale	Experimental
+Noise	Experimental
+Ambient Noise Wall	Noise
+Black Noise	Noise
+Gorenoise	Noise
+Harsh Noise	Noise
+Cut-Up Noise	Harsh Noise
+Harsh Noise Wall	Harsh Noise
+Power Electronics	Noise
+Power Noise	Noise
+Plunderphonics	Experimental
+Reductionism	Experimental
+Lowercase	Reductionism
+Onkyo	Reductionism
+Sound Art	Experimental
+Sound Collage	Experimental
+Epic Collage	Sound Collage
+Micromontage	Sound Collage
+Sound Poetry	Experimental
+Tape Music	Experimental
+Turntable Music	Experimental
 Folk	
+Contemporary Folk	Folk
+American Primitivism	Contemporary Folk
+Anti-Folk	Contemporary Folk
+Avant-Folk	Contemporary Folk
+Free Folk	Avant-Folk
+Campus Folk	Contemporary Folk
+Chamber Folk	Contemporary Folk
+Country Folk	Contemporary Folk
+Folk Baroque	Contemporary Folk
+Folk Pop	Contemporary Folk
+Stomp and Holler	Folk Pop
+Indie Folk	Contemporary Folk
+Stomp and Holler	Indie Folk
+Jibonmukhi gaan	Contemporary Folk
+Loner Folk	Contemporary Folk
+Neofolk	Contemporary Folk
+Dark Folk	Neofolk
+Neofolklore	Contemporary Folk
+Progressive Folk	Contemporary Folk
+Psychedelic Folk	Contemporary Folk
+Freak Folk	Psychedelic Folk
+Free Folk	Psychedelic Folk
+Udigrudi	Psychedelic Folk
+Wyrd Folk	Psychedelic Folk
+Skiffle	Contemporary Folk
+Xinyao	Contemporary Folk
+Traditional Folk Music	Folk
+African Folk Music	Traditional Folk Music
+Ambasse bey	African Folk Music
+Apala	African Folk Music
+Batuque	African Folk Music
+Dagomba Music	African Folk Music
+Gnawa	African Folk Music
+Kabye Folk Music	African Folk Music
+Kilapanga	African Folk Music
+Malagasy Folk Music	African Folk Music
+Mbenga-Mbuti Music	African Folk Music
+Moutya	African Folk Music
+Ngoma	African Folk Music
+Chakacha	Ngoma
+Unyago	Ngoma
+Southern African Folk Music	African Folk Music
+Afrikaner Folk Music	Southern African Folk Music
+Khoisan Folk Music	Southern African Folk Music
+Nguni Folk Music	Southern African Folk Music
+Sotho-Tswana Folk Music	Southern African Folk Music
+Tchinkoumé	African Folk Music
+Traditional Maloya	African Folk Music
+Traditional Séga	African Folk Music
+Séga tambour	Traditional Séga
+Zinli	African Folk Music
+American Folk Music	Traditional Folk Music
+Appalachian Folk Music	American Folk Music
+Old-Time	Appalachian Folk Music
+Country Blues	American Folk Music
+Field Hollers	American Folk Music
+Fife and Drum Blues	American Folk Music
+Jug Band	American Folk Music
+Pennsylvania Dutch Folk Music	American Folk Music
+Ring Shout	American Folk Music
+Shape Note Singing	American Folk Music
+Spiritual	American Folk Music
+Concert Spiritual	Spiritual
+Jubilee	Concert Spiritual
+Spiritual Art Song	Concert Spiritual
+Talking Blues	American Folk Music
+Traditional Cajun Music	American Folk Music
+Traditional Country	American Folk Music
+Arabic Folk Music	Traditional Folk Music
+Aita	Arabic Folk Music
+Arabic Bellydance Music	Arabic Folk Music
+Raqs baladi	Arabic Bellydance Music
+Ayyalah	Arabic Folk Music
+Bedoui wahrani	Arabic Folk Music
+Fijiri	Arabic Folk Music
+Liwa	Arabic Folk Music
+Nuban	Arabic Folk Music
+Sa'idi	Arabic Folk Music
+Australian Folk Music	Traditional Folk Music
+Bayawan	Traditional Folk Music
+Brazilian Folk Music	Traditional Folk Music
+Aboio	Brazilian Folk Music
+Aboio cantado	Aboio
+Banda de pífano	Brazilian Folk Music
+Candomblé Music	Brazilian Folk Music
+Cantoria	Brazilian Folk Music
+Repente	Cantoria
+Capoeira Music	Brazilian Folk Music
+Cururu	Brazilian Folk Music
+Fandango caiçara	Brazilian Folk Music
+Jongo	Brazilian Folk Music
+Ponto de umbanda	Jongo
+Lundu	Brazilian Folk Music
+Maracatu	Brazilian Folk Music
+Modinha	Brazilian Folk Music
+Seresta	Modinha
+Rasqueado	Brazilian Folk Music
+Samba de roda	Brazilian Folk Music
+Sertanejo de raiz	Brazilian Folk Music
+Moda de viola	Sertanejo de raiz
+Toada de Boi	Brazilian Folk Music
+Xaxado	Brazilian Folk Music
+Canadian Folk Music	Traditional Folk Music
+Canadian Maritime Folk	Canadian Folk Music
+Cape Breton Folk Music	Canadian Maritime Folk
+Cape Breton Fiddling	Cape Breton Folk Music
+French-Canadian Folk Music	Canadian Folk Music
+Métis Fiddling	Canadian Folk Music
+Newfoundland Folk Music	Canadian Folk Music
+Caribbean Folk Music	Traditional Folk Music
+Bele	Caribbean Folk Music
+Benna	Caribbean Folk Music
+Bomba	Caribbean Folk Music
+Fungi	Caribbean Folk Music
+Haitian Vodou Drumming	Caribbean Folk Music
+Jibaro	Caribbean Folk Music
+Kaiso	Caribbean Folk Music
+Kitchen Dance Music	Caribbean Folk Music
+Kumina	Caribbean Folk Music
+Mento	Caribbean Folk Music
+Méringue	Caribbean Folk Music
+Plena	Caribbean Folk Music
+Ripsaw	Caribbean Folk Music
+Trinidadian Cariso	Caribbean Folk Music
+Tumba	Caribbean Folk Music
+Virgin Islander Cariso	Caribbean Folk Music
+Chukchi Folk Music	Traditional Folk Music
+Drinking Song	Traditional Folk Music
+East Asian Folk Music	Traditional Folk Music
+Amami shimauta	East Asian Folk Music
+Chinese Folk Music	East Asian Folk Music
+Chaozhou xianshi	Chinese Folk Music
+Dongzu dage	Chinese Folk Music
+Han Folk Music	Chinese Folk Music
+Haozi	Chinese Folk Music
+Jiangnan sizhu	Chinese Folk Music
+Shan'ge	Chinese Folk Music
+Indigenous Taiwanese Music	East Asian Folk Music
+Japanese Folk Music	East Asian Folk Music
+Heikyoku	Japanese Folk Music
+Kagura	Japanese Folk Music
+Kouta	Japanese Folk Music
+Min'yō	Japanese Folk Music
+Ondō	Japanese Folk Music
+Rōkyoku	Japanese Folk Music
+Taiko	Japanese Folk Music
+Tsugaru Shamisen	Japanese Folk Music
+Korean Folk Music	East Asian Folk Music
+Muak	Korean Folk Music
+Pansori	Korean Folk Music
+Pungmul	Korean Folk Music
+Sanjo	Korean Folk Music
+Sinawi	Korean Folk Music
+Vietnamese Folk Music	East Asian Folk Music
+Chèo	Vietnamese Folk Music
+Quan họ	Vietnamese Folk Music
+Xẩm	Vietnamese Folk Music
+European Folk Music	Traditional Folk Music
+Alpine Folk Music	European Folk Music
+Canto degli Alpini	Alpine Folk Music
+Ländler	Alpine Folk Music
+Narodno zabavna glasba	Alpine Folk Music
+Naturjodel	Alpine Folk Music
+Balkan Folk Music	European Folk Music
+Albanian Folk Music	Balkan Folk Music
+Lab Polyphony	Albanian Folk Music
+Musika popullore	Albanian Folk Music
+Tosk Polyphony	Albanian Folk Music
+Aromanian Folk Music	Balkan Folk Music
+Balkan Brass Band	Balkan Folk Music
+Bosnian Folk Music	Balkan Folk Music
+Izvorna bosanska muzika	Bosnian Folk Music
+Sevdalinka	Bosnian Folk Music
+Bulgarian Folk Music	Balkan Folk Music
+Croatian Folk Music	Balkan Folk Music
+Klapa	Croatian Folk Music
+Csango Folk Music	Balkan Folk Music
+Gagauz Folk Music	Balkan Folk Music
+Ganga	Balkan Folk Music
+Greek Folk Music	Balkan Folk Music
+Aegean Islands Folk Music	Greek Folk Music
+Cretan Folk Music	Greek Folk Music
+Rizitika	Cretan Folk Music
+Dimotika	Greek Folk Music
+Ionian Islands Folk Music	Greek Folk Music
+Rembetika	Greek Folk Music
+Latvian Folk Music	Balkan Folk Music
+Macedonian Folk Music	Balkan Folk Music
+Čalgija	Macedonian Folk Music
+Montenegrin Folk Music	Balkan Folk Music
+Muzică lăutărească	Balkan Folk Music
+Serbian Folk Music	Balkan Folk Music
+Starogradska muzika	Balkan Folk Music
+Čalgija	Starogradska muzika
+Baltic Folk Music	European Folk Music
+Lithuanian Folk Music	Baltic Folk Music
+Sutartinės	Lithuanian Folk Music
+Balto-Finnic Folk Music	European Folk Music
+Estonian Folk Music	Balto-Finnic Folk Music
+Seto leelo	Estonian Folk Music
+Finnish Folk Music	Balto-Finnic Folk Music
+Karelian Folk Music	Balto-Finnic Folk Music
+Livonian Folk Music	Balto-Finnic Folk Music
+Rune Singing	Balto-Finnic Folk Music
+Seto leelo	Rune Singing
+Basque Folk Music	European Folk Music
+Catalan Folk Music	European Folk Music
+Sardana	Catalan Folk Music
+Caucasian Folk Music	European Folk Music
+Abkhazian Folk Music	Caucasian Folk Music
+Chechen Folk Music	Caucasian Folk Music
+Circassian Folk Music	Caucasian Folk Music
+Dagestani Folk Music	Caucasian Folk Music
+Avar Folk Music	Dagestani Folk Music
+Georgian Folk Music	Caucasian Folk Music
+Batonebi Song	Georgian Folk Music
+Ossetian Folk Music	Caucasian Folk Music
+Celtic Folk Music	European Folk Music
+Breton Celtic Folk Music	Celtic Folk Music
+Bagad	Breton Celtic Folk Music
+Cape Breton Folk Music	Celtic Folk Music
+Cornish Folk Music	Celtic Folk Music
+Irish Folk Music	Celtic Folk Music
+Sean-nós	Irish Folk Music
+Manx Folk Music	Celtic Folk Music
+Scottish Folk Music	Celtic Folk Music
+Òrain Ghàidhlig	Scottish Folk Music
+Òrain luaidh	Òrain Ghàidhlig
+Seinn nan salm	Òrain Ghàidhlig
+Pìobaireachd	Scottish Folk Music
+Pipe Band	Scottish Folk Music
+Scots Song	Scottish Folk Music
+Scottish Country Dance Music	Scottish Folk Music
+Shetland & Orkney Folk Music	Scottish Folk Music
+Welsh Folk Music	Celtic Folk Music
+Dutch Folk Music	European Folk Music
+English Folk Music	European Folk Music
+Cornish Folk Music	English Folk Music
+Morris Music	English Folk Music
+Northumbrian Folk Music	English Folk Music
+Scrumpy and Western	English Folk Music
+Flemish Folk Music	European Folk Music
+French Folk Music	European Folk Music
+Alsatian Folk Music	French Folk Music
+Breton Folk Music	French Folk Music
+Breton Celtic Folk Music	Breton Folk Music
+Kan ha diskan	Breton Folk Music
+Corsican Folk Music	French Folk Music
+Paghjella	Corsican Folk Music
+Musette	French Folk Music
+Swing musette	Musette
+Occitan Folk Music	French Folk Music
+Auvergnat Folk Music	Occitan Folk Music
+Gascon Folk Music	Occitan Folk Music
+Polifonia occitana	Occitan Folk Music
+German Folk Music	European Folk Music
+Fahrtenlied	German Folk Music
+Gstanzl	German Folk Music
+Pennsylvania Dutch Folk Music	German Folk Music
+Għana	European Folk Music
+Hungarian Folk Music	European Folk Music
+Csárdás	Hungarian Folk Music
+Magyar nóta	Hungarian Folk Music
+Pásztordal	Hungarian Folk Music
+Istrian Folk Music	European Folk Music
+Italian Folk Music	European Folk Music
+Canto degli Alpini	Italian Folk Music
+Canzone napoletana	Italian Folk Music
+Liscio	Italian Folk Music
+Sardinian Folk Music	Italian Folk Music
+Cantu a chiterra	Sardinian Folk Music
+Cantu a tenore	Sardinian Folk Music
+Stornello	Italian Folk Music
+Tarantella	Italian Folk Music
+Pizzica	Tarantella
+Tammurriata	Tarantella
+Trallalero	Italian Folk Music
+Luxembourgish Folk Music	European Folk Music
+Neo-Medieval Folk	European Folk Music
+Bardcore	Neo-Medieval Folk
+Neo-Pagan Folk	European Folk Music
+Nordic Folk Music	European Folk Music
+Danish Folk Music	Nordic Folk Music
+Faroese Folk Music	Nordic Folk Music
+Finnish Folk Music	Nordic Folk Music
+Icelandic Folk Music	Nordic Folk Music
+Joik	Nordic Folk Music
+Nordic Old Time Dance Music	Nordic Folk Music
+Polska	Nordic Old Time Dance Music
+Hambo	Polska
+Norwegian Folk Music	Nordic Folk Music
+Swedish Folk Music	Nordic Folk Music
+Hambo	Swedish Folk Music
+Polka	European Folk Music
+Chicago Polka	Polka
+Eastern-Style Polka	Polka
+Polka peruana	Polka
+Portuguese Folk Music	European Folk Music
+Cante alentejano	Portuguese Folk Music
+Chamarrita açoriana	Portuguese Folk Music
+Desgarrada	Portuguese Folk Music
+Fado	Portuguese Folk Music
+Fado de Coimbra	Fado
+Trás-os-Montes Folk Music	Portuguese Folk Music
+Vira	Portuguese Folk Music
+Romani Folk Music	European Folk Music
+Romanian Folk Music	European Folk Music
+Bocet	Romanian Folk Music
+Colinde	Romanian Folk Music
+Doină	Romanian Folk Music
+Muzică lăutărească	Romanian Folk Music
+Slavic Folk Music	European Folk Music
+Belarusian Folk Music	Slavic Folk Music
+Bosnian Folk Music	Slavic Folk Music
+Bulgarian Folk Music	Slavic Folk Music
+Croatian Folk Music	Slavic Folk Music
+Czech Folk Music	Slavic Folk Music
+Ganga	Slavic Folk Music
+Goral Music	Slavic Folk Music
+Polish Goral Music	Goral Music
+Macedonian Folk Music	Slavic Folk Music
+Montenegrin Folk Music	Slavic Folk Music
+Moravian Folk Music	Slavic Folk Music
+Polish Folk Music	Slavic Folk Music
+Folklor miejski	Polish Folk Music
+Warsaw City Folk	Folklor miejski
+Kashubian Folk Music	Polish Folk Music
+Krakowiak	Polish Folk Music
+Kujawiak	Polish Folk Music
+Kujon	Polish Folk Music
+Kurpian Folk Music	Polish Folk Music
+Oberek	Polish Folk Music
+Polish Goral Music	Polish Folk Music
+Russian Folk Music	Slavic Folk Music
+Serbian Folk Music	Slavic Folk Music
+Slovak Folk Music	Slavic Folk Music
+Slovenian Folk Music	Slavic Folk Music
+Narodno zabavna glasba	Slovenian Folk Music
+Starogradska muzika	Slavic Folk Music
+Ukrainian Folk Music	Slavic Folk Music
+Duma	Ukrainian Folk Music
+Hutsul Folk Music	Ukrainian Folk Music
+Spanish Folk Music	European Folk Music
+Andalusian Folk Music	Spanish Folk Music
+Saeta	Andalusian Folk Music
+Sevillanas	Andalusian Folk Music
+Aragonese Folk Music	Spanish Folk Music
+Asturian Folk Music	Spanish Folk Music
+Canarian Folk Music	Spanish Folk Music
+Chotis madrileño	Spanish Folk Music
+Copla	Spanish Folk Music
+Cuplé	Spanish Folk Music
+Galician Folk Music	Spanish Folk Music
+Música festera	Spanish Folk Music
+Pasodoble	Spanish Folk Music
+Valencian Folk Music	Spanish Folk Music
+Volga-Ural Folk Music	European Folk Music
+Bashkir Folk Music	Volga-Ural Folk Music
+Chuvash Folk Music	Volga-Ural Folk Music
+Komi Folk Music	Volga-Ural Folk Music
+Mari Folk Music	Volga-Ural Folk Music
+Mordvin Folk Music	Volga-Ural Folk Music
+Udmurt Folk Music	Volga-Ural Folk Music
+Volga Tatar Folk Music	Volga-Ural Folk Music
+Walloon Folk Music	European Folk Music
+White Voice	European Folk Music
+Yiddish Folksong	European Folk Music
+Football Chant	Traditional Folk Music
+Hazara Folk Music	Traditional Folk Music
+Hispanic American Folk Music	Traditional Folk Music
+Bambuco	Hispanic American Folk Music
+Bomba	Hispanic American Folk Music
+Candombe	Hispanic American Folk Music
+Canto a lo poeta	Hispanic American Folk Music
+Carranga	Hispanic American Folk Music
+Chacarera	Hispanic American Folk Music
+Chamamé	Hispanic American Folk Music
+Chamamé tropical	Chamamé
+Chamarrita rioplatense	Hispanic American Folk Music
+Cueca	Hispanic American Folk Music
+Cueca brava	Cueca
+Huayno	Hispanic American Folk Music
+Bolivian Huayño	Huayno
+Carnavalito	Huayno
+Chimaychi	Huayno
+Chuscada	Huayno
+Huayno con Arpa	Huayno
+Jibaro	Hispanic American Folk Music
+Joropo	Hispanic American Folk Music
+Malagueña venezolana	Hispanic American Folk Music
+Mexican Folk Music	Hispanic American Folk Music
+Canto cardenche	Mexican Folk Music
+Pirekua	Mexican Folk Music
+Son calentano	Mexican Folk Music
+Son huasteco	Mexican Folk Music
+Son istmeño	Mexican Folk Music
+Son jarocho	Mexican Folk Music
+Trova yucateca	Mexican Folk Music
+Milonga	Hispanic American Folk Music
+Milonga ciudadana	Milonga
+Muliza	Hispanic American Folk Music
+Música llanera	Hispanic American Folk Music
+Plena	Hispanic American Folk Music
+Saya	Hispanic American Folk Music
+Tamborito	Hispanic American Folk Music
+Taquirari	Hispanic American Folk Music
+Tonada chilena	Hispanic American Folk Music
+Yaraví	Hispanic American Folk Music
+Zamacueca	Hispanic American Folk Music
+Zamba	Hispanic American Folk Music
+Indigenous American Traditional Music	Traditional Folk Music
+Athabaskan Fiddling	Indigenous American Traditional Music
+Ghost Dance Song	Indigenous American Traditional Music
+Inuit Vocal Games	Indigenous American Traditional Music
+James Bay Fiddling	Indigenous American Traditional Music
+Mapuche Folk Music	Indigenous American Traditional Music
+Powwow Music	Indigenous American Traditional Music
+Rabbit Song	Indigenous American Traditional Music
+Stomp Dance Song	Indigenous American Traditional Music
+Tonada potosina	Indigenous American Traditional Music
+Unakesa	Indigenous American Traditional Music
+Indigenous Australian Traditional Music	Traditional Folk Music
+Djanba	Indigenous Australian Traditional Music
+Wangga	Indigenous Australian Traditional Music
+Industrial Folk Song	Traditional Folk Music
+Ladino Folksong	Traditional Folk Music
+Ob-Ugric Folk Music	Traditional Folk Music
+Payada	Traditional Folk Music
+Samoyedic Folk Music	Traditional Folk Music
+South Asian Folk Music	Traditional Folk Music
+Assamese Folk Music	South Asian Folk Music
+Nagara naam	Assamese Folk Music
+Bengali Folk Music	South Asian Folk Music
+Baul gaan	Bengali Folk Music
+Bhojpuri Folk Music	South Asian Folk Music
+Biraha	Bhojpuri Folk Music
+Boduberu	South Asian Folk Music
+Burushaski Folk Music	South Asian Folk Music
+Dohori	South Asian Folk Music
+Gujarati Folk Music	South Asian Folk Music
+Kannada Folk Music	South Asian Folk Music
+Kirtan	South Asian Folk Music
+Shabad kirtan	Kirtan
+Malayali Folk Music	South Asian Folk Music
+Mappila	Malayali Folk Music
+Marathi Folk Music	South Asian Folk Music
+Lavani	Marathi Folk Music
+Nepali lok geet	South Asian Folk Music
+Odia Folk Music	South Asian Folk Music
+Pala	Odia Folk Music
+Pashto Folk Music	South Asian Folk Music
+Punjabi Folk Music	South Asian Folk Music
+Rajasthani Folk Music	South Asian Folk Music
+Sinhalese Folk Music	South Asian Folk Music
+Sarala gee	Sinhalese Folk Music
+Tamil Folk Music	South Asian Folk Music
+Urumi melam	Tamil Folk Music
+Telugu Folk Music	South Asian Folk Music
+Burrakatha	Telugu Folk Music
+Southeast Asian Folk Music	Traditional Folk Music
+Balitaw	Southeast Asian Folk Music
+Bamar Folk Music	Southeast Asian Folk Music
+Gondang	Southeast Asian Folk Music
+Harana	Southeast Asian Folk Music
+Hmong Folk Music	Southeast Asian Folk Music
+Khmer Folk Music	Southeast Asian Folk Music
+Kuda kepang	Southeast Asian Folk Music
+Lao Folk Music	Southeast Asian Folk Music
+Malay Folk Music	Southeast Asian Folk Music
+Philippine Rondalla	Southeast Asian Folk Music
+Rapai dabõih	Southeast Asian Folk Music
+Tarawangsa	Southeast Asian Folk Music
+Thai Folk Music	Southeast Asian Folk Music
+Fon leb	Thai Folk Music
+Vietnamese Folk Music	Southeast Asian Folk Music
+West Asian Folk Music	Traditional Folk Music
+Alevi Folk Music	West Asian Folk Music
+Armenian Folk Music	West Asian Folk Music
+Kef Music	Armenian Folk Music
+Assyrian Folk Music	West Asian Folk Music
+Ayyalah	West Asian Folk Music
+Caucasian Folk Music	West Asian Folk Music
+Fijiri	West Asian Folk Music
+Israeli Folk Music	West Asian Folk Music
+Luri Folk Music	West Asian Folk Music
+Meyxana	West Asian Folk Music
+Persian Folk Music	West Asian Folk Music
+Turkish Folk Music	West Asian Folk Music
+Turkish Black Sea Region Folk Music	Turkish Folk Music
+Uzun Hava	Turkish Folk Music
+Bozlak	Uzun Hava
+Zeybek	Turkish Folk Music
+Work Song	Traditional Folk Music
+Aboio	Work Song
+Field Hollers	Work Song
+Haozi	Work Song
+Military Cadence	Work Song
+Òrain luaidh	Work Song
+Sea Shanty	Work Song
+Shan'ge	Work Song
+Yodeling	Traditional Folk Music
+Country Yodeling	Yodeling
+Naturjodel	Yodeling
 Hip Hop	
+Abstract Hip Hop	Hip Hop
+Afro Trap	Hip Hop
+Afroswing	Hip Hop
+Arabesque Rap	Hip Hop
+Battle Rap	Hip Hop
+Bongo Flava	Hip Hop
+Boom Bap	Hip Hop
+Bounce	Hip Hop
+Sissy Bounce	Bounce
+Chipmunk Soul	Hip Hop
+Chopped and Screwed	Hip Hop
+Christian Hip Hop	Hip Hop
+Cloud Rap	Hip Hop
+Comedy Rap	Hip Hop
+Chap Hop	Comedy Rap
+Conscious Hip Hop	Hip Hop
+Country Rap	Hip Hop
+Crunk	Hip Hop
+Crunkcore	Hip Hop
+Detroit Sound	Hip Hop
+Flint Sound	Detroit Sound
+Philly Drill	Detroit Sound
+Digicore	Hip Hop
+Dirty South	Hip Hop
+Disco Rap	Hip Hop
+Drill	Hip Hop
+Chicago Drill	Drill
+Bop	Chicago Drill
+Free Car Music	Drill
+Jersey Drill	Drill
+New York Drill	Drill
+Sample Drill	New York Drill
+Sexy Drill	New York Drill
+Philly Drill	Drill
+UK Drill	Drill
+Drumless	Hip Hop
+Emo Rap	Hip Hop
+Experimental Hip Hop	Hip Hop
+Industrial Hip Hop	Experimental Hip Hop
+G-Funk	Hip Hop
+Genge	Hip Hop
+Gengetone	Genge
+Hardcore Hip Hop	Hip Hop
+Britcore	Hardcore Hip Hop
+Chopper	Hardcore Hip Hop
+Gangsta Rap	Hardcore Hip Hop
+Coke Rap	Gangsta Rap
+Mafioso Rap	Gangsta Rap
+Road Rap	Gangsta Rap
+Scam Rap	Gangsta Rap
+Horrorcore	Hardcore Hip Hop
+Memphis Rap	Hardcore Hip Hop
+Dungeon Rap	Memphis Rap
+Phonk	Memphis Rap
+Mid-School Hip Hop	Hardcore Hip Hop
+Trap Metal	Hardcore Hip Hop
+Hipco	Hip Hop
+Hiplife	Hip Hop
+Houston Sound	Hip Hop
+Hyphy	Hip Hop
+Jerk Rap	Hyphy
+Instrumental Hip Hop	Hip Hop
+Rare Phonk	Instrumental Hip Hop
+Jazz Rap	Hip Hop
+Jerk	Hip Hop
+Jersey Club Rap	Hip Hop
+Jersey Drill	Jersey Club Rap
+Jigg	Hip Hop
+Jook	Hip Hop
+Latin Rap	Hip Hop
+Chicano Rap	Latin Rap
+Lo-Fi Hip Hop	Hip Hop
+Lowend	Hip Hop
+Miami Bass	Hip Hop
+Mobb Music	Hip Hop
+Motswako	Hip Hop
+Nerdcore Hip Hop	Hip Hop
+Nervous Music	Hip Hop
+Philly Club Rap	Hip Hop
+Pimp Rap	Hip Hop
+Political Hip Hop	Hip Hop
+Pop Rap	Hip Hop
+Bop	Pop Rap
+Frat Rap	Pop Rap
+Futuristic Swag	Pop Rap
+Ratchet	Hip Hop
+Samba Rap	Hip Hop
+Sigilkore	Hip Hop
+Snap	Hip Hop
+Stoner Rap	Hip Hop
+Trap	Hip Hop
+Chicago Drill	Trap
+Free Car Music	Trap
+Futuristic Swag	Trap
+New Jazz	Trap
+No Melody	Trap
+Plugg	Trap
+Ambient Plugg	Plugg
+Dark Plugg	Plugg
+PluggnB	Plugg
+Asian Rock	PluggnB
+Terror Plugg	Plugg
+Rage	Trap
+Rare Phonk	Trap
+Regalia	Trap
+Trap latino	Trap
+Trap Metal	Trap
+Trap Soul	Trap
+Tread	Trap
+Trap shaabi	Hip Hop
+Turntablism	Hip Hop
 Industrial / Noise	
+Industrial	Industrial / Noise
+Noise	Industrial / Noise
+Post-Industrial	Industrial / Noise
+Dark Ambient	Post-Industrial
+Deconstructed Club	Post-Industrial
+EBM	Post-Industrial
+Electro-Industrial	Post-Industrial
+Industrial Hardcore	Post-Industrial
+Industrial Hip Hop	Post-Industrial
+Industrial Metal	Post-Industrial
+Cyber Metal	Industrial Metal
+Neue Deutsche Härte	Industrial Metal
+Industrial Rock	Post-Industrial
+Machine Rock	Industrial Rock
+Industrial Techno	Post-Industrial
+Martial Industrial	Post-Industrial
+Power Noise	Post-Industrial
 Jazz	
+Afro-Jazz	Jazz
+Arabic Jazz	Jazz
+Avant-Garde Jazz	Jazz
+Experimental Big Band	Avant-Garde Jazz
+Free Funk	Avant-Garde Jazz
+Free Jazz	Avant-Garde Jazz
+European Free Jazz	Free Jazz
+Yass	Avant-Garde Jazz
+Bebop	Jazz
+Big Band	Jazz
+Experimental Big Band	Big Band
+Progressive Big Band	Big Band
+British Dance Band	Jazz
+Bulawayo Jazz	Jazz
+Cape Jazz	Jazz
+Cartoon Music	Jazz
+Chamber Jazz	Jazz
+Cool Jazz	Jazz
+Crime Jazz	Jazz
+Dark Jazz	Jazz
+Dixieland	Jazz
+ECM Style Jazz	Jazz
+Ethio-Jazz	Jazz
+Flamenco Jazz	Jazz
+Hard Bop	Jazz
+Indo Jazz	Jazz
+Jazz Fusion	Jazz
+Jazz manouche	Jazz
+Jazz Poetry	Jazz
+Jazz-Funk	Jazz
+Free Funk	Jazz-Funk
+Kréyol djaz	Jazz
+Latin Jazz	Jazz
+Afro-Cuban Jazz	Latin Jazz
+Samba-jazz	Latin Jazz
+Marabi	Jazz
+Kwela	Marabi
+Mbaqanga	Marabi
+Modal Jazz	Jazz
+Jazz Mugham	Modal Jazz
+Neo-Bop	Jazz
+Paramaribop	Jazz
+Post-Bop	Jazz
+Smooth Jazz	Jazz
+Soul Jazz	Jazz
+Spiritual Jazz	Jazz
+Spy Music	Jazz
+Stride	Jazz
+Sweet Jazz	Jazz
+Swing	Jazz
+Third Stream	Jazz
+Vocal Jazz	Jazz
+Vocalese	Vocal Jazz
+West Coast Jazz	Jazz
 Metal	
+Alternative Metal	Metal
+Funk Metal	Alternative Metal
+Neue Deutsche Härte	Alternative Metal
+Nu Metal	Alternative Metal
+Rap Metal	Alternative Metal
+Avant-Garde Metal	Metal
+Black Metal	Metal
+Atmospheric Black Metal	Black Metal
+Blackgaze	Atmospheric Black Metal
+Black 'n' Roll	Black Metal
+Black Noise	Black Metal
+Dissonant Black Metal	Black Metal
+DSBM	Black Metal
+Hellenic Black Metal	Black Metal
+Melodic Black Metal	Black Metal
+Pagan Black Metal	Black Metal
+Symphonic Black Metal	Black Metal
+War Metal	Black Metal
+Christian Metal	Metal
+Death Metal	Metal
+Brutal Death Metal	Death Metal
+Slam Death Metal	Brutal Death Metal
+Death 'n' Roll	Death Metal
+Deathgrind	Death Metal
+Melodic Death Metal	Death Metal
+Gothenburg Sound	Melodic Death Metal
+Technical Death Metal	Death Metal
+Dissonant Death Metal	Technical Death Metal
+Djent	Metal
+Thall	Djent
+Doom Metal	Metal
+Death Doom Metal	Doom Metal
+Funeral Doom Metal	Doom Metal
+Traditional Doom Metal	Doom Metal
+Epic Doom Metal	Traditional Doom Metal
+Drone Metal	Metal
+Folk Metal	Metal
+Celtic Metal	Folk Metal
+Mittelalter-Metal	Folk Metal
+Gothic Metal	Metal
+Grindcore	Metal
+Cybergrind	Grindcore
+Deathgrind	Grindcore
+Goregrind	Grindcore
+Gorenoise	Goregrind
+Pornogrind	Goregrind
+Mincecore	Grindcore
+Noisegrind	Grindcore
+Groove Metal	Metal
+Heavy Metal	Metal
+Speed Metal	Heavy Metal
+US Power Metal	Heavy Metal
+Industrial Metal	Metal
+Kawaii Metal	Metal
+Metalcore	Metal
+Deathcore	Metalcore
+Downtempo Deathcore	Deathcore
+Mathcore	Metalcore
+Melodic Metalcore	Metalcore
+Thall	Metalcore
+Neoclassical Metal	Metal
+Post-Metal	Metal
+Atmospheric Sludge Metal	Post-Metal
+Blackgaze	Post-Metal
+Doomgaze	Post-Metal
+Power Metal	Metal
+Progressive Metal	Metal
+Sludge Metal	Metal
+Atmospheric Sludge Metal	Sludge Metal
+Southern Metal	Metal
+Stenchcore	Metal
+Stoner Metal	Metal
+Symphonic Metal	Metal
+Thrash Metal	Metal
+Crossover Thrash	Thrash Metal
+Technical Thrash Metal	Thrash Metal
+Trance Metal	Metal
+Viking Metal	Metal
 Musical Theatre and Entertainment	
+Ballad Opera	Musical Theatre and Entertainment
+Cabaret	Musical Theatre and Entertainment
+Comédie-ballet	Musical Theatre and Entertainment
+Cuplé	Musical Theatre and Entertainment
+Dutch Cabaret	Musical Theatre and Entertainment
+Kabarett	Musical Theatre and Entertainment
+Kanto	Musical Theatre and Entertainment
+Minstrelsy	Musical Theatre and Entertainment
+Murga	Musical Theatre and Entertainment
+Murga uruguaya	Murga
+Music Hall	Musical Theatre and Entertainment
+Operetta	Musical Theatre and Entertainment
+Piosenka aktorska	Musical Theatre and Entertainment
+Revue	Musical Theatre and Entertainment
+Rock Musical	Musical Theatre and Entertainment
+Show Tunes	Musical Theatre and Entertainment
+Siffleur	Musical Theatre and Entertainment
+Singspiel	Musical Theatre and Entertainment
+Vaudeville	Musical Theatre and Entertainment
+Vaudeville Blues	Vaudeville
 New Age	
+Andean New Age	New Age
+Celtic New Age	New Age
+Native American New Age	New Age
+Neoclassical New Age	New Age
+New Age Kirtan	New Age
+Tibetan New Age	New Age
 Pop	
+Adult Contemporary	Pop
+Afrobeats	Pop
+Afropiano	Afrobeats
+Alté	Afrobeats
+Alt-Pop	Pop
+Arabic Pop	Pop
+Al jeel	Arabic Pop
+Mūsīqā lubnāniyya	Arabic Pop
+Art Pop	Pop
+Balkan Pop-Folk	Pop
+Chalga	Balkan Pop-Folk
+Manele	Balkan Pop-Folk
+Modern Laika	Balkan Pop-Folk
+Musika popullore	Balkan Pop-Folk
+Muzică de mahala	Balkan Pop-Folk
+Skiladika	Balkan Pop-Folk
+Tallava	Balkan Pop-Folk
+Turbo-Folk	Balkan Pop-Folk
+Baroque Pop	Pop
+Bitpop	Pop
+Blue-Eyed Soul	Pop
+Boy Band	Pop
+Brega calypso	Pop
+Brill Building	Pop
+Bubblegum	Pop
+C-Pop	Pop
+Cantopop	C-Pop
+Gufeng	C-Pop
+Hokkien Pop	C-Pop
+Mandopop	C-Pop
+Zhongguo feng	C-Pop
+Cambodian Pop	Pop
+Rom kbach	Cambodian Pop
+Canción melódica	Pop
+Bolero-Beat	Canción melódica
+Música cebolla	Canción melódica
+City Pop	Pop
+Neo-City Pop	City Pop
+Classical Crossover	Pop
+Operatic Pop	Classical Crossover
+Country Pop	Pop
+Dance-Pop	Pop
+Dangdut	Pop
+Dangdut koplo	Dangdut
+Dansbandsmusik	Pop
+Dansktop	Pop
+Electro Hop	Pop
+Electropop	Pop
+Europop	Pop
+Flamenco Pop	Pop
+Folk Pop	Pop
+French Pop	Pop
+Girl Group	Pop
+Hmong Pop	Pop
+Hyperpop	Pop
+Indian Pop	Pop
+Bohjpuri Pop	Indian Pop
+Indie Pop	Pop
+Bedroom Pop	Indie Pop
+C86	Indie Pop
+Chamber Pop	Indie Pop
+Neo-Acoustic	Indie Pop
+Tontipop	Indie Pop
+Twee Pop	Indie Pop
+Cuddlecore	Twee Pop
+Irish Showband	Pop
+Italo Pop	Pop
+Canzone neomelodica	Italo Pop
+J-Pop	Pop
+Akishibu-kei	J-Pop
+Denpa	J-Pop
+Wa Euro	J-Pop
+Yakousei	J-Pop
+Jazz Pop	Pop
+K-Pop	Pop
+Semi-Trot	K-Pop
+Kayōkyoku	Pop
+Idol kayō	Kayōkyoku
+Mood kayō	Kayōkyoku
+Techno kayō	Kayōkyoku
+Korean Ballad	Pop
+Oriental Ballad	Korean Ballad
+Latin Pop	Pop
+Cumbia pop	Latin Pop
+Tropipop	Latin Pop
+Lokal musik	Pop
+Mulatós	Pop
+Nederpop	Pop
+Palingsound	Nederpop
+New Music	Pop
+OPM	Pop
+Orthodox Pop	Pop
+P-Pop	Pop
+Persian Pop	Pop
+Pop Batak	Pop
+Pop Ghazal	Pop
+Pop Kreatif	Pop
+Pop Minang	Pop
+Talempong goyang	Pop Minang
+Pop Raï	Pop
+Pop Reggae	Pop
+Pop Rock	Pop
+Beat	Pop Rock
+Freakbeat	Beat
+Group Sounds	Beat
+Jovem Guarda	Beat
+Merseybeat	Beat
+Beat Rock	Pop Rock
+Big Music	Pop Rock
+Britpop	Pop Rock
+Jangle Pop	Pop Rock
+C86	Jangle Pop
+Dolewave	Jangle Pop
+Neo-Acoustic	Jangle Pop
+Paisley Underground	Jangle Pop
+Neon Pop Punk	Pop Rock
+Piano Rock	Pop Rock
+Pop Yeh-Yeh	Pop Rock
+Post-Britpop	Pop Rock
+Power Pop	Pop Rock
+Rock Jiwang	Pop Rock
+Soft Rock	Pop Rock
+Tropical Rock	Soft Rock
+Yacht Rock	Soft Rock
+Stereo	Pop Rock
+Twee Pop	Pop Rock
+Vocal Surf	Pop Rock
+Pop Soul	Pop
+Motown Sound	Pop Soul
+Pop Sunda	Pop
+Progressive Pop	Pop
+Psychedelic Pop	Pop
+Rabiz	Pop
+Rigsar	Pop
+Rockaballad	Pop
+Rumba catalana	Pop
+Russian Chanson	Pop
+Schlager	Pop
+Humppa	Schlager
+Levenslied	Schlager
+Partyschlager	Schlager
+Volkstümliche Musik	Schlager
+Sertanejo romântico	Pop
+Sertanejo universitário	Pop
+Agronejo	Sertanejo universitário
+Arrocha sertanejo	Sertanejo universitário
+Funknejo	Sertanejo universitário
+Sophisti-Pop	Pop
+Soviet Estrada	Pop
+Sunshine Pop	Pop
+Synthpop	Pop
+Tarz	Pop
+Teen Pop	Pop
+Toytown Pop	Pop
+Traditional Pop	Pop
+British Dance Band	Traditional Pop
+Mood kayō	Traditional Pop
+Romanţe	Traditional Pop
+Standards	Traditional Pop
+Tin Pan Alley	Traditional Pop
+Turkish Pop	Pop
+Vocal Trance	Pop
+Yé-yé	Pop
 Psychedelia	
+Neo-Psychedelia	Psychedelia
+Baggy	Neo-Psychedelia
+Dream Pop	Neo-Psychedelia
+Hypnagogic Pop	Neo-Psychedelia
+Paisley Underground	Neo-Psychedelia
+Space Rock Revival	Neo-Psychedelia
+Psychedelic Folk	Psychedelia
+Psychedelic Pop	Psychedelia
+Psychedelic Rock	Psychedelia
+Acid Rock	Psychedelic Rock
+Freakbeat	Psychedelic Rock
+Garage Psych	Psychedelic Rock
+Heavy Psych	Psychedelic Rock
+Raga Rock	Psychedelic Rock
+Space Rock	Psychedelic Rock
+Space Rock Revival	Space Rock
+Xian Psych	Psychedelic Rock
+Zamrock	Psychedelic Rock
+Psychedelic Soul	Psychedelia
+Psychsploitation	Psychedelia
+Sitarsploitation	Psychsploitation
+Stoner Metal	Psychedelia
+Stoner Rock	Psychedelia
+Tropicália	Psychedelia
 Punk / Post-Punk / Hardcore	
+Art Punk	Punk / Post-Punk / Hardcore
+Egg Punk	Art Punk
+Cowpunk	Punk / Post-Punk / Hardcore
+Digital Hardcore	Punk / Post-Punk / Hardcore
+Emo	Punk / Post-Punk / Hardcore
+Emo-Pop	Emo
+Emocore	Emo
+Mall Screamo	Emo
+Midwest Emo	Emo
+Screamo	Emo
+Emoviolence	Screamo
+Folk Punk	Punk / Post-Punk / Hardcore
+Celtic Punk	Folk Punk
+Gypsy Punk	Folk Punk
+Rustic Stomp	Folk Punk
+Hardcore [Punk]	Punk / Post-Punk / Hardcore
+Beatdown Hardcore	Hardcore [Punk]
+Electronicore	Hardcore [Punk]
+Grindcore	Hardcore [Punk]
+Hardcore Punk	Hardcore [Punk]
+Burning Spirits	Hardcore Punk
+Crossover Thrash	Hardcore Punk
+Crust Punk	Hardcore Punk
+Blackened Crust	Crust Punk
+Neocrust	Crust Punk
+Stenchcore	Crust Punk
+D-Beat	Hardcore Punk
+Melodic Hardcore	Hardcore Punk
+Mincecore	Hardcore Punk
+Skacore	Hardcore Punk
+Crack Rock Steady	Skacore
+Street Punk	Hardcore Punk
+Thrashcore	Hardcore Punk
+Powerviolence	Thrashcore
+Metalcore	Hardcore [Punk]
+Nintendocore	Hardcore [Punk]
+Noisecore	Hardcore [Punk]
+Post-Hardcore	Hardcore [Punk]
+Emocore	Post-Hardcore
+Mall Screamo	Post-Hardcore
+Screamo	Post-Hardcore
+Swancore	Post-Hardcore
+Sass	Hardcore [Punk]
+Tough Guy Hardcore	Hardcore [Punk]
+Mod Revival	Punk / Post-Punk / Hardcore
+Pigfuck	Punk / Post-Punk / Hardcore
+Post-Punk	Punk / Post-Punk / Hardcore
+Coldwave	Post-Punk
+Dance-Punk	Post-Punk
+Dance-Punk Revival	Dance-Punk
+Gothic Rock	Post-Punk
+Deathrock	Gothic Rock
+Positive Punk	Gothic Rock
+Post-Punk Revival	Post-Punk
+Dance-Punk Revival	Post-Punk Revival
+Proto-Punk	Punk / Post-Punk / Hardcore
+Punk Blues	Punk / Post-Punk / Hardcore
+Punk Poetry	Punk / Post-Punk / Hardcore
+Punk Rock	Punk / Post-Punk / Hardcore
+Anarcho-Punk	Punk Rock
+Celtic Punk	Punk Rock
+Deathrock	Punk Rock
+Deutschpunk	Punk Rock
+Egg Punk	Punk Rock
+Garage Punk	Punk Rock
+Budget Rock	Garage Punk
+Glam Punk	Punk Rock
+Hardcore Punk	Punk Rock
+Horror Punk	Punk Rock
+Könsrock	Punk Rock
+Oi!	Punk Rock
+Pop Punk	Punk Rock
+Easycore	Pop Punk
+Neon Pop Punk	Pop Punk
+Seishun Punk	Pop Punk
+Positive Punk	Punk Rock
+Psychobilly	Punk Rock
+Ska Punk	Punk Rock
+Skacore	Ska Punk
+Skate Punk	Punk Rock
+Surf Punk	Punk Rock
+Vikingarock	Punk Rock
+Synth Punk	Punk / Post-Punk / Hardcore
 R&B / Soul / Funk	
+Acid Jazz	R&B / Soul / Funk
+Beach Music	R&B / Soul / Funk
+Blue-Eyed Soul	R&B / Soul / Funk
+Boogie	R&B / Soul / Funk
+Contemporary R&B	R&B / Soul / Funk
+Alternative R&B	Contemporary R&B
+Hip Hop Soul	Contemporary R&B
+New Jack Swing	Contemporary R&B
+Trap Soul	Contemporary R&B
+UK Street Soul	Contemporary R&B
+Funk	R&B / Soul / Funk
+Afro-Funk	Funk
+Britfunk	Funk
+Deep Funk	Funk
+Go-Go	Funk
+Bounce Beat	Go-Go
+Jazz-Funk	Funk
+Latin Funk	Funk
+P-Funk	Funk
+Porn Groove	Funk
+Synth Funk	Funk
+Minneapolis Sound	Synth Funk
+New Orleans R&B	R&B / Soul / Funk
+Rhythm & Blues	R&B / Soul / Funk
+British Rhythm & Blues	Rhythm & Blues
+Doo-Wop	Rhythm & Blues
+Swamp Pop	Rhythm & Blues
+Twist	Rhythm & Blues
+West Side Sound	Rhythm & Blues
+Soul	R&B / Soul / Funk
+Chicago Soul	Soul
+Country Soul	Soul
+Deep Soul	Soul
+Latin Soul	Soul
+Neo-Soul	Soul
+Philly Soul	Soul
+Pop Soul	Soul
+Progressive Soul	Soul
+Psychedelic Soul	Soul
+Smooth Soul	Soul
+Southern Soul	Soul
+Soul Blues	R&B / Soul / Funk
 Reggae / Ska / Dancehall	
+Dancehall	Reggae / Ska / Dancehall
+Bubbling	Dancehall
+Digital Dancehall	Dancehall
+Flex Dance Music	Dancehall
+Gommance	Dancehall
+Ragga	Dancehall
+Shatta	Dancehall
+Trap Dancehall	Dancehall
+Zess	Dancehall
+Reggae	Reggae / Ska / Dancehall
+Deejay	Reggae
+Digital Dancehall	Reggae
+Dub	Reggae
+Lovers Rock	Reggae
+Pacific Reggae	Reggae
+Jawaiian	Pacific Reggae
+Pop Reggae	Reggae
+Roots Reggae	Reggae
+Dub Poetry	Roots Reggae
+Seggae	Reggae
+Skinhead Reggae	Reggae
+Rocksteady	Reggae / Ska / Dancehall
+Ska	Reggae / Ska / Dancehall
+2 Tone	Ska
+Jamaican Ska	Ska
+New Tone	Ska
+Spouge	Ska
+Third Wave Ska	Ska
+Ska Punk	Third Wave Ska
 Regional Music	
+African Music	Regional Music
+African Folk Music	African Music
+Afro-Jazz	African Music
+Cape Verdean Music	African Music
+Batuque	Cape Verdean Music
+Coladeira	Cape Verdean Music
+Funaná	Cape Verdean Music
+Morna	Cape Verdean Music
+Central African Music	African Music
+Ambasse bey	Central African Music
+Assiko	Central African Music
+Banda Music	Central African Music
+Bend-skin	Central African Music
+Bikutsi	Central African Music
+Congolese Rumba	Central African Music
+Kalindula	Central African Music
+Kilapanga	Central African Music
+Kizomba	Central African Music
+Tarraxinha	Kizomba
+Kuduro	Central African Music
+Makossa	Central African Music
+Mangambeu	Central African Music
+Mbenga-Mbuti Music	Central African Music
+Mbolé	Central African Music
+Puxa	Central African Music
+Semba	Central African Music
+Soukous	Central African Music
+Kwassa kwassa	Soukous
+Tradi-moderne congolais	Central African Music
+Twa Music	Central African Music
+Zamrock	Central African Music
+East African Music	African Music
+Acholi Music	East African Music
+Acholitronix	Acholi Music
+Baganda Music	East African Music
+Buganda Royal Court Music	Baganda Music
+Kadongo kamu	Baganda Music
+Mataali	Baganda Music
+Benga	East African Music
+Beni	East African Music
+Bongo Flava	East African Music
+Comorian Music	East African Music
+M'godro	Comorian Music
+Dinka Music	East African Music
+Genge	East African Music
+Gogo Music	East African Music
+Inkiranya	East African Music
+Kadodi	East African Music
+Kapuka	East African Music
+Kidandali	East African Music
+Kidumbak	East African Music
+Luo Music	East African Music
+Marrabenta	East African Music
+Mchiriku	East African Music
+Mijikenda Music	East African Music
+Mugithi	East African Music
+Muziki wa dansi	East African Music
+Ngoma	East African Music
+Omutibo	East African Music
+Shilluk Music	East African Music
+Singeli	East African Music
+Soga Music	East African Music
+Taarab	East African Music
+Timbila	East African Music
+Twa Music	East African Music
+Malagasy Music	African Music
+Kalon'ny fahiny	Malagasy Music
+Malagasy Folk Music	Malagasy Music
+Salegy	Malagasy Music
+Tsapiky	Malagasy Music
+North African Music	African Music
+Amazigh Music	North African Music
+Ahwash	Amazigh Music
+Izlan	Amazigh Music
+Kabyle Music	Amazigh Music
+Sahrawi Music	Amazigh Music
+Staïfi	Amazigh Music
+Tuareg Music	Amazigh Music
+Takamba	Tuareg Music
+Tishoumaren	Tuareg Music
+Egyptian Music	North African Music
+Al jeel	Egyptian Music
+Ancient Egyptian Music	Egyptian Music
+Coptic Music	Egyptian Music
+Raqs baladi	Egyptian Music
+Sa'idi	Egyptian Music
+Shaabi	Egyptian Music
+Mahraganat	Shaabi
+Trap shaabi	Shaabi
+Maghrebi Music	North African Music
+Aita	Maghrebi Music
+Algerian Chaabi	Maghrebi Music
+Andalusian Classical Music	Maghrebi Music
+Banga	Maghrebi Music
+Bedoui wahrani	Maghrebi Music
+Gnawa	Maghrebi Music
+Jilala Music	Maghrebi Music
+Malhun	Maghrebi Music
+Moroccan Chaabi	Maghrebi Music
+Moorish Music	North African Music
+Northeastern African Music	African Music
+Afar Music	Northeastern African Music
+Beja Music	Northeastern African Music
+Dinka Music	Northeastern African Music
+Ethiopic Music	Northeastern African Music
+Azmari	Ethiopic Music
+Ethio-Jazz	Ethiopic Music
+Ethiopian Church Music	Ethiopic Music
+Gurage Music	Ethiopic Music
+Manzuma	Ethiopic Music
+Tigrinya Music	Ethiopic Music
+Guayla	Tigrinya Music
+Tizita	Ethiopic Music
+Nubian Music	Northeastern African Music
+Nuer Music	Northeastern African Music
+Oromo Music	Northeastern African Music
+Shilluk Music	Northeastern African Music
+Somali Music	Northeastern African Music
+Belwo	Somali Music
+Dhaanto	Somali Music
+Qaraami	Somali Music
+Welayta Music	Northeastern African Music
+Seychelles & Mascarene Islands Music	African Music
+Maloya	Seychelles & Mascarene Islands Music
+Maloya électronique	Maloya
+Maloya élektrik	Maloya
+Traditional Maloya	Maloya
+Moutya	Seychelles & Mascarene Islands Music
+Santé engagé	Seychelles & Mascarene Islands Music
+Séga	Seychelles & Mascarene Islands Music
+Seggae	Séga
+Traditional Séga	Séga
+Southern African Music	African Music
+Amapiano	Southern African Music
+Bulawayo Jazz	Southern African Music
+Cape Jazz	Southern African Music
+Famo	Southern African Music
+Gqom	Southern African Music
+Isicathamiya	Southern African Music
+Jit	Southern African Music
+Kwaito	Southern African Music
+Marabi	Southern African Music
+Maskandi	Southern African Music
+Mbube	Southern African Music
+Motswako	Southern African Music
+Shangaan Electro	Southern African Music
+Shona Music	Southern African Music
+Chimurenga	Shona Music
+Shona Mbira Music	Shona Music
+Southern African Folk Music	Southern African Music
+Sungura	Southern African Music
+Township Bubblegum	Southern African Music
+Township Jive	Southern African Music
+Tsonga Disco	Southern African Music
+West African Music	African Music
+Afro-Funk	West African Music
+Afro-Rock	West African Music
+Afrobeat	West African Music
+Akan Music	West African Music
+Kete	Akan Music
+Zoblazo	Akan Music
+Balani Show	West African Music
+Dagomba Music	West African Music
+Ewe Music	West African Music
+Agbadza	Ewe Music
+Agbekor	Ewe Music
+Fon Music	West African Music
+Tchink System	Fon Music
+Tchinkoumé	Fon Music
+Zinli	Fon Music
+Fula Music	West African Music
+Griot Music	West African Music
+Gumbe	West African Music
+Hausa Music	West African Music
+Highlife	West African Music
+Burger-Highlife	Highlife
+Hipco	West African Music
+Hiplife	West African Music
+Igbo Music	West African Music
+Ogene Music	Igbo Music
+Ufie Music	Igbo Music
+Kabye Folk Music	West African Music
+Kru Music	West African Music
+Alloukou	Kru Music
+Palm Wine Music	Kru Music
+Ziglibithy	Kru Music
+Mande Music	West African Music
+Mossi Music	West African Music
+Songhai Music	West African Music
+Tradi-moderne ivoirien	West African Music
+Wassoulou	West African Music
+Wolof Music	West African Music
+Mbalax	Wolof Music
+Tassu	Wolof Music
+Yoruba Music	West African Music
+Apala	Yoruba Music
+Fuji	Yoruba Music
+Jùjú	Yoruba Music
+Santería Music	Yoruba Music
+Waka	Yoruba Music
+Yoruba Folk Opera	Yoruba Music
+Zouglou	West African Music
+Coupé-décalé	Zouglou
+Ancient Music	Regional Music
+Ancient Chinese Music	Ancient Music
+Ancient Egyptian Music	Ancient Music
+Ancient Greek Music	Ancient Music
+Ancient Levitical Music	Ancient Music
+Ancient Roman Music	Ancient Music
+Hyang-ak	Ancient Music
+Mesopotamian Music	Ancient Music
+Arabic Music	Regional Music
+Al-Jadīd	Arabic Music
+Algerian Chaabi	Arabic Music
+Arabic Classical Music	Arabic Music
+Arabic Folk Music	Arabic Music
+Arabic Jazz	Arabic Music
+Arabic Pop	Arabic Music
+Bedouin Music	Arabic Music
+Aita	Bedouin Music
+Ayyalah	Bedouin Music
+Bedoui wahrani	Bedouin Music
+Raï	Bedouin Music
+Pop Raï	Raï
+Traditional Raï	Raï
+Samri	Bedouin Music
+Shilla	Bedouin Music
+Dabke	Arabic Music
+Khaliji Music	Arabic Music
+Ayyalah	Khaliji Music
+Fijiri	Khaliji Music
+Liwa	Khaliji Music
+Nuban	Khaliji Music
+Samri	Khaliji Music
+Sawt	Khaliji Music
+Shehhi Music	Khaliji Music
+Shilla	Khaliji Music
+Levantine Arabic Music	Arabic Music
+Druze Music	Levantine Arabic Music
+Mūsīqā lubnāniyya	Levantine Arabic Music
+Orkes gambus	Arabic Music
+Raï	Arabic Music
+Shaabi	Arabic Music
+Zajal	Arabic Music
+Asian Music	Regional Music
+Buddhist Music	Asian Music
+Beompae	Buddhist Music
+Chöd	Buddhist Music
+Shōmyō	Buddhist Music
+Tibetan Buddhist Chant	Buddhist Music
+Central Asian Music	Asian Music
+Altai Music	Central Asian Music
+Balochi Music	Central Asian Music
+Bashkir Folk Music	Central Asian Music
+Burushaski Folk Music	Central Asian Music
+Central Asian Throat Singing	Central Asian Music
+Kai	Central Asian Throat Singing
+Mongolian Throat Singing	Central Asian Throat Singing
+Tuvan Throat Singing	Central Asian Throat Singing
+Hazara Folk Music	Central Asian Music
+Karakalpak Traditional Music	Central Asian Music
+Kazakh Music	Central Asian Music
+Khakas Traditional Music	Central Asian Music
+Kyrgyz Traditional Music	Central Asian Music
+Mongolian Music	Central Asian Music
+Bogino duu	Mongolian Music
+Buryat Music	Mongolian Music
+Kalmyk Music	Mongolian Music
+Mongolian Throat Singing	Mongolian Music
+Urtiin duu	Mongolian Music
+Zohioliin duu	Mongolian Music
+Pamiri Music	Central Asian Music
+Falak	Pamiri Music
+Pashto Folk Music	Central Asian Music
+Shashmaqam	Central Asian Music
+Sufiana kalam	Central Asian Music
+Tajik Music	Central Asian Music
+Tarz	Central Asian Music
+Tibetan Music	Central Asian Music
+Chöd	Tibetan Music
+Tibetan Buddhist Chant	Tibetan Music
+Zhabdro gorgom	Tibetan Music
+Turkmen Music	Central Asian Music
+Uyghur Music	Central Asian Music
+Bayawan	Uyghur Music
+Twelve Muqam	Uyghur Music
+Uzbek Music	Central Asian Music
+East Asian Music	Asian Music
+Ainu Music	East Asian Music
+Upopo	Ainu Music
+Yukar	Ainu Music
+Chinese Music	East Asian Music
+Ancient Chinese Music	Chinese Music
+Campus Folk	Chinese Music
+Chinese Classical Music	Chinese Music
+Chinese Folk Music	Chinese Music
+Chinese Opera	Chinese Music
+Cantonese Opera	Chinese Opera
+Henan Opera	Chinese Opera
+Kunqu Opera	Chinese Opera
+Peking Opera	Chinese Opera
+Korean Revolutionary Opera	Peking Opera
+Revolutionary Opera	Peking Opera
+Shaoxing Opera	Chinese Opera
+Sichuan Opera	Chinese Opera
+Yangzhou Opera	Chinese Opera
+Minyue	Chinese Music
+Naxi Music	Chinese Music
+Baisha xiyue	Naxi Music
+Dongjing	Naxi Music
+Quyi	Chinese Music
+Shidaiqu	Chinese Music
+Sizhu Music	Chinese Music
+Chaozhou xianshi	Sizhu Music
+Guangdong yinyue	Sizhu Music
+Jiangnan sizhu	Sizhu Music
+Nanyin	Sizhu Music
+Taoist Ritual Music	Chinese Music
+Xibei feng	Chinese Music
+Xinyao	Chinese Music
+Zhongguo feng	Chinese Music
+East Asian Classical Music	East Asian Music
+East Asian Folk Music	East Asian Music
+Japanese Music	East Asian Music
+Eleki	Japanese Music
+Enka	Japanese Music
+Japanese Classical Music	Japanese Music
+Japanese Folk Music	Japanese Music
+Ryūkōka	Japanese Music
+Korean Music	East Asian Music
+Beompae	Korean Music
+Changjak gugak	Korean Music
+Fusion Gugak	Korean Music
+Korean Classical Music	Korean Music
+Korean Folk Music	Korean Music
+Korean Revolutionary Opera	Korean Music
+Oriental Ballad	Korean Music
+Trot	Korean Music
+Pon-chak disco	Trot
+Semi-Trot	Trot
+Manchu Music	East Asian Music
+Ryukyuan Music	East Asian Music
+Amami shimauta	Ryukyuan Music
+Okinawan Music	Ryukyuan Music
+Vietnamese Music	East Asian Music
+Bolero Việt Nam	Vietnamese Music
+Ca trù	Vietnamese Music
+Cải lương	Vietnamese Music
+Hát lô tô	Vietnamese Music
+Ngâm thơ	Vietnamese Music
+Nhạc đỏ	Vietnamese Music
+Nhạc tiền chiến	Vietnamese Music
+Nhạc vàng	Vietnamese Music
+Tân cổ giao duyên	Vietnamese Music
+Vietnamese Court Music	Vietnamese Music
+Vietnamese Folk Music	Vietnamese Music
+Ghazal	Asian Music
+North Asian Music	Asian Music
+Ainu Music	North Asian Music
+Chukchi Folk Music	North Asian Music
+Kai	North Asian Music
+Khakas Traditional Music	North Asian Music
+Manchu Music	North Asian Music
+Mongolian Music	North Asian Music
+Nivkh Music	North Asian Music
+Ob-Ugric Folk Music	North Asian Music
+Sakha Traditional Music	North Asian Music
+Samoyedic Folk Music	North Asian Music
+Tuvan Throat Singing	North Asian Music
+South Asian Music	Asian Music
+Adhunik geet	South Asian Music
+Baila	South Asian Music
+Balochi Music	South Asian Music
+Bhajan	South Asian Music
+Bhangra	South Asian Music
+Folkhop	Bhangra
+Dek Bass	South Asian Music
+Dhol tasha	South Asian Music
+Filmi	South Asian Music
+Gaana	South Asian Music
+Garba	South Asian Music
+Ginan	South Asian Music
+Goan Music	South Asian Music
+Indian Pop	South Asian Music
+Indo Jazz	South Asian Music
+Jhumar	South Asian Music
+Jibonmukhi gaan	South Asian Music
+Newa Music	South Asian Music
+Pop Ghazal	South Asian Music
+Rigsar	South Asian Music
+Sindhi Music	South Asian Music
+South Asian Classical Music	South Asian Music
+South Asian Folk Music	South Asian Music
+Stotra	South Asian Music
+Sufi Rock	South Asian Music
+Sufiana kalam	South Asian Music
+Tarz	South Asian Music
+Vedic Chant	South Asian Music
+Southeast Asian Music	Asian Music
+Bamar Music	Southeast Asian Music
+Bamar Folk Music	Bamar Music
+Burmese Classical Music	Bamar Music
+Mono	Bamar Music
+Hill Tribe Music	Southeast Asian Music
+Hmong Folk Music	Hill Tribe Music
+Hmong Pop	Hill Tribe Music
+Lisu Music	Hill Tribe Music
+Indonesian Music	Southeast Asian Music
+Balinese Music	Indonesian Music
+Balinese Gamelan	Balinese Music
+Kecak	Balinese Music
+Batak Music	Indonesian Music
+Gondang	Batak Music
+Pop Batak	Batak Music
+Dangdut	Indonesian Music
+Gambang kromong	Indonesian Music
+Javanese Music	Indonesian Music
+Bantengan	Javanese Music
+Campursari	Javanese Music
+Dangdut koplo	Javanese Music
+Javanese Gamelan	Javanese Music
+Kuda kepang	Javanese Music
+Langgam Jawa	Javanese Music
+Kakawin	Indonesian Music
+Keroncong	Indonesian Music
+Cilokaq	Keroncong
+Langgam Jawa	Keroncong
+Minangkabau Music	Indonesian Music
+Pop Minang	Minangkabau Music
+Saluang klasik	Minangkabau Music
+Talempong	Minangkabau Music
+Orkes gambus	Indonesian Music
+Qasidah modern	Indonesian Music
+Sundanese Music	Indonesian Music
+Gamelan degung	Sundanese Music
+Jaipongan	Sundanese Music
+Kacapi suling	Sundanese Music
+Ketuk tilu	Sundanese Music
+Kliningan	Sundanese Music
+Pop Sunda	Sundanese Music
+Tarawangsa	Sundanese Music
+Tembang Sunda Cianjuran	Sundanese Music
+Tanjidor	Indonesian Music
+Khmer Music	Southeast Asian Music
+Cambodian Pop	Khmer Music
+Kantruem	Khmer Music
+Khmer Folk Music	Khmer Music
+Pinpeat	Khmer Music
+Malay Music	Southeast Asian Music
+Dikir barat	Malay Music
+Dondang sayang	Malay Music
+Malay Classical Music	Malay Music
+Malay Folk Music	Malay Music
+Pop Yeh-Yeh	Malay Music
+Rock Jiwang	Malay Music
+Rock Kapak	Malay Music
+Molam	Southeast Asian Music
+Molam sing	Molam
+Philippine Music	Southeast Asian Music
+Balitaw	Philippine Music
+Harana	Philippine Music
+Igorot Music	Philippine Music
+Ilocano Music	Philippine Music
+Kundiman	Philippine Music
+OPM	Philippine Music
+Philippine Rondalla	Philippine Music
+Pinoy Folk Rock	Philippine Music
+Southeast Asian Classical Music	Southeast Asian Music
+Southeast Asian Folk Music	Southeast Asian Music
+Stereo	Southeast Asian Music
+Thai Music	Southeast Asian Music
+Luk krung	Thai Music
+Lilat	Luk krung
+Luk thung	Thai Music
+Molam sing	Thai Music
+Phleng phuea chiwit	Thai Music
+Thai Classical Music	Thai Music
+Thai Folk Music	Thai Music
+Wong shadow	Thai Music
+Vietnamese Music	Southeast Asian Music
+Xinyao	Southeast Asian Music
+West Asian Music	Asian Music
+Armenian Music	West Asian Music
+Armenian Church Music	Armenian Music
+Armenian Folk Music	Armenian Music
+Rabiz	Armenian Music
+Azerbaijani Music	West Asian Music
+Azerbaijani Mugham	Azerbaijani Music
+Jazz Mugham	Azerbaijani Music
+Meyxana	Azerbaijani Music
+Symphonic Mugham	Azerbaijani Music
+Caucasian Music	West Asian Music
+Caucasian Folk Music	Caucasian Music
+Karachay-Balkarian Music	Caucasian Music
+Rabiz	Caucasian Music
+Dabke	West Asian Music
+Gilaki Music	West Asian Music
+Iraqi Maqam	West Asian Music
+Khaliji Music	West Asian Music
+Kurdish Music	West Asian Music
+Levantine Arabic Music	West Asian Music
+Maftirim	West Asian Music
+Mesopotamian Music	West Asian Music
+Muzika mizrahit	West Asian Music
+Muzikat dika'on	Muzika mizrahit
+Persian Music	West Asian Music
+Achomi Music	Persian Music
+Bandari	Persian Music
+Koche bazari	Persian Music
+Persian Classical Music	Persian Music
+Persian Folk Music	Persian Music
+Persian Pop	Persian Music
+Sana'ani Song	West Asian Music
+Turkish Music	West Asian Music
+Anatolian Rock	Turkish Music
+Arabesk	Turkish Music
+Fantezi	Turkish Music
+Kanto	Turkish Music
+Ottoman Military Music	Turkish Music
+Özgün Müzik	Turkish Music
+Turkish Classical Music	Turkish Music
+Turkish Folk Music	Turkish Music
+Turkish Pop	Turkish Music
+West Asian Folk Music	West Asian Music
+Yemenite Jewish Diwan	West Asian Music
+Austronesian Music	Regional Music
+Balinese Music	Austronesian Music
+Batak Music	Austronesian Music
+Gamelan	Austronesian Music
+Igorot Music	Austronesian Music
+Indigenous Taiwanese Music	Austronesian Music
+Javanese Music	Austronesian Music
+Malagasy Music	Austronesian Music
+Malay Music	Austronesian Music
+Minangkabau Music	Austronesian Music
+Pakacaping Music	Austronesian Music
+Sundanese Music	Austronesian Music
+Caribbean Music	Regional Music
+Aleke	Caribbean Music
+Brukdown	Caribbean Music
+Bullerengue	Caribbean Music
+Calypso	Caribbean Music
+Calipso venezolano	Calypso
+Spouge	Calypso
+Caribbean Folk Music	Caribbean Music
+Champeta	Caribbean Music
+Cuban Music	Caribbean Music
+Abakuá Music	Cuban Music
+Chachachá	Cuban Music
+Changüí	Cuban Music
+Conga	Cuban Music
+Cuban Charanga	Cuban Music
+Cubaton	Cuban Music
+Reparto	Cubaton
+Danzón	Cuban Music
+Descarga	Cuban Music
+Filin	Cuban Music
+Guajira	Cuban Music
+Guaracha	Cuban Music
+Habanera	Cuban Music
+Mambo	Cuban Music
+Mozambique	Cuban Music
+Pachanga	Cuban Music
+Pilón	Cuban Music
+Rumba cubana	Cuban Music
+Guaguancó	Rumba cubana
+Santería Music	Cuban Music
+Son cubano	Cuban Music
+Bolero son	Son cubano
+Son montuno	Son cubano
+Songo	Cuban Music
+Timba	Cuban Music
+Trova	Cuban Music
+Nueva trova	Trova
+Tumba francesa	Cuban Music
+Cumbia colombiana	Caribbean Music
+Dominican Music	Caribbean Music
+Bachata	Dominican Music
+Dembow	Dominican Music
+Merengue	Dominican Music
+Mambo urbano	Merengue
+Merecumbé	Merengue
+Merengue típico	Merengue
+Merenhouse	Merengue
+Tecnomerengue	Merengue
+French Caribbean Music	Caribbean Music
+Bele	French Caribbean Music
+Biguine	French Caribbean Music
+Bouyon	French Caribbean Music
+Cadence Lypso	French Caribbean Music
+Dennery Segment	French Caribbean Music
+Gwo ka	French Caribbean Music
+Haitian Music	French Caribbean Music
+Cadence rampa	Haitian Music
+Compas	Haitian Music
+Haitian Vodou Drumming	Haitian Music
+Méringue	Haitian Music
+Rabòday	Haitian Music
+Rara	Haitian Music
+Rasin	Haitian Music
+Twoubadou	Haitian Music
+Kréyol djaz	French Caribbean Music
+Tumbélé	French Caribbean Music
+Zouk	French Caribbean Music
+Cabo-Zouk	Zouk
+Zouk Love	Zouk
+Gaita zuliana	Caribbean Music
+Garifuna Music	Caribbean Music
+Punta	Garifuna Music
+Goombay	Caribbean Music
+Indo-Caribbean Music	Caribbean Music
+Baithak gana	Indo-Caribbean Music
+Chutney	Indo-Caribbean Music
+Chutney Soca	Chutney
+Tassa	Indo-Caribbean Music
+Jamaican Music	Caribbean Music
+Dancehall	Jamaican Music
+Jamaican Ska	Jamaican Music
+Kumina	Jamaican Music
+Mento	Jamaican Music
+Nyahbinghi	Jamaican Music
+Reggae	Jamaican Music
+Rocksteady	Jamaican Music
+Junkanoo	Caribbean Music
+Kaseko	Caribbean Music
+Palo de mayo	Caribbean Music
+Parang	Caribbean Music
+Porro	Caribbean Music
+Reggae panameño	Caribbean Music
+Soca	Caribbean Music
+Bashment Soca	Soca
+Chutney Soca	Soca
+Dennery Segment	Soca
+Power Soca	Soca
+Rapso	Soca
+Steel Band	Caribbean Music
+Tropicanibalismo	Caribbean Music
+Vallenato	Caribbean Music
+Central American Music	Regional Music
+Brukdown	Central American Music
+Cumbia salvadoreña	Central American Music
+Garifuna Music	Central American Music
+Palo de mayo	Central American Music
+Purísima	Central American Music
+Reggae panameño	Central American Music
+Son de pascua	Central American Music
+Son nica	Central American Music
+Tamborera	Central American Music
+Tamborito	Central American Music
+Xuc	Central American Music
+Christian Liturgical Music	Regional Music
+Anglican Chant	Christian Liturgical Music
+Armenian Church Music	Christian Liturgical Music
+Byzantine Chant	Christian Liturgical Music
+Coptic Music	Christian Liturgical Music
+East Slavic Church Music	Christian Liturgical Music
+Choral Concerto	East Slavic Church Music
+Kyivan Chant	East Slavic Church Music
+New Direction	East Slavic Church Music
+Valaam Chant	East Slavic Church Music
+Znamenny Chant	East Slavic Church Music
+Ethiopian Church Music	Christian Liturgical Music
+Mass	Christian Liturgical Music
+Requiem	Mass
+Moravian Church Music	Christian Liturgical Music
+Passion	Christian Liturgical Music
+Plainsong	Christian Liturgical Music
+Seinn nan salm	Christian Liturgical Music
+Syriac Chant	Christian Liturgical Music
+Taizé Chant	Christian Liturgical Music
+European Music	Regional Music
+Alpenrock	European Music
+Ancient Roman Music	European Music
+Anglican Chant	European Music
+Ashkenazi Music	European Music
+Ashkenazi Cantorial Music	Ashkenazi Music
+Klezmer	Ashkenazi Music
+Yiddish Folksong	Ashkenazi Music
+Balkan Music	European Music
+Balkan Folk Music	Balkan Music
+Balkan Pop-Folk	Balkan Music
+Entechna	Balkan Music
+Entechna laika	Entechna
+Neo Kyma	Entechna
+Laika	Balkan Music
+Entechna laika	Laika
+Modern Laika	Laika
+Skiladika	Laika
+Romanţe	Balkan Music
+Yu-Mex	Balkan Music
+Baroque Music	European Music
+Baroque Suite	European Music
+British Music	European Music
+Ballad Opera	British Music
+British Brass Band	British Music
+British Dance Band	British Music
+British Folk Rock	British Music
+Change Ringing	British Music
+Concertina Band	British Music
+Contenance angloise	British Music
+English Folk Music	British Music
+English Pastoral School	British Music
+Music Hall	British Music
+Sarum Chant	British Music
+Scottish Folk Music	British Music
+Welsh Folk Music	British Music
+Caucasian Music	European Music
+Celtic Electronica	European Music
+Celtic Metal	European Music
+Celtic New Age	European Music
+Celtic Punk	European Music
+Celtic Rock	European Music
+Chanson	European Music
+Chanson à texte	Chanson
+Chanson alternative	Chanson
+Chanson québécoise	Chanson
+Chanson réaliste	Chanson
+Nouvelle chanson française	Chanson
+Classical Period	European Music
+Country & Irish	European Music
+Crimean Tatar Music	European Music
+Dechovka	European Music
+Dutch Cabaret	European Music
+East Slavic Church Music	European Music
+European Folk Music	European Music
+Fanfare	European Music
+German Music	European Music
+Alsatian Folk Music	German Music
+German Folk Music	German Music
+Guggenmusik	German Music
+Ländler	German Music
+Lied	German Music
+Liedermacher	German Music
+Luxembourgish Folk Music	German Music
+Minnesang	German Music
+Romantische Oper	German Music
+Volkstümliche Musik	German Music
+Zeitoper	German Music
+Grand opéra	European Music
+Greek Music	European Music
+Ancient Greek Music	Greek Music
+Byzantine Music	Greek Music
+Entechna	Greek Music
+Greek Folk Music	Greek Music
+Laika	Greek Music
+Hornpipe	European Music
+Iberian Music	European Music
+Basque Folk Music	Iberian Music
+Catalan Folk Music	Iberian Music
+Euskal kantagintza berria	Iberian Music
+Fandango	Iberian Music
+Fandango caiçara	Fandango
+Nova cançó	Iberian Music
+Portuguese Music	Iberian Music
+Música de intervenção	Portuguese Music
+Pimba	Portuguese Music
+Portuguese Folk Music	Portuguese Music
+Spanish Music	Iberian Music
+Bolero español	Spanish Music
+Flamenco	Spanish Music
+Bulería	Flamenco
+Flamenco nuevo	Flamenco
+Flamenco Jazz	Flamenco nuevo
+Rumba flamenca	Flamenco
+Flamenco Pop	Spanish Music
+Nueva canción española	Spanish Music
+Rock andaluz	Spanish Music
+Rumba catalana	Spanish Music
+Spanish Classical Music	Spanish Music
+Spanish Folk Music	Spanish Music
+Tecnorumba	Spanish Music
+Villancico	Iberian Music
+Irish Showband	European Music
+Italian Music	European Music
+Canto beneventano	Italian Music
+Canzone d'autore	Italian Music
+Italian Folk Music	Italian Music
+Lauda	Italian Music
+Old Roman Chant	Italian Music
+Opera buffa	Italian Music
+Opera semiseria	Italian Music
+Opera seria	Italian Music
+Kabarett	European Music
+Kalmyk Music	European Music
+Kleinkunst	European Music
+Madrigal	European Music
+Medieval Classical Music	European Music
+Mélodie	European Music
+Mittelalter-Metal	European Music
+Mittelalter-Rock	European Music
+Moravian Church Music	European Music
+Mulatós	European Music
+Nordic Music	European Music
+Dansbandsmusik	Nordic Music
+Dansktop	Nordic Music
+Finnish Tango	Nordic Music
+Greenlandic Music	Nordic Music
+Kalattut	Greenlandic Music
+Tivaner inngernerlu	Greenlandic Music
+Uaajeerneq	Greenlandic Music
+Vaigat	Greenlandic Music
+Nordic Folk Music	Nordic Music
+Nordic Folk Rock	Nordic Music
+Rautalanka	Nordic Music
+Visa	Nordic Music
+Nòva cançon	European Music
+Opéra-comique	European Music
+Polish Music	European Music
+Chicago Polka	Polish Music
+Disco polo	Polish Music
+Eastern-Style Polka	Polish Music
+Mazur	Polish Music
+Mazurka	Polish Music
+Miejski folk	Polish Music
+Piosenka aktorska	Polish Music
+Poezja śpiewana	Polish Music
+Polish Folk Music	Polish Music
+Polonaise	Polish Music
+Renaissance Music	European Music
+Romanian Music	European Music
+Muzică de mahala	Romanian Music
+Romanian Etno Music	Romanian Music
+Romanian Folk Music	Romanian Music
+Romanţe	Romanian Music
+Russian Music	European Music
+Avtorskaya pesnya	Russian Music
+Bard Rock	Avtorskaya pesnya
+Russian Chanson	Russian Music
+Russian Folk Music	Russian Music
+Russian Romance	Russian Music
+Valaam Chant	Russian Music
+Schlager	European Music
+Schottische	European Music
+Chotis madrileño	Schottische
+Singspiel	European Music
+Taizé Chant	European Music
+Tragédie en musique	European Music
+Trampská hudba	European Music
+Verismo	European Music
+Waltz	European Music
+Vals venezolano	Waltz
+Valsa brasileira	Waltz
+Gospel	Regional Music
+Black Gospel	Gospel
+Praise Break	Black Gospel
+Sacred Steel	Black Gospel
+Traditional Black Gospel	Black Gospel
+Urban Contemporary Gospel	Black Gospel
+Country Gospel	Gospel
+Gospel Hymn	Gospel
+Southern Gospel	Gospel
+Hispanic Music	Regional Music
+Canción melódica	Hispanic Music
+Hispanic American Music	Hispanic Music
+Afro-Cuban Jazz	Hispanic American Music
+Argentine Music	Hispanic American Music
+Cuarteto	Argentine Music
+Cumbia argentina	Argentine Music
+Cumbia santafesina	Cumbia argentina
+Cumbia turra	Cumbia argentina
+Cumbia villera	Cumbia argentina
+Guaracha santiagueña	Argentine Music
+Nuevo Cancionero	Argentine Music
+RKT	Argentine Music
+Avanzada	Hispanic American Music
+Bailecito	Hispanic American Music
+Bolero	Hispanic American Music
+Bolero son	Bolero
+Filin	Bolero
+Boogaloo	Hispanic American Music
+Bullerengue	Hispanic American Music
+Caporal	Hispanic American Music
+Carnaval cruceño	Hispanic American Music
+Champeta	Hispanic American Music
+Chilean Music	Hispanic American Music
+Canto a lo poeta	Chilean Music
+Chilote Music	Chilean Music
+Cueca brava	Chilean Music
+Cumbia chilena	Chilean Music
+Nueva cumbia chilena	Cumbia chilena
+Jazz guachaca	Chilean Music
+Mambo chileno	Chilean Music
+Música cebolla	Chilean Music
+Música típica chilena	Chilean Music
+Neofolklore	Música típica chilena
+Nueva canción chilena	Chilean Music
+Tonada chilena	Chilean Music
+Chuntunqui romántico	Hispanic American Music
+Conjunto andino	Hispanic American Music
+Cuban Music	Hispanic American Music
+Cumbia	Hispanic American Music
+Cachaca	Cumbia
+Cumbia argentina	Cumbia
+Cumbia chilena	Cumbia
+Cumbia colombiana	Cumbia
+Cumbia mexicana	Cumbia
+Cumbia sonidera	Cumbia mexicana
+Cumbia rebajada	Cumbia sonidera
+Cumbia peruana	Cumbia
+Chicha	Cumbia peruana
+Cumbia amazónica	Cumbia peruana
+Cumbia norteña peruana	Cumbia peruana
+Cumbia sanjuanera	Cumbia norteña peruana
+Cumbia sureña peruana	Cumbia peruana
+Cumbia pop	Cumbia
+Cumbia salvadoreña	Cumbia
+Cumbia tejana	Cumbia
+Digital Cumbia	Cumbia
+Merecumbé	Cumbia
+Tecnocumbia	Cumbia
+Currulao	Hispanic American Music
+Dominican Music	Hispanic American Music
+Gaita zuliana	Hispanic American Music
+Guarania	Hispanic American Music
+Hispanic American Folk Music	Hispanic American Music
+Latin Alternative	Hispanic American Music
+Nueva cumbia chilena	Latin Alternative
+Latin American Classical Music	Hispanic American Music
+Latin Disco	Hispanic American Music
+Latin Electronic	Hispanic American Music
+Latin Funk	Hispanic American Music
+Latin Pop	Hispanic American Music
+Latin Rock	Hispanic American Music
+Latin Soul	Hispanic American Music
+Mexican Music	Hispanic American Music
+Bandas de viento de México	Mexican Music
+Banda sinaloense	Bandas de viento de México
+Movimiento Alterado	Banda sinaloense
+Tecnobanda	Banda sinaloense
+Chilena	Mexican Music
+Corrido	Mexican Music
+Cumbia mexicana	Mexican Music
+Cumbiatón	Mexican Music
+Grupero	Mexican Music
+Mariachi	Mexican Music
+Mexican Folk Music	Mexican Music
+Norteño	Mexican Music
+Cumbia norteña mexicana	Norteño
+Duranguense	Norteño
+Movimiento Alterado	Norteño
+Sierreño	Norteño
+Corrido tumbado	Sierreño
+Ranchera	Mexican Music
+Tejano Music	Mexican Music
+Cumbia tejana	Tejano Music
+New Mexico Music	Hispanic American Music
+Nueva canción latinoamericana	Hispanic American Music
+Nueva canción chilena	Nueva canción latinoamericana
+Nueva trova	Nueva canción latinoamericana
+Nuevo Cancionero	Nueva canción latinoamericana
+Onda nueva	Hispanic American Music
+Pasillo	Hispanic American Music
+Peruvian Music	Hispanic American Music
+Chimaychi	Peruvian Music
+Chuscada	Peruvian Music
+Coplas cajamarquinas	Peruvian Music
+Cumbia peruana	Peruvian Music
+Huaylarsh	Peruvian Music
+Huayno con Arpa	Peruvian Music
+Música criolla peruana	Peruvian Music
+Festejo	Música criolla peruana
+Landó	Música criolla peruana
+Marinera	Música criolla peruana
+Marinera norteña	Marinera
+Polka peruana	Música criolla peruana
+Tondero	Música criolla peruana
+Vals criollo	Música criolla peruana
+Pandilla	Peruvian Music
+Tunantada	Peruvian Music
+Polka paraguaya	Hispanic American Music
+Porro	Hispanic American Music
+Purísima	Hispanic American Music
+Reggae panameño	Hispanic American Music
+Reggaetón	Hispanic American Music
+Bachatón	Reggaetón
+Cubaton	Reggaetón
+Cumbiatón	Reggaetón
+Doble paso	Reggaetón
+Neoperreo	Reggaetón
+RKT	Reggaetón
+Romantic Flow	Reggaetón
+Rhumba	Hispanic American Music
+Rioplatense Music	Hispanic American Music
+Candombe	Rioplatense Music
+Candombe beat	Rioplatense Music
+Chamarrita rioplatense	Rioplatense Music
+Cumbia pop	Rioplatense Music
+Electrotango	Rioplatense Music
+Milonga	Rioplatense Music
+Murga uruguaya	Rioplatense Music
+Tango	Rioplatense Music
+Finnish Tango	Tango
+Milonga ciudadana	Tango
+Tango Nuevo	Tango
+Rock andino	Hispanic American Music
+Salsa	Hispanic American Music
+Salsa choke	Salsa
+Salsa dura	Salsa
+Salsa romántica	Salsa
+Timba	Salsa
+Son de pascua	Hispanic American Music
+Son nica	Hispanic American Music
+Tamborera	Hispanic American Music
+Tropicanibalismo	Hispanic American Music
+Vallenato	Hispanic American Music
+Vals venezolano	Hispanic American Music
+Xuc	Hispanic American Music
+Murga	Hispanic Music
+Nueva canción	Hispanic Music
+Nueva canción española	Nueva canción
+Nueva canción latinoamericana	Nueva canción
+Philippine Rondalla	Hispanic Music
+Romance	Hispanic Music
+Spanish Music	Hispanic Music
+Indigenous American Music	Regional Music
+Garifuna Music	Indigenous American Music
+Indigenous American Traditional Music	Indigenous American Music
+Indigenous Andean Music	Indigenous American Music
+Baguala	Indigenous Andean Music
+Harawi	Indigenous Andean Music
+Huaylarsh	Indigenous Andean Music
+Huayno	Indigenous Andean Music
+Morenada	Indigenous Andean Music
+Sikuri	Indigenous Andean Music
+Tonada potosina	Indigenous Andean Music
+Indigenous North American Music	Indigenous American Music
+Athabaskan Fiddling	Indigenous North American Music
+Ghost Dance Song	Indigenous North American Music
+Inuit Music	Indigenous North American Music
+Inuit Vocal Games	Inuit Music
+Tivaner inngernerlu	Inuit Music
+Uaajeerneq	Inuit Music
+James Bay Fiddling	Indigenous North American Music
+Métis Music	Indigenous North American Music
+Métis Fiddling	Métis Music
+Navajo Music	Indigenous North American Music
+O'odham Music	Indigenous North American Music
+Waila	O'odham Music
+Powwow Music	Indigenous North American Music
+Pueblo Music	Indigenous North American Music
+Rabbit Song	Indigenous North American Music
+Stomp Dance Song	Indigenous North American Music
+Mesoamerican Music	Indigenous American Music
+Maya Music	Mesoamerican Music
+Nahua Music	Mesoamerican Music
+Pirekua	Mesoamerican Music
+Islamic Religious Music & Recitation	Regional Music
+Adhan	Islamic Religious Music & Recitation
+Ginan	Islamic Religious Music & Recitation
+Jilala Music	Islamic Religious Music & Recitation
+Maddahi	Islamic Religious Music & Recitation
+Shoor	Maddahi
+Mappila	Islamic Religious Music & Recitation
+Mataali	Islamic Religious Music & Recitation
+Nasheed	Islamic Religious Music & Recitation
+Rapai dabõih	Islamic Religious Music & Recitation
+Turkish Mevlevi Music	Islamic Religious Music & Recitation
+Jewish Music	Regional Music
+Ashkenazi Music	Jewish Music
+Hasidic Music	Jewish Music
+Nigun	Hasidic Music
+Jewish Liturgical Music	Jewish Music
+Ancient Levitical Music	Jewish Liturgical Music
+Chazzanut	Jewish Liturgical Music
+Ashkenazi Cantorial Music	Chazzanut
+Kriyat haTorah	Jewish Liturgical Music
+Piyyut	Jewish Liturgical Music
+Baqashot	Piyyut
+Zemirot	Piyyut
+Muzika mizrahit	Jewish Music
+Muzika yehudit mekorit	Jewish Music
+Oriental Jewish Music	Jewish Music
+Baqashot	Oriental Jewish Music
+Yemenite Jewish Diwan	Oriental Jewish Music
+Orthodox Pop	Jewish Music
+Sephardic Music	Jewish Music
+Baqashot	Sephardic Music
+Ladino Folksong	Sephardic Music
+Maftirim	Sephardic Music
+Maqāmic Music	Regional Music
+Northern American Music	Regional Music
+Ambient Americana	Northern American Music
+American Folk Music	Northern American Music
+American Primitivism	Northern American Music
+Barbershop	Northern American Music
+Jubilee	Barbershop
+Black Gospel	Northern American Music
+Boogie Woogie	Northern American Music
+Canadian Folk Music	Northern American Music
+Chanson québécoise	Northern American Music
+Chicago Polka	Northern American Music
+Coon Song	Northern American Music
+Country	Northern American Music
+Country Rock	Northern American Music
+Cosmic Country	Country Rock
+Cowboy Poetry	Northern American Music
+Eastern-Style Polka	Northern American Music
+Foxtrot	Northern American Music
+Gospel Hymn	Northern American Music
+Greenlandic Music	Northern American Music
+Hapa haole	Northern American Music
+Indigenous North American Music	Northern American Music
+Louisiana Music	Northern American Music
+Cajun Music	Louisiana Music
+Traditional Cajun Music	Cajun Music
+New Orleans Brass Band	Louisiana Music
+New Orleans R&B	Louisiana Music
+Swamp Blues	Louisiana Music
+Swamp Pop	Louisiana Music
+Zydeco	Louisiana Music
+Nouveau zydeco	Zydeco
+Minstrelsy	Northern American Music
+New Mexico Music	Northern American Music
+Pep Band	Northern American Music
+Ragtime	Northern American Music
+Cakewalk	Ragtime
+Classic Ragtime	Ragtime
+Honky-Tonk Piano	Ragtime
+Novelty Piano	Ragtime
+Ragtime Song	Ragtime
+Stride	Ragtime
+Roots Rock	Northern American Music
+Swamp Rock	Roots Rock
+Tex-Mex	Roots Rock
+Shaker Music	Northern American Music
+Southern Gospel	Northern American Music
+Texan Music	Northern American Music
+Acoustic Texas Blues	Texan Music
+Electric Texas Blues	Texan Music
+Tejano Music	Texan Music
+Tex-Mex	Texan Music
+Tin Pan Alley	Northern American Music
+Vaudeville	Northern American Music
+Oceanian Music	Regional Music
+Australian Folk Music	Oceanian Music
+Indigenous Australian Traditional Music	Oceanian Music
+Melanesian Music	Oceanian Music
+Fijian Music	Melanesian Music
+Vude	Fijian Music
+Kaneka	Melanesian Music
+Lokal musik	Melanesian Music
+Papuan Folk Music	Melanesian Music
+Tolai Rock	Melanesian Music
+Micronesian Music	Oceanian Music
+Kantan Chamorrita	Micronesian Music
+Pacific Reggae	Oceanian Music
+Polynesian Music	Oceanian Music
+Fijian Music	Polynesian Music
+Hawaiian Music	Polynesian Music
+Hapa haole	Hawaiian Music
+Jawaiian	Hawaiian Music
+Slack-Key Guitar	Hawaiian Music
+Himene tarava	Polynesian Music
+Māori Music	Polynesian Music
+Samoan Music	Polynesian Music
+Tahitian Music	Polynesian Music
+'Ote'a	Tahitian Music
+Tongan Music	Polynesian Music
+Siren Jam	Oceanian Music
+Polyphonic Chant	Regional Music
+Ars nova	Polyphonic Chant
+Ars subtilior	Polyphonic Chant
+Cante alentejano	Polyphonic Chant
+Cantu a tenore	Polyphonic Chant
+Contenance angloise	Polyphonic Chant
+Dongzu dage	Polyphonic Chant
+Ganga	Polyphonic Chant
+Himene tarava	Polyphonic Chant
+Izvorna bosanska muzika	Polyphonic Chant
+Lab Polyphony	Polyphonic Chant
+Madrigal	Polyphonic Chant
+Paghjella	Polyphonic Chant
+Polifonia occitana	Polyphonic Chant
+Seto leelo	Polyphonic Chant
+Sutartinės	Polyphonic Chant
+Tosk Polyphony	Polyphonic Chant
+Trallalero	Polyphonic Chant
+Prehistoric Music	Regional Music
+South American Music	Regional Music
+Aleke	South American Music
+Argentine Music	South American Music
+Avanzada	South American Music
+Bailecito	South American Music
+Baithak gana	South American Music
+Bambuco	South American Music
+Brazilian Music	South American Music
+Brazilian Classical Music	Brazilian Music
+Brazilian Folk Music	Brazilian Music
+Brega	Brazilian Music
+Arrocha	Brega
+Arrochadeira	Arrocha
+Bregadeira	Arrocha
+Brega calypso	Brega
+Tecnobrega	Brega
+Dobrado	Brazilian Music
+Funk brasileiro	Brazilian Music
+Arrocha funk	Funk brasileiro
+Beat bolha	Funk brasileiro
+Beat fino	Funk brasileiro
+Brega funk	Funk brasileiro
+Eletrofunk	Funk brasileiro
+Funk 150 bpm	Funk brasileiro
+Funk carioca	Funk brasileiro
+Funk proibidão	Funk carioca
+Tamborzão	Funk carioca
+Funk consciente	Funk brasileiro
+Funk de BH	Funk brasileiro
+Funk mandelão	Funk brasileiro
+Funk Melody	Funk brasileiro
+Funk ostentação	Funk brasileiro
+Funknejo	Funk brasileiro
+Mega funk	Funk brasileiro
+Noiadance	Funk brasileiro
+Rasteirinha	Funk brasileiro
+Tecnofunk	Funk brasileiro
+Trapfunk	Funk brasileiro
+Lambada	Brazilian Music
+Guitarrada	Lambada
+MPB	Brazilian Music
+Tropicália	MPB
+Northeastern Brazilian Music	Brazilian Music
+Aboio	Northeastern Brazilian Music
+Afoxé	Northeastern Brazilian Music
+Arrocha	Northeastern Brazilian Music
+Axé	Northeastern Brazilian Music
+Pagodão	Axé
+Arrochadeira	Pagodão
+Samba-reggae	Axé
+Baião	Northeastern Brazilian Music
+Banda de pífano	Northeastern Brazilian Music
+Brega funk	Northeastern Brazilian Music
+Cantoria	Northeastern Brazilian Music
+Coco	Northeastern Brazilian Music
+Ciranda	Coco
+Embolada	Coco
+Forró	Northeastern Brazilian Music
+Forró eletrônico	Forró
+Forró de favela	Forró eletrônico
+Piseiro	Forró eletrônico
+Forró universitário	Forró
+Frevo	Northeastern Brazilian Music
+Frevo de bloco	Frevo
+Frevo de rua	Frevo
+Frevo elétrico	Frevo
+Frevo-canção	Frevo
+Manguebeat	Northeastern Brazilian Music
+Maracatu	Northeastern Brazilian Music
+Samba de roda	Northeastern Brazilian Music
+Tecnobrega	Northeastern Brazilian Music
+Udigrudi	Northeastern Brazilian Music
+Unakesa	Northeastern Brazilian Music
+Xaxado	Northeastern Brazilian Music
+Northern Brazilian Music	Brazilian Music
+Brega calypso	Northern Brazilian Music
+Carimbó	Northern Brazilian Music
+Rock rural	Brazilian Music
+Samba	Brazilian Music
+Batucada	Samba
+Bossa nova	Samba
+Marchinha	Samba
+Pagode	Samba
+Pagodão	Pagode
+Pagode romântico	Pagode
+Partido alto	Samba
+Samba de breque	Samba
+Samba de gafieira	Samba
+Samba de roda	Samba
+Samba de terreiro	Samba
+Samba-canção	Samba
+Samba-choro	Samba
+Samba-enredo	Samba
+Samba-exaltação	Samba
+Samba-jazz	Samba
+Samba-joia	Samba
+Samba-rock	Samba
+Samba Soul	Samba-rock
+Sambalanço	Samba
+Samba Rap	Brazilian Music
+Sertanejo	Brazilian Music
+Rasqueado	Sertanejo
+Sertanejo de raiz	Sertanejo
+Sertanejo romântico	Sertanejo
+Sertanejo universitário	Sertanejo
+Southeastern Brazilian Music	Brazilian Music
+Choro	Southeastern Brazilian Music
+Samba-choro	Choro
+Jongo	Southeastern Brazilian Music
+Marchinha	Southeastern Brazilian Music
+Maxixe	Southeastern Brazilian Music
+Pagode	Southeastern Brazilian Music
+Partido alto	Southeastern Brazilian Music
+Samba de breque	Southeastern Brazilian Music
+Samba de gafieira	Southeastern Brazilian Music
+Samba de terreiro	Southeastern Brazilian Music
+Samba-enredo	Southeastern Brazilian Music
+Seresta	Southeastern Brazilian Music
+Tamborzão	Southeastern Brazilian Music
+Southern Brazilian Music	Brazilian Music
+Bandinha	Southern Brazilian Music
+Música gaúcha	Southern Brazilian Music
+Vanera	Música gaúcha
+Xote	Brazilian Music
+Bullerengue	South American Music
+Cachaca	South American Music
+Calipso venezolano	South American Music
+Candombe beat	South American Music
+Caporal	South American Music
+Carnaval cruceño	South American Music
+Carranga	South American Music
+Chacarera	South American Music
+Chamamé	South American Music
+Champeta	South American Music
+Chilean Music	South American Music
+Chuntunqui romántico	South American Music
+Conjunto andino	South American Music
+Cueca	South American Music
+Cumbia colombiana	South American Music
+Currulao	South American Music
+Gaita zuliana	South American Music
+Guarania	South American Music
+Indigenous Andean Music	South American Music
+Joropo	South American Music
+Kaseko	South American Music
+Malagueña venezolana	South American Music
+Mapuche Folk Music	South American Music
+Muliza	South American Music
+Música llanera	South American Music
+Onda nueva	South American Music
+Paramaribop	South American Music
+Pasillo	South American Music
+Payada	South American Music
+Peruvian Music	South American Music
+Polka paraguaya	South American Music
+Porro	South American Music
+Rioplatense Music	South American Music
+Rock andino	South American Music
+Salsa choke	South American Music
+Saya	South American Music
+Taquirari	South American Music
+Tecnomerengue	South American Music
+Vallenato	South American Music
+Vals venezolano	South American Music
+Yaraví	South American Music
+Zamacueca	South American Music
+Zamba	South American Music
+Sufi Music	Regional Music
+Banga	Sufi Music
+Jilala Music	Sufi Music
+Kafi	Sufi Music
+Manzuma	Sufi Music
+Qawwali	Sufi Music
+Sufi Rock	Sufi Music
+Sufiana kalam	Sufi Music
+Turkish Mevlevi Music	Sufi Music
+Traditional Folk Music	Regional Music
+Turkic-Mongolic Music	Regional Music
+Altai Music	Turkic-Mongolic Music
+Bashkir Folk Music	Turkic-Mongolic Music
+Central Asian Throat Singing	Turkic-Mongolic Music
+Karakalpak Traditional Music	Turkic-Mongolic Music
+Khakas Traditional Music	Turkic-Mongolic Music
+Kyrgyz Traditional Music	Turkic-Mongolic Music
+Mongolian Music	Turkic-Mongolic Music
+Sakha Traditional Music	Turkic-Mongolic Music
 Rock	
-Scenes & Movements	
+Acoustic Rock	Rock
+Afro-Rock	Rock
+Alternative Rock	Rock
+Alternative Dance	Alternative Rock
+Britpop	Alternative Rock
+Dream Pop	Alternative Rock
+Emo-Pop	Alternative Rock
+Geek Rock	Alternative Rock
+Grunge	Alternative Rock
+Indie Rock	Alternative Rock
+Baggy	Indie Rock
+C86	Indie Rock
+Dolewave	Indie Rock
+Dunedin Sound	Indie Rock
+Garage Rock Revival	Indie Rock
+Grebo	Indie Rock
+Indie Surf	Indie Rock
+Math Pop	Indie Rock
+Midwest Emo	Indie Rock
+New Rave	Indie Rock
+Noise Pop	Indie Rock
+Post-Punk Revival	Indie Rock
+Slacker Rock	Indie Rock
+Shitgaze	Slacker Rock
+Slowcore	Indie Rock
+Jangle Pop	Alternative Rock
+Mall Screamo	Alternative Rock
+Post-Britpop	Alternative Rock
+Post-Grunge	Alternative Rock
+Shimokita-kei	Alternative Rock
+Shoegaze	Alternative Rock
+Anatolian Rock	Rock
+AOR	Rock
+Art Punk	Rock
+Art Rock	Rock
+Bard Rock	Rock
+Blues Rock	Rock
+Boogie Rock	Blues Rock
+British Rhythm & Blues	Rock
+Candombe beat	Rock
+Christian Rock	Rock
+Xian Psych	Christian Rock
+Comedy Rock	Rock
+Country Rock	Rock
+Cowpunk	Rock
+Deutschrock	Rock
+Emo	Rock
+Experimental Rock	Rock
+Avant-Prog	Experimental Rock
+Brutal Prog	Avant-Prog
+Zeuhl	Avant-Prog
+Folk Rock	Rock
+Alpenrock	Folk Rock
+British Folk Rock	Folk Rock
+Celtic Rock	Folk Rock
+Mittelalter-Rock	Folk Rock
+Nordic Folk Rock	Folk Rock
+Phleng phuea chiwit	Folk Rock
+Pinoy Folk Rock	Folk Rock
+Rock rural	Folk Rock
+Funk Rock	Rock
+Funk Metal	Funk Rock
+Garage Rock	Rock
+Frat Rock	Garage Rock
+Freakbeat	Garage Rock
+Garage Psych	Garage Rock
+Garage Punk	Garage Rock
+Garage Rock Revival	Garage Rock
+Glam Rock	Rock
+Glam Punk	Glam Rock
+Hard Rock	Rock
+Glam Metal	Hard Rock
+Sleaze Rock	Glam Metal
+Heavy Psych	Hard Rock
+Occult Rock	Hard Rock
+Rock Kapak	Hard Rock
+Stoner Rock	Hard Rock
+Hardcore [Punk]	Rock
+Heartland Rock	Rock
+Industrial Rock	Rock
+Jam Band	Rock
+Jamgrass	Jam Band
+Livetronica	Jam Band
+Jazz-Rock	Rock
+Jersey Shore Sound	Rock
+Latin Rock	Rock
+Manguebeat	Rock
+Math Rock	Rock
+Math Pop	Math Rock
+Metal	Rock
+Miejski folk	Rock
+New Wave	Rock
+2 Tone	New Wave
+Beat Rock	New Wave
+Mod Revival	New Wave
+Noise Rock	Rock
+Pigfuck	Noise Rock
+Shitgaze	Noise Rock
+Pop Rock	Rock
+Post-Punk	Rock
+Post-Rock	Rock
+Progressive Rock	Rock
+Avant-Prog	Progressive Rock
+Canterbury Scene	Progressive Rock
+Neo-Canterbury	Canterbury Scene
+Neo-Prog	Progressive Rock
+Symphonic Prog	Progressive Rock
+Proto-Punk	Rock
+Psychedelic Rock	Rock
+Pub Rock	Rock
+Punk Blues	Rock
+Punk Rock	Rock
+Rap Rock	Rock
+Rap Metal	Rap Rock
+Reggae Rock	Rock
+Rock & Roll	Rock
+Indorock	Rock & Roll
+Rockaballad	Rock & Roll
+Rockabilly	Rock & Roll
+Psychobilly	Rockabilly
+Twist	Rock & Roll
+Rock andaluz	Rock
+Rock andino	Rock
+Rock Musical	Rock
+Rock Opera	Rock
+Roots Rock	Rock
+Southern Rock	Rock
+Sufi Rock	Rock
+Surf Music	Rock
+Hot Rod Music	Surf Music
+Indie Surf	Surf Music
+Surf Punk	Surf Music
+Surf Rock	Surf Music
+Eleki	Surf Rock
+Rautalanka	Surf Rock
+Wong shadow	Surf Rock
+Vocal Surf	Surf Music
+Symphonic Rock	Rock
+Tolai Rock	Rock
+Zolo	Rock
 Singer-Songwriter	
+Avtorskaya pesnya	Singer-Songwriter
+Canzone d'autore	Singer-Songwriter
+Chanson à texte	Singer-Songwriter
+Euskal kantagintza berria	Singer-Songwriter
+Jibonmukhi gaan	Singer-Songwriter
+Kleinkunst	Singer-Songwriter
+Liedermacher	Singer-Songwriter
+Música de intervenção	Singer-Songwriter
+Nova cançó	Singer-Songwriter
+Nòva cançon	Singer-Songwriter
+Nueva canción	Singer-Songwriter
+Poezja śpiewana	Singer-Songwriter
+Trova	Singer-Songwriter
 Spoken Word	
+Fairy Tale	Spoken Word
+Folktales	Spoken Word
+Guided Meditation	Spoken Word
+Interview	Spoken Word
+Lectures	Spoken Word
+Poetry	Spoken Word
+Beat Poetry	Poetry
+Cowboy Poetry	Poetry
+Dub Poetry	Poetry
+Jazz Poetry	Poetry
+Punk Poetry	Poetry
+Slam Poetry	Poetry
+Sound Poetry	Poetry
+Radio Drama	Spoken Word
+Speeches	Spoken Word
+Sermons	Speeches
+Stand-Up Comedy	Spoken Word
 Ambient Pop	
 ASMR	
 Audio Documentary	
+Sound Map	Audio Documentary
 Beatboxing	
 Bugle Call	
 Children's Music	
+Lullabies	Children's Music
+Batonebi Song	Lullabies
+Nursery Rhymes	Children's Music
 Comedy	
+Break-In	Comedy
+Dutch Cabaret	Comedy
+Kabarett	Comedy
+Musical Comedy	Comedy
+Comedy Rap	Musical Comedy
+Comedy Rock	Musical Comedy
+Scrumpy and Western	Musical Comedy
+Prank Call	Comedy
+Sketch Comedy	Comedy
+Stand-Up Comedy	Comedy
 Concert Band	
 Dark Cabaret	
 Darkwave	
+Ethereal Wave	Darkwave
+Neoclassical Darkwave	Darkwave
+Neue Deutsche Todeskunst	Darkwave
+A cappella	
+Canto cardenche	A cappella
+Choral Concerto	A cappella
+Contemporary A Cappella	A cappella
+Ghost Dance Song	A cappella
+Isicathamiya	A cappella
+Mbube	A cappella
+Sean-nós	A cappella
+Shape Note Singing	A cappella
+Educational Music	
+Holiday Music	
+Carols	Holiday Music
+Christmas Music	Holiday Music
+Son de pascua	Christmas Music
+Halloween Music	Holiday Music
+Marchinha	Holiday Music
+Samba-enredo	Holiday Music
+Toada de Boi	Holiday Music
+Musical Parody	
+Satire	
+Soundtrack	
+Film Soundtrack	Soundtrack
+Film Score	Film Soundtrack
+Filmi	Film Soundtrack
+Library Music	Soundtrack
+Television Music	Soundtrack
+Video Game Music	Soundtrack
+Vocal Group	
+Barbershop	Vocal Group
+Doo-Wop	Vocal Group
 Field Recording	
-Gospel	
+Nature Recordings	Field Recording
+Animal Sounds	Nature Recordings
+Bird Sounds	Animal Sounds
+Insect Sounds	Animal Sounds
+Whale Song	Animal Sounds
+Rain Sounds	Nature Recordings
+Radio Broadcast Recordings	Field Recording
+Sound Map	Field Recording
 Hanmai	
 Hauntology	
 Hymn	
+Bhajan	Hymn
+Gospel Hymn	Hymn
+Lauda	Hymn
+Purísima	Hymn
+Shape Note Singing	Hymn
+Stotra	Hymn
 Jingles	
 Krautrock	
+Berlin School	Krautrock
 Mantra	
+Tibetan Buddhist Chant	Mantra
+Vedic Chant	Mantra
 March	
+Circus March	March
+Dobrado	March
+Funeral March	March
+Música festera	March
 Marching Band	
+Beni	Marching Band
+Drum and Bugle Corps	Marching Band
+Drumline	Marching Band
+Fife and Drum Corps	Marching Band
+Guggenmusik	Marching Band
+Pep Band	Marching Band
+Pipe Band	Marching Band
 Mashup	
 Mechanical Music	
 Novelty	
@@ -51,5 +3615,306 @@ Parlour Music
 Sacred Singing Circle	
 Slowed & Reverb	
 Sound Effects	
+Battle Record	Sound Effects
+Binaural Beats	Sound Effects
+Broadband Noise	Sound Effects
 Toypop	
 Worldbeat	
+ABC No Rio Scene	Scenes & Movements
+Afrofuturism	Scenes & Movements
+Akron Sound	Scenes & Movements
+Alté	Scenes & Movements
+Anarcho-Punk	Scenes & Movements
+Anison	Scenes & Movements
+Asian Underground	Scenes & Movements
+Aussie Pub Rock	Scenes & Movements
+Austin New Sincerity	Scenes & Movements
+Authenticité	Scenes & Movements
+Ballroom	Scenes & Movements
+Bay Area Thrash Metal	Scenes & Movements
+Beach Music	Scenes & Movements
+Beijing New Sound	Scenes & Movements
+Bérite Club	Scenes & Movements
+Berlin Techno	Scenes & Movements
+Bernese Dialect Scene	Scenes & Movements
+Black Rio	Scenes & Movements
+Bloghouse	Scenes & Movements
+Bosstown Sound	Scenes & Movements
+Boston Hardcore	Scenes & Movements
+Bristol Sound	Scenes & Movements
+British Beat Boom	Scenes & Movements
+British Rhythm & Blues	Scenes & Movements
+British Trad Jazz	Scenes & Movements
+Britpop	Scenes & Movements
+Brno Alternative Scene	Scenes & Movements
+BRock	Scenes & Movements
+Brony Music	Scenes & Movements
+Brumbeat	Scenes & Movements
+Burger-Highlife	Scenes & Movements
+C-Pop	Scenes & Movements
+Campus Folk	Scenes & Movements
+Canterbury Scene	Scenes & Movements
+Cascadian Black Metal	Scenes & Movements
+CBGB Scene	Scenes & Movements
+CCM	Scenes & Movements
+Jesus Music	CCM
+Praise & Worship	CCM
+Urban Contemporary Gospel	CCM
+Česká alternativní scéna	Scenes & Movements
+Česká nová vlna	Scenes & Movements
+Český underground	Scenes & Movements
+Chicago No Wave	Scenes & Movements
+Chicago School	Scenes & Movements
+Chikipunk	Scenes & Movements
+Christian Hardcore	Scenes & Movements
+City Pop	Scenes & Movements
+Cleveland Punk	Scenes & Movements
+Clube da esquina	Scenes & Movements
+Cocktail Nation	Scenes & Movements
+Crisálida sónica	Scenes & Movements
+D.C. Hardcore	Scenes & Movements
+Revolution Summer	D.C. Hardcore
+Dariacore	Scenes & Movements
+Darmstadt School	Scenes & Movements
+Dek Bass	Scenes & Movements
+Demoscene	Scenes & Movements
+Desi Hip Hop	Scenes & Movements
+Deutschrock	Scenes & Movements
+Dolewave	Scenes & Movements
+Donosti Sound	Scenes & Movements
+Doom WAD Music	Scenes & Movements
+Doujin Music	Scenes & Movements
+Touhou Music	Doujin Music
+Downtown Music	Scenes & Movements
+Du ca	Scenes & Movements
+Dunedin Sound	Scenes & Movements
+Düsseldorf School	Scenes & Movements
+East Coast Hip Hop	Scenes & Movements
+Bronx Drill	East Coast Hip Hop
+Brooklyn Drill	East Coast Hip Hop
+DMV Hip Hop	East Coast Hip Hop
+Echtzeitmusik	Scenes & Movements
+Emo Revival	Scenes & Movements
+English Underground	Scenes & Movements
+Epadunk	Scenes & Movements
+Filk	Scenes & Movements
+First Wave of Detroit Techno	Scenes & Movements
+Florida Fast Music	Scenes & Movements
+Fort Thunder Scene	Scenes & Movements
+Franco-Flemish School	Scenes & Movements
+Frankfurt Sound	Scenes & Movements
+Frapcore	Scenes & Movements
+Free Noise	Scenes & Movements
+French Hip Hop	Scenes & Movements
+Friese bries	Scenes & Movements
+Furry Music	Scenes & Movements
+Futurism	Scenes & Movements
+Gothenburg Sound	Scenes & Movements
+Grebo	Scenes & Movements
+Greenwich Village Scene	Scenes & Movements
+Group Sounds	Scenes & Movements
+Hamburger Schule	Scenes & Movements
+Harlem Renaissance	Scenes & Movements
+Hellenic Black Metal	Scenes & Movements
+High Quality Rip	Scenes & Movements
+Hip-hopolo	Scenes & Movements
+Hipco	Scenes & Movements
+Hoboken Sound	Scenes & Movements
+Hollandse School	Scenes & Movements
+Hollywood Punk	Scenes & Movements
+Holy Terror	Scenes & Movements
+Hưng ca	Scenes & Movements
+Impressionism	Scenes & Movements
+Indie Sleaze Revival	Scenes & Movements
+J-core	Scenes & Movements
+Future Core	J-core
+J-Pop	Scenes & Movements
+Japanese Hardcore	Scenes & Movements
+Japanese Hip Hop	Scenes & Movements
+Japanese Idol	Scenes & Movements
+Alternative Idol	Japanese Idol
+Jersey Shore Sound	Scenes & Movements
+Joseon Punk	Scenes & Movements
+Jovem Guarda	Scenes & Movements
+K-Pop	Scenes & Movements
+Kansai No Wave	Scenes & Movements
+Kawaii Metal	Scenes & Movements
+LA Beat Scene	Scenes & Movements
+La Onda	Scenes & Movements
+Ladbroke Grove Scene	Scenes & Movements
+Laurel Canyon Scene	Scenes & Movements
+Leningrad Rock Club Scene	Scenes & Movements
+Little Band Scene	Scenes & Movements
+Loft Jazz	Scenes & Movements
+Los Angeles Counterculture	Scenes & Movements
+Los Angeles Hardcore	Scenes & Movements
+Louisville Sound	Scenes & Movements
+Madchester	Scenes & Movements
+Maidcore	Scenes & Movements
+Manguebeat	Scenes & Movements
+Manila Sound	Scenes & Movements
+Medway Scene	Scenes & Movements
+Mentai Rock	Scenes & Movements
+Merseybeat	Scenes & Movements
+Midwest Hip Hop	Scenes & Movements
+Minneapolis Sound	Scenes & Movements
+Młoda Polska	Scenes & Movements
+Mod	Scenes & Movements
+Mod Revival	Mod
+Moscow School	Scenes & Movements
+Motswako	Scenes & Movements
+Movida madrileña	Scenes & Movements
+Nardcore	Scenes & Movements
+Nederbeat	Scenes & Movements
+Neo Rave	Scenes & Movements
+Nerdcore Hip Hop	Scenes & Movements
+Nerdcore Techno	Scenes & Movements
+Neue Deutsche Welle	Scenes & Movements
+Neue Neue Deutsche Welle	Scenes & Movements
+Neue Volksmusik	Scenes & Movements
+New Brunswick Basement Scene	Scenes & Movements
+New Direction	Scenes & Movements
+New London Jazz	Scenes & Movements
+New London Silence	Scenes & Movements
+New Music	Scenes & Movements
+New Orleans Blues	Scenes & Movements
+New Partisans	Scenes & Movements
+New Pop	Scenes & Movements
+New Primitivism	Scenes & Movements
+New Romantic	Scenes & Movements
+New Tone	Scenes & Movements
+New Wave of New Wave	Scenes & Movements
+New Way of Danish Fuck You	Scenes & Movements
+New Weird America	Scenes & Movements
+New Weird Finland	Scenes & Movements
+New York Hardcore	Scenes & Movements
+New York School	Scenes & Movements
+No Wave	Scenes & Movements
+NOLA Sludge	Scenes & Movements
+Non-Music Beijing Scene	Scenes & Movements
+Northern Gothic	Scenes & Movements
+Northern Soul	Scenes & Movements
+Nouvelle chanson française	Scenes & Movements
+Nova srpska scena	Scenes & Movements
+Nova vanguarda paulistana	Scenes & Movements
+Novaya scena	Scenes & Movements
+Novo Dub	Scenes & Movements
+Nueva canción	Scenes & Movements
+Nueva escena chilena	Scenes & Movements
+Nueva ola	Scenes & Movements
+NWOBHM	Scenes & Movements
+Onkyo	Scenes & Movements
+OPM	Scenes & Movements
+P-Pop	Scenes & Movements
+Paisley Underground	Scenes & Movements
+Palm Desert Scene	Scenes & Movements
+Pansy Craze	Scenes & Movements
+Pécs Underground Scene	Scenes & Movements
+Pessoal do Ceará	Scenes & Movements
+Pop de guitarras	Scenes & Movements
+Pop Kreatif	Scenes & Movements
+Pop Yeh-Yeh	Scenes & Movements
+Positive Punk	Scenes & Movements
+Progg	Scenes & Movements
+Psichedelia occulta italiana	Scenes & Movements
+Psychsploitation	Scenes & Movements
+Q-Pop	Scenes & Movements
+Queercore	Scenes & Movements
+RABM	Scenes & Movements
+Red Dirt	Scenes & Movements
+Riot Grrrl	Scenes & Movements
+Road Rap	Scenes & Movements
+Rock Against Racism	Scenes & Movements
+Rock barrial	Scenes & Movements
+Rock in Opposition	Scenes & Movements
+Rock Kapak	Scenes & Movements
+Rock radical vasco	Scenes & Movements
+Rock sónico	Scenes & Movements
+Rock subterráneo	Scenes & Movements
+Rock triste	Scenes & Movements
+Rock urbano español	Scenes & Movements
+Rock urbano mexicano	Scenes & Movements
+Rockabilly Revival	Scenes & Movements
+Roman School	Scenes & Movements
+Romanticism	Scenes & Movements
+Romo	Scenes & Movements
+Russemusikk	Scenes & Movements
+San Diego Sound	Scenes & Movements
+San Francisco Sound	Scenes & Movements
+Haight-Ashbury Scene	San Francisco Sound
+São Paulo Queer Underground	Scenes & Movements
+Scene	Scenes & Movements
+Happy Rock	Scene
+Scottish Folk Revival	Scenes & Movements
+Scum Rock	Scenes & Movements
+Seapunk	Scenes & Movements
+Second British Folk Revival	Scenes & Movements
+Second Viennese School	Scenes & Movements
+Second Wave of Detroit Techno	Scenes & Movements
+Shibuya-kei	Scenes & Movements
+Akishibu-kei	Shibuya-kei
+Picopop	Shibuya-kei
+Shimokita-kei	Scenes & Movements
+Siberian Punk	Scenes & Movements
+Socialist Realism	Scenes & Movements
+SoundClown	Scenes & Movements
+Southern Hip Hop	Scenes & Movements
+South Florida SoundCloud Rap	Southern Hip Hop
+Sovietwave	Scenes & Movements
+Straight Edge	Scenes & Movements
+Krishnacore	Straight Edge
+Vegan Straight Edge	Straight Edge
+H8000	Vegan Straight Edge
+Hardline	Vegan Straight Edge
+Youth Crew	Straight Edge
+Sunset Strip Glam Metal	Scenes & Movements
+Swing Revival	Scenes & Movements
+T-Pop	Scenes & Movements
+Taqwacore	Scenes & Movements
+Tecktonik	Scenes & Movements
+Teutonic Thrash Metal	Scenes & Movements
+Texas Psychedelia	Scenes & Movements
+The Batcave	Scenes & Movements
+The New Thing	Scenes & Movements
+The Sound of Young Scotland	Scenes & Movements
+The Wave	Scenes & Movements
+Topanga Canyon Scene	Scenes & Movements
+Tropicália	Scenes & Movements
+Tropicanibalismo	Scenes & Movements
+Trova rosarina	Scenes & Movements
+Udigrudi	Scenes & Movements
+UK Hip Hop	Scenes & Movements
+UK82	Scenes & Movements
+Ultra	Scenes & Movements
+Ultra Metal	Scenes & Movements
+Umeå Hardcore	Scenes & Movements
+Urban Grooves	Scenes & Movements
+V-Pop	Scenes & Movements
+Vanguarda paulista	Scenes & Movements
+Vietnamese New Wave	Scenes & Movements
+Visual kei	Scenes & Movements
+Kote kei	Visual kei
+Nagoya kei	Visual kei
+Soft Visual	Visual kei
+Vixa	Scenes & Movements
+Vocaloid Scene	Scenes & Movements
+Utaite	Vocaloid Scene
+Voëlvry Movement	Scenes & Movements
+VTuber Music	Scenes & Movements
+Wandelweiser	Scenes & Movements
+Warez Scene	Scenes & Movements
+West Coast Hip Hop	Scenes & Movements
+Bay Area Hip Hop	West Coast Hip Hop
+West Coast Sound of Holland	Scenes & Movements
+West Side Sound	Scenes & Movements
+Windmill Scene	Scenes & Movements
+Wizard Rock	Scenes & Movements
+Women's Music Movement	Scenes & Movements
+Xibei feng	Scenes & Movements
+Yass	Scenes & Movements
+YTPMV	Scenes & Movements
+otoMAD	YTPMV
+Yugoslav New Wave	Scenes & Movements
+Zamrock	Scenes & Movements
+Zimdancehall	Scenes & Movements
+Scenes & Movements	
