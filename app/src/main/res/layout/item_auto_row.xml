@@ -41,6 +41,18 @@
             android:maxLines="1"
             android:textAppearance="?attr/textAppearanceBodyMedium" />
 
+        <!-- Fork pessoal: gêneros (só na tela de um gênero). -->
+        <TextView
+            android:id="@+id/auto_genres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </LinearLayout>

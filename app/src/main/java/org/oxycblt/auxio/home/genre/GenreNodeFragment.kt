@@ -62,7 +62,7 @@ class GenreNodeFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
     @Inject lateinit var musicRepository: MusicRepository
     @Inject lateinit var listSettings: ListSettings
 
-    private class Row(val music: Music, val subtitle: String)
+    private class Row(val music: Music, val subtitle: String, val genres: CharSequence)
 
     private var node: GenreTree.Node? = null
     private var rows: List<Row> = emptyList()
@@ -131,32 +131,70 @@ class GenreNodeFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
         group.addView(chip)
     }
 
-    /** Nomes dos gêneros de [songs] (sem repetir), na ordem em que aparecem. */
-    private fun genresOf(songs: Collection<Song>): String =
-        songs
-            .flatMap { it.genres }
-            .distinct()
-            .flatMap { (it.name as? Name.Known)?.raw?.let(GenreTree::split).orEmpty() }
-            .distinct()
-            .joinToString(", ")
+    /** Chaves deste gênero e de todos os subgêneros. */
+    private var branch: Set<String> = emptySet()
+
+    private fun collectBranch(node: GenreTree.Node): Set<String> {
+        val out = HashSet<String>()
+        val stack = ArrayDeque(listOf(node))
+        while (stack.isNotEmpty()) {
+            val n = stack.removeLast()
+            if (out.add(n.key)) stack.addAll(n.children)
+        }
+        return out
+    }
+
+    /**
+     * Gêneros de [songs] (sem repetir): primeiro, na cor de destaque, os que fazem parte deste ramo
+     * (o motivo de o álbum estar aqui); depois os outros.
+     */
+    private fun genresOf(songs: Collection<Song>, accent: Int): CharSequence {
+        val names =
+            songs
+                .flatMap { it.genres }
+                .distinct()
+                .flatMap { (it.name as? Name.Known)?.raw?.let(GenreTree::split).orEmpty() }
+                .distinctBy { GenreTree.key(it) }
+        val (inside, outside) = names.partition { GenreTree.key(it) in branch }
+        val out = android.text.SpannableStringBuilder()
+        for ((i, name) in (inside + outside).withIndex()) {
+            if (i > 0) out.append(" · ")
+            val start = out.length
+            out.append(name)
+            if (i < inside.size) {
+                out.setSpan(
+                    android.text.style.ForegroundColorSpan(accent),
+                    start,
+                    out.length,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
+        }
+        return out
+    }
 
     private fun render(toTop: Boolean) {
         val binding = binding ?: return
         val context = requireContext()
         val current = node
         binding.autoToolbar.title = current?.name ?: ""
+        branch = current?.let(::collectBranch).orEmpty()
+        val accent =
+            com.google.android.material.color.MaterialColors.getColor(
+                binding.root,
+                androidx.appcompat.R.attr.colorPrimary,
+            )
         rows =
             when {
                 current == null -> emptyList()
                 showAlbums ->
                     listSettings.albumSort.albums(current.albums).map { album ->
                         val artist = album.artists.resolveNames(context)
-                        val genres = genresOf(album.songs)
-                        Row(album, if (genres.isEmpty()) artist else "$artist · $genres")
+                        Row(album, artist, genresOf(album.songs, accent))
                     }
                 else ->
                     listSettings.songSort.songs(current.songs).map { song ->
-                        Row(song, song.artists.resolveNames(context) + " · " + genresOf(listOf(song)))
+                        Row(song, song.artists.resolveNames(context), genresOf(listOf(song), accent))
                     }
             }
         adapter.notifyDataSetChanged()
@@ -221,6 +259,8 @@ class GenreNodeFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
                 else -> {}
             }
             b.autoSubtitle.text = row.subtitle
+            b.autoGenres.text = row.genres
+            b.autoGenres.isVisible = row.genres.isNotEmpty()
             b.root.setOnClickListener {
                 val pos = holder.bindingAdapterPosition
                 if (pos != RecyclerView.NO_POSITION) onRowClick(pos)
