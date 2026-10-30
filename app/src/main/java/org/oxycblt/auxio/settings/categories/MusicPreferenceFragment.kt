@@ -56,6 +56,7 @@ class MusicPreferenceFragment : BasePreferenceFragment(R.xml.preferences_music) 
                         android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE or
                         android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             }
+        org.oxycblt.auxio.util.ClearText.attach(input)
         val pad = (20 * resources.displayMetrics.density).toInt()
         val frame =
             android.widget.FrameLayout(context).apply {

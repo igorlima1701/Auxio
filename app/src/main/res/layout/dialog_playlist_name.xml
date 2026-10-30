@@ -7,7 +7,8 @@
     android:paddingStart="@dimen/spacing_mid_large"
     android:paddingTop="@dimen/spacing_medium"
     android:paddingEnd="@dimen/spacing_mid_large"
-    app:hintEnabled="false">
+    app:hintEnabled="false"
+            app:endIconMode="clear_text">
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/playlist_name"

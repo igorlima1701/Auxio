@@ -181,6 +181,8 @@ class HomeFragment : SelectionFragment<FragmentHomeBinding>() {
 
         // Fork pessoal: liga a busca do topo. A aba mostrada é escolhida em onViewStateRestored.
         binding.homeQuery.doAfterTextChanged { homeModel.setQuery(it?.toString() ?: "") }
+        // Fork pessoal: "x" para apagar a busca de uma vez.
+        org.oxycblt.auxio.util.ClearText.attach(binding.homeQuery)
 
         // --- VIEWMODEL SETUP ---
         collect(homeModel.recreateTabs.flow, ::handleRecreate)

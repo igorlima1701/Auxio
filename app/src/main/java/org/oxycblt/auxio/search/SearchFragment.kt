@@ -137,6 +137,7 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
             setOnMenuItemClickListener(this@SearchFragment)
         }
 
+        org.oxycblt.auxio.util.ClearText.attach(binding.searchEditText)
         binding.searchEditText.apply {
             addTextChangedListener { text ->
                 // Run the search with the updated text as the query

@@ -342,6 +342,7 @@ object BookmarksDialog {
                 gravity = Gravity.TOP or Gravity.START
             }
         noteLayout.addView(note)
+        org.oxycblt.auxio.util.ClearText.attach(note)
         root.addView(noteLayout)
 
         // Controles: voltar 5 s, tocar/pausar, avançar 5 s e o tempo atual (tocar copia para cima).
@@ -438,6 +439,7 @@ object BookmarksDialog {
                 setSelection(text.length)
                 isSingleLine = true
             }
+        org.oxycblt.auxio.util.ClearText.attach(input)
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.lbl_bookmark_save_as)
             .setView(

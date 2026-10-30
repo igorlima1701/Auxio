@@ -89,6 +89,7 @@ object CollectionDialogs {
                 hint = context.getString(R.string.lng_collection_name_hint)
                 isSingleLine = true
             }
+        org.oxycblt.auxio.util.ClearText.attach(input)
         val pad = context.resources.getDimensionPixelSize(R.dimen.spacing_large)
         val container =
             FrameLayout(context).apply {

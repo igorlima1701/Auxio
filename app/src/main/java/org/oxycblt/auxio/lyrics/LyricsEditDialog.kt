@@ -105,6 +105,7 @@ class LyricsEditDialog : ViewBindingMaterialDialogFragment<DialogLyricsEditBindi
                 setSingleLine()
                 selectAll()
             }
+        org.oxycblt.auxio.util.ClearText.attach(input)
         val pad = (20 * resources.displayMetrics.density).toInt()
         val frame =
             android.widget.FrameLayout(context).apply {

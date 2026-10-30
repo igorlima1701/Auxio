@@ -286,6 +286,7 @@ object SleepTimerDialog {
                 isSingleLine = true
                 gravity = Gravity.CENTER
             }
+        org.oxycblt.auxio.util.ClearText.attach(input)
         val pad = context.resources.getDimensionPixelSize(R.dimen.spacing_large)
         MaterialAlertDialogBuilder(context)
             .setTitle(title)

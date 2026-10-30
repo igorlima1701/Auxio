@@ -480,6 +480,7 @@ class QueueFragment :
                 setSingleLine()
                 selectAll()
             }
+        org.oxycblt.auxio.util.ClearText.attach(input)
         val pad = (20 * resources.displayMetrics.density).toInt()
         val frame =
             FrameLayout(context).apply {
