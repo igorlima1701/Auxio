@@ -99,15 +99,16 @@ object GenreTree {
     /** Monta a árvore para os gêneros da biblioteca. Rodar fora da main. */
     fun build(context: Context, genres: Collection<Genre>): List<Node> {
         val tree = load(context)
-        // Gêneros da biblioteca, pela chave do nome.
-        val library = HashMap<String, Genre>()
+        // Gêneros da biblioteca, pela chave do nome. Uma tag com vários gêneros ("Folk Rock;
+        // Slowcore") conta para cada um deles, mesmo sem o separador ";" ligado nas configurações.
+        val library = HashMap<String, MutableList<Genre>>()
         for (genre in genres) {
-            val k =
+            val parts =
                 when (val name = genre.name) {
-                    is Name.Known -> key(name.raw)
-                    else -> UNKNOWN_KEY
+                    is Name.Known -> split(name.raw).map(::key).ifEmpty { listOf(UNKNOWN_KEY) }
+                    else -> listOf(UNKNOWN_KEY)
                 }
-            library.putIfAbsent(k, genre)
+            for (k in parts) library.getOrPut(k) { mutableListOf() } += genre
         }
 
         // Visíveis: os da biblioteca e todos os ancestrais deles.
@@ -137,13 +138,22 @@ object GenreTree {
                     .orEmpty()
                     .filter { it !in path } // proteção contra laços na árvore
                     .map { node(it, path + k) }
-            val genre = library[k]
+            val matches = library[k].orEmpty()
+            // A tela normal do gênero só serve quando a tag é exatamente este gênero, sozinho.
+            val genre =
+                matches.singleOrNull()?.takeIf {
+                    val n = it.name
+                    n !is Name.Known || split(n.raw).size == 1
+                }
             val songs = LinkedHashSet<Song>()
-            genre?.songs?.let(songs::addAll)
+            matches.forEach { songs.addAll(it.songs) }
             kids.forEach { songs.addAll(it.songs) }
             val name =
-                genre?.name?.resolve(context)
-                    ?: names[k]
+                names[k]
+                    ?: matches.firstNotNullOfOrNull { g ->
+                        (g.name as? Name.Known)?.raw?.let(::split)?.firstOrNull { key(it) == k }
+                    }
+                    ?: genre?.name?.resolve(context)
                     ?: k
             return Node(k, name, genre, kids.sortedBy { key(it.name) }, songs.toList()).also {
                 built[k] = it
@@ -153,6 +163,9 @@ object GenreTree {
             compareBy<Node> { it.key == UNKNOWN_KEY }.thenBy { key(it.name) }
         )
     }
+
+    /** Separa uma tag com vários gêneros ("A; B; C"). */
+    fun split(raw: String): List<String> = raw.split(';').map { it.trim() }.filter { it.isNotEmpty() }
 
     /** Acha o nó [key] na árvore montada. */
     fun find(roots: List<Node>, key: String): Node? {

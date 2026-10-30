@@ -136,7 +136,8 @@ class GenreNodeFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
         songs
             .flatMap { it.genres }
             .distinct()
-            .mapNotNull { (it.name as? Name.Known)?.raw }
+            .flatMap { (it.name as? Name.Known)?.raw?.let(GenreTree::split).orEmpty() }
+            .distinct()
             .joinToString(", ")
 
     private fun render(toTop: Boolean) {
