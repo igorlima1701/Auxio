@@ -201,14 +201,9 @@ class GenreListFragment :
         refreshRows()
     }
 
-    /** Abre o gênero: sem subgêneros, a tela normal do gênero; com subgêneros, a lista de tudo. */
+    /** Abre o gênero na tela com os álbuns dele (e dos subgêneros, se houver). */
     private fun open(row: TreeRow) {
         val node = row.node
-        val genre = node.genre
-        if (node.children.isEmpty() && genre != null) {
-            detailModel.showGenre(genre)
-            return
-        }
         NavHostFragment.findNavController(this)
             .navigate(R.id.genre_node_fragment, bundleOf(GenreNodeFragment.ARG_KEY to node.key))
     }
