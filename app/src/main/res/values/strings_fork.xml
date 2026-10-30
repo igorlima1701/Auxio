@@ -266,4 +266,7 @@
     <string name="lbl_sort_plays" translatable="false">Mais tocados</string>
     <string name="fmt_genre_plays" translatable="false">%d execuções</string>
     <string name="fmt_genre_rating" translatable="false">★ %.1f</string>
+    <string name="lbl_genre_tree" translatable="false">Árvore de gêneros</string>
+    <string name="lng_genre_tree_empty" translatable="false">Este álbum ainda não tem gênero.</string>
+    <string name="lng_genre_tree_hint" translatable="false">Toque num gênero para ver os álbuns dele.</string>
 </resources>

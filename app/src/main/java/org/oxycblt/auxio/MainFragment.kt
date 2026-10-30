@@ -219,6 +219,13 @@ class MainFragment :
         // FIXME: This is a consequence of sharing events across several consumers. There has to be
         //  a better way of doing this.
         collectImmediately(detailModel.outsideShow.flow, ::handleShow)
+        // Fork pessoal: abrir um gênero a partir da árvore de gêneros de um álbum.
+        collectImmediately(org.oxycblt.auxio.home.genre.GenreTree.openRequest) { key ->
+            if (key != null) {
+                org.oxycblt.auxio.home.genre.GenreTree.consumeOpen()
+                deferNav { openGenreNode(key) }
+            }
+        }
         collectImmediately(detailModel.editedPlaylist, detailBackCallback::invalidateEnabled)
         collectImmediately(homeModel.showOuter.flow, ::handleShowOuter)
         collect(homeModel.showTabEvent.flow, ::handleShowTab)
@@ -584,6 +591,18 @@ class MainFragment :
                 detailModel.showSong(show.song)
             }
         }
+    }
+
+    /** Fork pessoal: abre a tela de um gênero da árvore (álbuns dele e dos subgêneros). */
+    private fun openGenreNode(key: String) {
+        switchTab(MusicType.GENRES, reveal = false, toGrid = false)
+        val nav = requireBinding().exploreNavHost.findNavController()
+        nav.navigate(
+            R.id.genre_node_fragment,
+            bundleOf(org.oxycblt.auxio.home.genre.GenreNodeFragment.ARG_KEY to key),
+        )
+        flushExploreNav()
+        showPage(Page.HOME)
     }
 
     private fun showDetailFromOutside(tab: MusicType, destId: Int, argName: String, uid: Music.UID) {

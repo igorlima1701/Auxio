@@ -165,6 +165,27 @@ object GenreTree {
         )
     }
 
+    /** Pedido para abrir a tela de um gênero (chave), atendido pela tela principal. */
+    val openRequest: kotlinx.coroutines.flow.StateFlow<String?>
+        field = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+
+    fun requestOpen(key: String) {
+        openRequest.value = key
+    }
+
+    fun consumeOpen() {
+        openRequest.value = null
+    }
+
+    /** Pais de [key] na árvore do RYM (chaves). */
+    fun parentsOf(context: Context, key: String): List<String> = load(context)[key].orEmpty()
+
+    /** Nome de exibição de [key] na árvore do RYM, se existir. */
+    fun nameOf(context: Context, key: String): String? {
+        load(context)
+        return names[key]
+    }
+
     /** Separa uma tag com vários gêneros ("A; B; C"). */
     fun split(raw: String): List<String> = raw.split(';').map { it.trim() }.filter { it.isNotEmpty() }
 

@@ -33,6 +33,11 @@
         android:id="@+id/action_artist_details"
         android:icon="@drawable/ic_artist_24"
         android:title="@string/lbl_artist_details" />
+    <!-- Fork pessoal: árvore de gêneros do álbum. -->
+    <item
+        android:id="@+id/action_genre_tree"
+        android:icon="@drawable/ic_genre_24"
+        android:title="@string/lbl_genre_tree" />
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_24"

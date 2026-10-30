@@ -93,6 +93,8 @@ class SongMenuDialogFragment : MenuDialogFragment<Menu.ForSong>() {
             // Fork pessoal: "Parar depois desta" também no menu da música do player.
             R.id.action_stop_after ->
                 org.oxycblt.auxio.playback.StopAfterSong.toggle(menu.song.uid)
+            R.id.action_genre_tree ->
+                org.oxycblt.auxio.home.genre.GenreTreeDialog.show(requireActivity(), menu.song.album)
             else -> error("Unexpected menu item selected $item")
         }
     }
@@ -162,6 +164,8 @@ class AlbumMenuDialogFragment : MenuDialogFragment<Menu.ForAlbum>() {
                     requireActivity(),
                     listOf(menu.album),
                 )
+            R.id.action_genre_tree ->
+                org.oxycblt.auxio.home.genre.GenreTreeDialog.show(requireActivity(), menu.album)
             else -> error("Unexpected menu item selected $item")
         }
     }
