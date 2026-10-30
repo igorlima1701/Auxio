@@ -52,6 +52,7 @@ import org.oxycblt.auxio.list.adapter.SelectionIndicatorAdapter
 import org.oxycblt.auxio.list.recycler.FastScrollRecyclerView
 import org.oxycblt.auxio.list.recycler.GenreViewHolder
 import org.oxycblt.auxio.list.sort.Sort
+import org.oxycblt.auxio.list.sort.SongStats
 import org.oxycblt.auxio.music.IndexingState
 import org.oxycblt.auxio.music.MusicViewModel
 import org.oxycblt.auxio.playback.PlaybackViewModel
@@ -184,14 +185,54 @@ class GenreListFragment :
             }
     }
 
+    /** Ordem da árvore conforme o "Organizar por" (vale em cada nível). */
+    private fun ordered(nodes: List<GenreTree.Node>): List<GenreTree.Node> {
+        val sort = homeModel.genreSort
+        val byName = compareBy<GenreTree.Node> { GenreTree.key(it.name) }
+        val metric: ((GenreTree.Node) -> Comparable<*>)? =
+            when (sort.mode) {
+                is Sort.Mode.ByAlbumCount -> { n -> n.albums.size }
+                is Sort.Mode.ByCount -> { n -> n.songs.size }
+                is Sort.Mode.ByDuration -> { n -> SongStats.durationMs(n.songs) }
+                is Sort.Mode.ByPlays -> { n -> SongStats.plays(n.songs) }
+                is Sort.Mode.ByRating -> { n -> SongStats.averageRating(n.songs) }
+                is Sort.Mode.ByDateAdded -> { n -> SongStats.lastAdded(n.songs) }
+                else -> null
+            }
+        val main =
+            if (metric == null) byName
+            else compareBy<GenreTree.Node>(metric).then(byName)
+        val directed = if (sort.direction == Sort.Direction.ASCENDING) main else main.reversed()
+        // "Sem gênero" sempre por último.
+        return nodes.sortedWith(
+            compareBy<GenreTree.Node> { it.key == GenreTree.UNKNOWN_KEY }.then(directed)
+        )
+    }
+
+    /** O número à direita de cada gênero, conforme a ordem escolhida. */
+    private fun countText(node: GenreTree.Node): String {
+        val res = resources
+        return when (homeModel.genreSort.mode) {
+            is Sort.Mode.ByCount ->
+                res.getQuantityString(R.plurals.fmt_song_count, node.songs.size, node.songs.size)
+            is Sort.Mode.ByDuration -> SongStats.durationMs(node.songs).formatDurationMsPopup()
+            is Sort.Mode.ByPlays -> getString(R.string.fmt_genre_plays, SongStats.plays(node.songs))
+            is Sort.Mode.ByRating -> {
+                val avg = SongStats.averageRating(node.songs)
+                if (avg < 0) "—" else getString(R.string.fmt_genre_rating, avg)
+            }
+            else -> res.getQuantityString(R.plurals.fmt_album_count, node.albums.size, node.albums.size)
+        }
+    }
+
     private fun refreshRows() {
         val out = mutableListOf<TreeRow>()
         fun add(node: GenreTree.Node, depth: Int, parentPath: String) {
             val path = parentPath + "/" + node.key
             out += TreeRow(node, depth, path)
-            if (path in expanded) node.children.forEach { add(it, depth + 1, path) }
+            if (path in expanded) ordered(node.children).forEach { add(it, depth + 1, path) }
         }
-        roots.forEach { add(it, 0, "") }
+        ordered(roots).forEach { add(it, 0, "") }
         rows = out
         treeAdapter.notifyDataSetChanged()
     }
@@ -225,9 +266,7 @@ class GenreListFragment :
             holder.arrow.rotation = if (row.path in expanded) 0f else -90f
             holder.arrow.setOnClickListener { if (hasKids) toggle(row) }
             holder.name.text = node.name
-            val albums = node.albums.size
-            holder.count.text =
-                context.resources.getQuantityString(R.plurals.fmt_album_count, albums, albums)
+            holder.count.text = countText(node)
             holder.itemView.setOnClickListener { open(row) }
             holder.itemView.setOnLongClickListener {
                 val genre = node.genre

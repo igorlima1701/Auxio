@@ -49,7 +49,8 @@ object GenreTree {
         val albums: List<Album> by lazy { songs.map { it.album }.distinct() }
     }
 
-    private const val UNKNOWN_KEY = "\u0000sem-genero"
+    /** Chave do "sem gênero". */
+    const val UNKNOWN_KEY = "\u0000sem-genero"
 
     @Volatile private var parents: Map<String, List<String>>? = null
     @Volatile private var names: Map<String, String> = emptyMap()

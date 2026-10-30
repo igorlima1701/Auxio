@@ -358,6 +358,15 @@ data class Sort(val mode: Mode, val direction: Direction) {
             override val intCode = IntegerTable.SORT_BY_DATE_ADDED
             override val stringRes = R.string.lbl_date_added
 
+            /** Fork pessoal: gêneros pelo álbum adicionado mais recentemente. */
+            override fun sortGenres(genres: MutableList<Genre>, direction: Direction) {
+                genres.sortBy { it.name }
+                when (direction) {
+                    Direction.ASCENDING -> genres.sortBy { SongStats.lastAdded(it.songs) }
+                    Direction.DESCENDING -> genres.sortByDescending { SongStats.lastAdded(it.songs) }
+                }
+            }
+
             override fun sortSongs(songs: MutableList<Song>, direction: Direction) {
                 songs.sortBy { it.name }
                 when (direction) {
@@ -387,6 +396,44 @@ data class Sort(val mode: Mode, val direction: Direction) {
                     Direction.DESCENDING -> albums.sortByDescending { AlbumRatings.get(it) ?: -1 }
                 }
             }
+
+            /** Fork pessoal: gêneros pela nota média dos álbuns com nota. */
+            override fun sortGenres(genres: MutableList<Genre>, direction: Direction) {
+                genres.sortBy { it.name }
+                when (direction) {
+                    Direction.ASCENDING -> genres.sortBy { SongStats.averageRating(it.songs) }
+                    Direction.DESCENDING ->
+                        genres.sortByDescending { SongStats.averageRating(it.songs) }
+                }
+            }
+        }
+
+        /** Fork pessoal: gêneros pelo número de álbuns. */
+        data object ByAlbumCount : Mode {
+            override val intCode = IntegerTable.SORT_BY_ALBUM_COUNT
+            override val stringRes = R.string.lbl_sort_album_count
+
+            override fun sortGenres(genres: MutableList<Genre>, direction: Direction) {
+                genres.sortBy { it.name }
+                when (direction) {
+                    Direction.ASCENDING -> genres.sortBy { SongStats.albumCount(it.songs) }
+                    Direction.DESCENDING -> genres.sortByDescending { SongStats.albumCount(it.songs) }
+                }
+            }
+        }
+
+        /** Fork pessoal: gêneros pelo total de execuções das músicas. */
+        data object ByPlays : Mode {
+            override val intCode = IntegerTable.SORT_BY_PLAYS
+            override val stringRes = R.string.lbl_sort_plays
+
+            override fun sortGenres(genres: MutableList<Genre>, direction: Direction) {
+                genres.sortBy { it.name }
+                when (direction) {
+                    Direction.ASCENDING -> genres.sortBy { SongStats.plays(it.songs) }
+                    Direction.DESCENDING -> genres.sortByDescending { SongStats.plays(it.songs) }
+                }
+            }
         }
 
         companion object {
@@ -402,6 +449,8 @@ data class Sort(val mode: Mode, val direction: Direction) {
                     ByTrack.intCode -> ByTrack
                     ByDateAdded.intCode -> ByDateAdded
                     ByRating.intCode -> ByRating
+                    ByAlbumCount.intCode -> ByAlbumCount
+                    ByPlays.intCode -> ByPlays
                     else -> null
                 }
         }
@@ -430,4 +479,24 @@ data class Sort(val mode: Mode, val direction: Direction) {
             return Sort(mode, direction)
         }
     }
+}
+
+/** Fork pessoal: números de um conjunto de músicas (gênero ou ramo da árvore de gêneros). */
+object SongStats {
+    fun albumCount(songs: Collection<Song>): Int = songs.mapTo(HashSet()) { it.album }.size
+
+    fun plays(songs: Collection<Song>): Int {
+        val all = org.oxycblt.auxio.playback.PlayHistory.all()
+        return songs.sumOf { all[it.uid.toString()]?.count ?: 0 }
+    }
+
+    /** Nota média dos álbuns com nota (-1 = nenhum álbum com nota). */
+    fun averageRating(songs: Collection<Song>): Double {
+        val rated = songs.mapTo(HashSet()) { it.album }.mapNotNull { AlbumRatings.get(it) }
+        return if (rated.isEmpty()) -1.0 else rated.average()
+    }
+
+    fun lastAdded(songs: Collection<Song>): Long = songs.maxOfOrNull { it.addedMs } ?: 0L
+
+    fun durationMs(songs: Collection<Song>): Long = songs.sumOf { it.durationMs }
 }

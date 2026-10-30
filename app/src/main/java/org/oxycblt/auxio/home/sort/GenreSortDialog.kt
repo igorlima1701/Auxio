@@ -40,5 +40,13 @@ class GenreSortDialog : SortDialog() {
     }
 
     override fun getModeChoices() =
-        listOf(Sort.Mode.ByName, Sort.Mode.ByDuration, Sort.Mode.ByCount)
+        listOf(
+            Sort.Mode.ByName,
+            Sort.Mode.ByAlbumCount,
+            Sort.Mode.ByCount,
+            Sort.Mode.ByDuration,
+            Sort.Mode.ByPlays,
+            Sort.Mode.ByRating,
+            Sort.Mode.ByDateAdded,
+        )
 }

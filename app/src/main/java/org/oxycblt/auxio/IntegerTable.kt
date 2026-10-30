@@ -111,6 +111,10 @@ object IntegerTable {
     const val SORT_BY_DATE_ADDED = 0xA118
     /** Fork pessoal: Sort.Mode.ByRating */
     const val SORT_BY_RATING = 0xA1F0
+    /** Fork pessoal: Sort.Mode.ByAlbumCount */
+    const val SORT_BY_ALBUM_COUNT = 0xA1F1
+    /** Fork pessoal: Sort.Mode.ByPlays */
+    const val SORT_BY_PLAYS = 0xA1F2
     /** ReplayGainMode.Off (No longer used but still reserved) */
     const val REPLAY_GAIN_MODE_OFF = 0xA110
     /** ReplayGainMode.Track */
