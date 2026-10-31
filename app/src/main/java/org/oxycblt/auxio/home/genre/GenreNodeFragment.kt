@@ -46,6 +46,7 @@ import org.oxycblt.auxio.music.resolve
 import org.oxycblt.auxio.music.resolveNames
 import org.oxycblt.auxio.playback.PlaybackViewModel
 import org.oxycblt.auxio.ui.ViewBindingFragment
+import org.oxycblt.auxio.util.collect
 import org.oxycblt.auxio.util.inflater
 import org.oxycblt.musikr.Album
 import org.oxycblt.musikr.Music
@@ -59,6 +60,7 @@ import org.oxycblt.musikr.tag.Name
 @AndroidEntryPoint
 class GenreNodeFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
     private val playbackModel: PlaybackViewModel by activityViewModels()
+    private val listModel: org.oxycblt.auxio.list.ListViewModel by activityViewModels()
     @Inject lateinit var musicRepository: MusicRepository
     @Inject lateinit var listSettings: ListSettings
 
@@ -77,6 +79,8 @@ class GenreNodeFragment : ViewBindingFragment<FragmentAutoPlaylistBinding>() {
     override fun onBindingCreated(binding: FragmentAutoPlaylistBinding, savedInstanceState: Bundle?) {
         super.onBindingCreated(binding, savedInstanceState)
         binding.autoToolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        // Fork pessoal: menus pedidos com esta tela aberta (ex.: "..." do player).
+        collect(listModel.menu.flow) { org.oxycblt.auxio.list.menu.MenuNav.open(this, it) }
         binding.autoName.isVisible = false
         binding.autoPeriodsScroll.isVisible = false
         binding.autoRecycler.layoutManager = LinearLayoutManager(requireContext())
