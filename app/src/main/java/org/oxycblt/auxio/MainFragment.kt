@@ -576,21 +576,43 @@ class MainFragment :
                     "playlistUid",
                     show.playlist.uid,
                 )
-            // Escolha entre artistas e detalhes da música: abre a tela inicial e repassa o pedido
-            // para a tela que estiver aberta.
-            is Show.SongArtistDecision -> {
-                showPage(Page.HOME)
-                detailModel.showArtist(show.song)
-            }
-            is Show.AlbumArtistDecision -> {
-                showPage(Page.HOME)
-                detailModel.showArtist(show.album)
-            }
+            // Fork pessoal: escolha entre vários artistas vinda do player ou da fila. A escolha é
+            // feita aqui mesmo e o artista abre na aba Artistas (repassar o pedido para a tela
+            // aberta embaixo fazia a escolha não levar a lugar nenhum).
+            is Show.SongArtistDecision -> chooseArtist(show.song.artists)
+            is Show.AlbumArtistDecision -> chooseArtist(show.album.artists)
             is Show.SongDetails -> {
                 showPage(Page.HOME)
                 detailModel.showSong(show.song)
             }
         }
+    }
+
+    /** Fork pessoal: pergunta qual dos artistas abrir e abre na aba Artistas. */
+    private fun chooseArtist(artists: List<org.oxycblt.musikr.Artist>) {
+        val context = requireContext()
+        when (artists.size) {
+            0 -> return
+            1 -> {
+                openArtist(artists.first())
+                return
+            }
+        }
+        val names = artists.map { it.name.resolve(context) }.toTypedArray<CharSequence>()
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.lbl_artists)
+            .setItems(names) { _, which -> deferNav { openArtist(artists[which]) } }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .show()
+    }
+
+    private fun openArtist(artist: org.oxycblt.musikr.Artist) {
+        showDetailFromOutside(
+            MusicType.ARTISTS,
+            R.id.artist_detail_fragment,
+            "artistUid",
+            artist.uid,
+        )
     }
 
     /** Fork pessoal: abre a tela de um gênero da árvore (álbuns dele e dos subgêneros). */
