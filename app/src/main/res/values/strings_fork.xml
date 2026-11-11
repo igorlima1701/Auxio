@@ -269,4 +269,7 @@
     <string name="lbl_genre_tree" translatable="false">Árvore de gêneros</string>
     <string name="lng_genre_tree_empty" translatable="false">Este álbum ainda não tem gênero.</string>
     <string name="lng_genre_tree_hint" translatable="false">Toque num gênero para ver os álbuns dele.</string>
+    <string name="lbl_search_history" translatable="false">Buscas recentes</string>
+    <string name="lbl_search_history_clear" translatable="false">Limpar</string>
+    <string name="desc_search_history_remove" translatable="false">Tirar do histórico</string>
 </resources>

@@ -142,6 +142,15 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
             addTextChangedListener { text ->
                 // Run the search with the updated text as the query
                 searchModel.search(text?.toString()?.trim())
+                updateHistory()
+            }
+            // Fork pessoal: "buscar" no teclado guarda a busca no histórico.
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                    rememberQuery()
+                    hideKeyboard()
+                    true
+                } else false
             }
 
             if (!launchedKeyboard) {
@@ -203,6 +212,7 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
         )
         collect(playbackModel.playbackDecision.flow, ::handlePlaybackDecision)
         collect(detailModel.toShow.flow, ::handleShow)
+        updateHistory()
     }
 
     override fun onDestroyBinding(binding: FragmentSearchBinding) {
@@ -211,7 +221,127 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
         binding.searchRecycler.adapter = null
     }
 
+    // --- Fork pessoal: histórico da busca ---
+
+    private fun currentQuery() = binding?.searchEditText?.text?.toString()?.trim().orEmpty()
+
+    private fun rememberQuery() {
+        SearchHistory.add(requireContext(), currentQuery())
+    }
+
+    /** Mostra as buscas recentes quando o campo está vazio. */
+    private fun updateHistory() {
+        val binding = binding ?: return
+        val context = requireContext()
+        val items = if (currentQuery().isEmpty()) SearchHistory.all(context) else emptyList()
+        binding.searchHistory.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+        val list = binding.searchHistoryList
+        list.removeAllViews()
+        if (items.isEmpty()) return
+        val density = resources.displayMetrics.density
+        fun dp(v: Int) = (v * density).toInt()
+        val ripple =
+            android.util.TypedValue().also {
+                context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
+            }
+
+        // Cabeçalho: "Buscas recentes" e "Limpar".
+        val header =
+            android.widget.LinearLayout(context).apply {
+                orientation = android.widget.LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(dp(16), dp(8), dp(4), 0)
+            }
+        header.addView(
+            android.widget.TextView(context).apply {
+                setText(R.string.lbl_search_history)
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
+                setTextColor(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        this,
+                        androidx.appcompat.R.attr.colorPrimary,
+                    )
+                )
+            },
+            android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+        )
+        header.addView(
+            com.google.android.material.button.MaterialButton(
+                    context,
+                    null,
+                    com.google.android.material.R.attr.borderlessButtonStyle,
+                )
+                .apply {
+                    setText(R.string.lbl_search_history_clear)
+                    setOnClickListener {
+                        SearchHistory.clear(context)
+                        updateHistory()
+                    }
+                }
+        )
+        list.addView(header)
+
+        for (query in items) {
+            val row =
+                android.widget.LinearLayout(context).apply {
+                    orientation = android.widget.LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    minimumHeight = dp(52)
+                    setPadding(dp(16), 0, dp(4), 0)
+                    setBackgroundResource(ripple.resourceId)
+                    setOnClickListener {
+                        val edit = binding.searchEditText
+                        edit.setText(query)
+                        edit.setSelection(query.length)
+                        SearchHistory.add(context, query)
+                        hideKeyboard()
+                    }
+                }
+            row.addView(
+                android.widget.ImageView(context).apply {
+                    setImageResource(R.drawable.ic_time_24)
+                    alpha = 0.6f
+                },
+                android.widget.LinearLayout.LayoutParams(dp(24), dp(24)),
+            )
+            row.addView(
+                android.widget.TextView(context).apply {
+                    text = query
+                    setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    setPadding(dp(20), 0, dp(8), 0)
+                },
+                android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f),
+            )
+            row.addView(
+                android.widget.ImageView(context).apply {
+                    setImageResource(R.drawable.ic_close_24)
+                    alpha = 0.6f
+                    scaleType = android.widget.ImageView.ScaleType.CENTER
+                    contentDescription = getString(R.string.desc_search_history_remove)
+                    val borderless =
+                        android.util.TypedValue().also {
+                            context.theme.resolveAttribute(
+                                android.R.attr.selectableItemBackgroundBorderless,
+                                it,
+                                true,
+                            )
+                        }
+                    setBackgroundResource(borderless.resourceId)
+                    setOnClickListener {
+                        SearchHistory.remove(context, query)
+                        updateHistory()
+                    }
+                },
+                android.widget.LinearLayout.LayoutParams(dp(48), dp(48)),
+            )
+            list.addView(row)
+        }
+    }
+
     override fun onRealClick(item: Music) {
+        rememberQuery()
         when (item) {
             is Song -> playbackModel.play(item, searchModel.playWith)
             is Album -> detailModel.showAlbum(item)
@@ -222,6 +352,7 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
     }
 
     override fun onOpenMenu(item: Music) {
+        rememberQuery()
         when (item) {
             is Song -> listModel.openMenu(R.menu.song, item, searchModel.playWith)
             is Album -> listModel.openMenu(R.menu.album, item)
