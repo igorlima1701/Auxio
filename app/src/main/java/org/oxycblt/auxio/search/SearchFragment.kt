@@ -269,7 +269,7 @@ class SearchFragment : ListFragment<Music, FragmentSearchBinding>() {
             com.google.android.material.button.MaterialButton(
                     context,
                     null,
-                    com.google.android.material.R.attr.borderlessButtonStyle,
+                    androidx.appcompat.R.attr.borderlessButtonStyle,
                 )
                 .apply {
                     setText(R.string.lbl_search_history_clear)
